@@ -120,13 +120,14 @@ vector<C_Vertex> FindBBoxPlaneIntersections ( C_BBox* bbox , C_Plane* plane )
 
 C_Vertex FindIntersectionPoint ( C_Vertex *ptA , C_Vertex *ptB , C_Plane *plane )
 {
-	C_Vertex intersectionPoint;
+	C_Vertex intersectionPoint, planeNormal;
 
 	C_Vertex v;
 	v.x = ptB->x - ptA->x;
 	v.y = ptB->y - ptA->y;
 	v.z = ptB->z - ptA->z;
-	float sect = -plane->distanceFromPoint ( ptA ) / C_Vector3::DotProduct ( &plane->getPlaneNormal() , &v );
+	planeNormal = plane->getPlaneNormal();
+	float sect = -plane->distanceFromPoint ( ptA ) / C_Vector3::DotProduct ( &planeNormal , &v );
 	intersectionPoint.x = ptA->x + v.x*sect;
 	intersectionPoint.y = ptA->y + v.y*sect;
 	intersectionPoint.z = ptA->z + v.z*sect;
@@ -137,11 +138,13 @@ C_Vertex FindIntersectionPoint ( C_Vertex *ptA , C_Vertex *ptB , C_Plane *plane 
 
 bool FindIntersectionPoint_withCheck ( C_Vertex *ptA , C_Vertex *ptB , C_Plane *plane , C_Vertex* intersectionPoint )
 {
-	C_Vertex v;
+	C_Vertex v, planeNormal;
+
 	v.x = ptB->x - ptA->x;
 	v.y = ptB->y - ptA->y;
 	v.z = ptB->z - ptA->z;
-	float denominator = C_Vector3::DotProduct ( &plane->getPlaneNormal() , &v );
+	planeNormal = plane->getPlaneNormal();
+	float denominator = C_Vector3::DotProduct ( &planeNormal, &v );
 
 	// If denominator is 0 then line and plane are parallel so they don't intersect
 	if ( !denominator )

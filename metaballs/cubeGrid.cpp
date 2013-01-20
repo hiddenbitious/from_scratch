@@ -2,7 +2,7 @@
 #include "cubeGrid.h"
 #include "tables.h"
 //#include <gl\gl.h>
-#include <gl\glut.h>
+#include <GL/glut.h>
 #include "../math.h"
 
 
@@ -167,7 +167,7 @@ void C_CubeGrid::Update ( C_Metaball *metaballs , unsigned short nBalls , C_Frus
 			cubeIndex |= 64;
 		if ( gridCubes[cb].vertices[7]->value < THRESHOLD )
 			cubeIndex |= 128;
-		
+
 		// ...bres poies pleures einai entos tou paidiou
 		short usedEdges = edgeTable[cubeIndex];
 

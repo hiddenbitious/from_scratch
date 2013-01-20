@@ -15,7 +15,7 @@
 ****************************************/
 
 #include "bbox.h"
-#include <GL\GLUT.h>
+#include <GL/glut.h>
 
 void C_BBox::SetMax ( const float x , const float y , const float z )
 {
@@ -24,12 +24,10 @@ void C_BBox::SetMax ( const float x , const float y , const float z )
 	max.z = z;
 }
 
-
 void C_BBox::SetMax ( const C_Vector3 *vec )
 {
 	max.SetVector ( *vec );
 }
-
 
 void C_BBox::SetMin ( const float x , const float y , const float z )
 {
@@ -38,12 +36,10 @@ void C_BBox::SetMin ( const float x , const float y , const float z )
 	min.z = z;
 }
 
-
 void C_BBox::SetMin ( const C_Vector3 *vec )
 {
 	min.SetVector ( *vec );
 }
-
 
 void C_BBox::SetVertices ( void )
 {
@@ -57,7 +53,6 @@ void C_BBox::SetVertices ( void )
 	vertices[6].SetVector ( min.x,max.y,max.z );
 	vertices[7].SetVector ( min.x,max.y,min.z );
 }
-
 
 void C_BBox::GetVertices ( C_Vector3* _vertices ) const
 {
@@ -74,7 +69,6 @@ void C_BBox::GetVertices ( C_Vector3* _vertices ) const
 	_vertices[7].SetVector ( min.x,max.y,min.z );
 }
 
-
 void C_BBox::GetVertices ( C_Vertex* _vertices ) const
 {
 	if ( _vertices == NULL ) return;
@@ -90,18 +84,15 @@ void C_BBox::GetVertices ( C_Vertex* _vertices ) const
 	_vertices[7].x = min.x;		_vertices[7].y = max.y;		_vertices[7].z = min.z;
 }
 
-
 void C_BBox::GetMax ( C_Vector3* vec )
 {
 	vec->SetVector ( max );
 }
 
-
 void C_BBox::GetMin ( C_Vector3* vec )
 {
 	vec->SetVector ( min );
 }
-
 
 void C_BBox::GetMax ( C_Vertex* vec )
 {
@@ -110,14 +101,12 @@ void C_BBox::GetMax ( C_Vertex* vec )
 	vec->z = max.z;
 }
 
-
 void C_BBox::GetMin ( C_Vertex* vec )
 {
 	vec->x = min.x;
 	vec->y = min.y;
 	vec->z = min.z;
 }
-
 
 void C_BBox::GetMax ( float* x , float* y , float* z )
 {
@@ -126,14 +115,12 @@ void C_BBox::GetMax ( float* x , float* y , float* z )
 	*z = max.z;
 }
 
-
 void C_BBox::GetMin ( float* x , float* y , float* z )
 {
 	*x = min.x;
 	*y = min.y;
 	*z = min.z;
 }
-
 
 void C_BBox::Draw ( void )
 {
@@ -184,7 +171,6 @@ void C_BBox::Draw ( void )
 	glPolygonMode ( GL_FRONT_AND_BACK , GL_FILL );
 }
 
-
 void C_BBox::Draw ( float r , float g , float b )
 {
 	glPolygonMode ( GL_FRONT_AND_BACK , GL_LINE );
@@ -234,7 +220,6 @@ void C_BBox::Draw ( float r , float g , float b )
 	glPolygonMode ( GL_FRONT_AND_BACK , GL_FILL );
 }
 
-
 void C_BBox::Translate ( const float x, const float y, const float z )
 {
 	min.Translate ( x , y , z );
@@ -250,7 +235,6 @@ void C_BBox::Translate ( const float x, const float y, const float z )
 	vertices[7].Translate ( x , y , z );
 }
 
-
 void C_BBox::Translate ( const C_Vector3 *vec )
 {
 	min.Translate ( vec );
@@ -265,7 +249,6 @@ void C_BBox::Translate ( const C_Vector3 *vec )
 	vertices[6].Translate ( vec );
 	vertices[7].Translate ( vec );
 }
-
 
 void C_BBox::Rotate ( const float anglex , const float angley , const float anglez , const C_Vector3 *rotPoint )
 {
@@ -290,7 +273,6 @@ void C_BBox::Rotate ( const float anglex , const float angley , const float angl
 	min.z = MinOfEight ( vertices[0].z , vertices[1].z , vertices[2].z , vertices[3].z , vertices[4].z , vertices[5].z , vertices[6].z , vertices[7].z );
 }
 
-
 float C_BBox::MaxOfEight ( float n1 , float n2 , float n3 , float n4 , float n5 , float n6 , float n7 , float n8 )
 {
 	float max = n1;
@@ -306,7 +288,6 @@ float C_BBox::MaxOfEight ( float n1 , float n2 , float n3 , float n4 , float n5 
 	return max;
 }
 
-
 float C_BBox::MinOfEight ( float n1 , float n2 , float n3 , float n4 , float n5 , float n6 , float n7 , float n8 )
 {
 	float min = n1;
@@ -321,7 +302,6 @@ float C_BBox::MinOfEight ( float n1 , float n2 , float n3 , float n4 , float n5 
 
 	return min;
 }
-
 
 bool C_BBox::IsInside ( const C_Vertex* p )
 {

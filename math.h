@@ -31,12 +31,16 @@
 #define EPSILON 1.0e-4f
 #define FLOAT_EQ(x,v) (((v - EPSILON)<=x) && (x <=( v + EPSILON)))
 
-//#define FLT_MAX numeric_limits<float>::max ()
+/// Numeric limts
+#define FLT_MAX numeric_limits<float>::max()
+#define FLT_MIN numeric_limits<float>::min()
+#define INT_MAX numeric_limits<int>::min()
+#define INT_MIN numeric_limits<int>::min()
 
 #define SMALLEST_FLOAT -1*( FLT_MAX - 1 )
 #define GREATEST_FLOAT FLT_MAX
 
-// limits a value to low and high
+/// limits a value to low and high
 #define LIMIT_RANGE(low, value, high)	{	if (value < low)	value = low;	else if(value > high)	value = high;	}
 #define UPPER_LIMIT (value , limit )		{ if ( value > limit ) value = limit; }
 #define ABS(value)		{	 if ( value < 0 )	value *= -1.0;	}

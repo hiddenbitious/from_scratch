@@ -7,15 +7,12 @@
 #include "vectors.h"
 
 #define GLEW_STATIC
-#include <GL\GLEW.h>
-#include <GL\GLUT.h>
+#include <GL/glew.h>
+#include <GL/glut.h>
 
-
-#include "..\oglRenderer\oglDriver.h"
-#include "..\oglRenderer\shaders\glsl.h"
-#include "..\oglRenderer\textureLoader\TextureLoader.h"
-
-
+#include "../oglRenderer/oglDriver.h"
+#include "../oglRenderer/shaders/glsl.h"
+//#include "../oglRenderer/textureLoader/TextureLoader.h"
 
 class box
 {

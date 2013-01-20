@@ -15,7 +15,7 @@
 ****************************************/
 
 #include "frustum.h"
-#include <GL\GLUT.H>
+#include <GL/glut.h>
 
 C_Frustum::C_Frustum ( void )
 {

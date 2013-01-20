@@ -17,6 +17,7 @@
 #include "bspNode.h"
 #include "bspTree.h"
 #include "bspHelperFunctions.h"
+#include <GL/glut.h>
 
 #define MINIMUMRELATION			0.5f
 #define MINIMUMRELATIONSCALE	2.0f
@@ -143,8 +144,8 @@ void C_BspNode::BuildBspTree ( C_BspNode* node , C_BspTree *tree )
 
 	C_Plane tempPlane;
 
-	// An i geometria dimiourgei kleisto horo 
-	// i an ehei ftasei arketa bathia sto dendro 
+	// An i geometria dimiourgei kleisto horo
+	// i an ehei ftasei arketa bathia sto dendro
 	// tote einai katalili gia filo sto dentro
 	if ( C_BspNode::IsConvex ( node->geometry , node->nPolys ) || node->depth >= maxDepth )
 	{
@@ -239,7 +240,7 @@ void C_BspNode::BuildBspTree ( C_BspNode* node , C_BspTree *tree )
 	if ( nFront )
 	{
 		C_BspNode::BuildBspTree ( node->frontNode , tree );
-		
+
 		node->frontNode->CalculateBBox ();
 		if ( node->frontNode->isLeaf == false )
 		{
@@ -299,7 +300,7 @@ bool C_BspNode::SelectPartitionfromList ( poly** geometry , int nPolys , C_Plane
 			}
 
 			relation = (float)MIN(nFront,nBack) / (float)MAX(nFront,nBack);
-			
+
 			if ( ( relation > minRelation && nSplits < bestSplits ) ||
 				 ( nSplits == bestSplits && relation > bestRelation ) )
 			{
@@ -320,7 +321,7 @@ bool C_BspNode::SelectPartitionfromList ( poly** geometry , int nPolys , C_Plane
 
 	geometry[bestPlane]->usedAsDivider = true;
 
-	// Keep plane's information so we can draw it 
+	// Keep plane's information so we can draw it
 	debug.push_back ( finalPlane->points[0] );
 	debug.push_back ( finalPlane->points[1] );
 	debug.push_back ( finalPlane->points[2] );
@@ -734,7 +735,7 @@ void C_BspNode::TessellatePolygonsInLeaves ( C_BspNode* node )
 void C_BspNode::CleanUpPointSet ( C_BspNode* node , vector<C_Vertex>& points )
 {
 	int cPoint = 0;
-	
+
 	// Remove points outside the bbox
 	while ( cPoint < points.size () )
 	{

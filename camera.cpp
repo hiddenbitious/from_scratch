@@ -15,18 +15,20 @@
 ****************************************/
 
 #include "camera.h"
-#include "..\oglRenderer\ogldriver.h"
+#include "../oglRenderer/oglDriver.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
 
-
-// Here are the fonts: 
-LPVOID glutFonts[7] = { 
-    GLUT_BITMAP_9_BY_15, 
-    GLUT_BITMAP_8_BY_13, 
-    GLUT_BITMAP_TIMES_ROMAN_10, 
-    GLUT_BITMAP_TIMES_ROMAN_24, 
-    GLUT_BITMAP_HELVETICA_10, 
-    GLUT_BITMAP_HELVETICA_12, 
-    GLUT_BITMAP_HELVETICA_18 
+// Here are the fonts:
+void *glutFonts[7] = {
+    GLUT_BITMAP_9_BY_15,
+    GLUT_BITMAP_8_BY_13,
+    GLUT_BITMAP_TIMES_ROMAN_10,
+    GLUT_BITMAP_TIMES_ROMAN_24,
+    GLUT_BITMAP_HELVETICA_10,
+    GLUT_BITMAP_HELVETICA_12,
+    GLUT_BITMAP_HELVETICA_18
 };
 
 
@@ -49,7 +51,7 @@ C_Camera::C_Camera ( void )
 	zFar = 500.0f;
 
 	updateFrustum = true;
-	
+
 	rotation = translation = true;
 }
 
@@ -156,7 +158,7 @@ void C_Camera::StrafeLeft ( const float speed )
 	tempUp.Translate ( &up );
 	moveVec = C_Vector3::CrossProduct ( &tempUp , &position , &lookAt );
 	moveVec.Normalize ();
-	
+
 	Move ( moveVec.x*revSpeed , moveVec.y*revSpeed , moveVec.z*revSpeed );
 
 	updateFrustum = true;
@@ -172,7 +174,7 @@ void C_Camera::StrafeRight ( const float speed )
 	tempUp.Translate ( &up );
 	moveVec = C_Vector3::CrossProduct ( &tempUp , &position , &lookAt );
 	moveVec.Normalize ();
-	
+
 	Move ( moveVec.x*speed , moveVec.y*speed , moveVec.z*speed );
 
 	updateFrustum = true;
@@ -217,7 +219,7 @@ void C_Camera::PrintText ( int x , int y , float r , float g , float b, float a 
 	char text[256];
 	va_list va;
 	va_start ( va , string );
-		vsprintf ( text , string , va );
+	vsprintf ( text , string , va );
 	va_end ( va );
 
 	if ( glIsEnabled ( GL_TEXTURE_2D ) ) texturing = true;
@@ -240,9 +242,9 @@ void C_Camera::PrintText ( int x , int y , float r , float g , float b, float a 
 		glRasterPos2i ( x , this->h - y );
 		int i = 0;
 		while ( text[i] )
-		{ 
-			glutBitmapCharacter ( glutFonts[6] , text[i] ); 
-			i++; 
+		{
+			glutBitmapCharacter ( glutFonts[6] , text[i] );
+			i++;
 		}
 
 	glPopMatrix ();
@@ -252,4 +254,4 @@ void C_Camera::PrintText ( int x , int y , float r , float g , float b, float a 
     if ( !blending ) glDisable(GL_BLEND);
 	if ( texturing ) glEnable ( GL_TEXTURE_2D );
 	if ( lighting ) glEnable ( GL_LIGHTING );
-}  
+}

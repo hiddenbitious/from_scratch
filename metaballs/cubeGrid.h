@@ -2,10 +2,10 @@
 #ifndef _CUBEGRID_H_
 #define _CUBEGRID_H_
 
-#include "..\globals.h"
-#include "..\bbox.h"
+#include "../globals.h"
+#include "../bbox.h"
 #include "metaball.h"
-#include "..\frustum.h"
+#include "../frustum.h"
 
 
 
@@ -53,11 +53,11 @@ class C_CubeGrid
 
 		// Pinakas pou tha krataei tous kibous apo tous opoious tha apoteleite to grid
 		grid_cube gridCubes[ CUBES_PER_AXIS * CUBES_PER_AXIS * CUBES_PER_AXIS ];
-		
+
 
 		// Oi korifes metaksi ton kibon tha moirazondai
 		grid_cube_vertex gridCubeVertices [ (CUBES_PER_AXIS+1)*(CUBES_PER_AXIS+1)*(CUBES_PER_AXIS+1) ];
-		
+
 
 		unsigned long nGridCubes;
 		unsigned long nGridCubeVertices;

@@ -18,91 +18,89 @@
 #include <sstream>
 #include <time.h>
 
-#pragma comment( lib, "..\\debug\\oglRenderer.lib" )
-
-#include <GL\GLEW.h>
-#include <GL\GLUT.h>
+#include <GL/glew.h>
+#include <GL/glut.h>
 
 #include "camera.h"
 #include "vectors.h"
 #include "quaternion.h"
 #include "meshgroup.h"
-#include "3DS reader\3dsreader.h"
-#include "timer.h"
+#include "3dsReader/3dsReader.h"
+//#include "timer.h"
 #include "bspTree.h"
 
-#include "..\oglRenderer\oglDriver.h"
-#include "..\oglRenderer\shaders\glsl.h"
+#include "../oglRenderer/oglDriver.h"
+#include "../oglRenderer/shaders/glsl.h"
 
-#include "metaballs\cubeGrid.h"
-#include "metaballs\metaball.h"
+#include "metaballs/cubeGrid.h"
+#include "metaballs/metaball.h"
 
 
 using namespace std;
 
 // Diloseis sinartiseon
-void SetRelevantDir ( LPWSTR dir );
-void CountFPS ( void );
-LPWSTR szAppPath = (LPWSTR)new wchar_t[256];
+//void SetRelevantDir ( LPWSTR dir );
+//void CountFPS ( void );
+//LPWSTR szAppPath = (LPWSTR)new wchar_t[256];
 
 // BSP
 // Orise ena dendro me megisto bathos 15
-C_BspTree bspTest ( 15 );
+static C_BspTree bspTest ( 15 );
 
 // Shaders. Tha hrisimopoiithoun 2 shaders
-C_GLShaderManager shaderManager;
-C_GLShader* basicShader;
-C_GLShader* basicShader_texture;
+static C_GLShaderManager shaderManager;
+static C_GLShader* basicShader;
+static C_GLShader* basicShader_texture;
 
 // Dinamika 3D antikeimena
-C_MeshGroup bunny;
-C_MeshGroup narn;
-C_MeshGroup statue1;
-C_MeshGroup statue2;
+static C_MeshGroup bunny;
+static C_MeshGroup narn;
+static C_MeshGroup statue1;
+static C_MeshGroup statue2;
 
 // Camera kai frustum
-C_Camera camera;
-C_Frustum frustum;
+static C_Camera camera;
+static C_Frustum frustum;
 
 // Metablites gia to parathiro
-int winID;
-int windowWidth = 800;
-int windowHeight = 500;
-int windowPositionX = 100;
-int windowPositionY = 200;
+static int winID;
+static int windowWidth = 800;
+static int windowHeight = 500;
+static int windowPositionX = 100;
+static int windowPositionY = 200;
 
 // Tahitita metakinisis cameras
-float speed = 7.0f;
-float angle = 0.5f;
-float angle2 = 0.5f;
+static float speed = 7.0f;
+static float angle = 0.5f;
+static float angle2 = 0.5f;
 
-int meshesInFrustum = 0;
-int meshesPolys = 0;
-int metaballPolys = 0;
-int mapPolys = 0;
-bool frustumCulling = true;
-int bspRenderingType = 0;
+static int meshesInFrustum = 0;
+static int meshesPolys = 0;
+static int metaballPolys = 0;
+static int mapPolys = 0;
+static bool frustumCulling = true;
+static int bspRenderingType = 0;
 
 // Hrisimes statheres
-float red[] = { 1.0f , 0.0f , 0.0f , 1.0f };
-float white[] = { 1.0f , 1.0f , 1.0f , 1.0f };
-float grey[] = { 0.3f , 0.3f , 0.3f , 0.3f };
-C_Vector3 center ( 0.0f , 0.0f , 0.0f );
+static float red[] = { 1.0f , 0.0f , 0.0f , 1.0f };
+static float white[] = { 1.0f , 1.0f , 1.0f , 1.0f };
+static float grey[] = { 0.3f , 0.3f , 0.3f , 0.3f };
+static C_Vector3 center ( 0.0f , 0.0f , 0.0f );
 
 // Metablites hronometrisis
-C_Timer timer;
-ULONG start = timer.GetTime ();
+//C_Timer timer;
+//ULONG start = timer.GetTime ();
 float timeElapsed = 0.0f;
-float fps;
+static float fps;
 
 // Metaballs
-C_CubeGrid grid;
-C_Metaball metaball[3];
+static C_CubeGrid grid;
+static C_Metaball metaball[3];
 
 
 
 // Sinartisi arhikpoiiseon
-void Initializations ( void )
+static void Initializations ( void )
 {
 	// Hroma background
 	glClearColor ( 0.3671875f , 0.15234375f , 0.8359375f , 1.0f );
@@ -146,12 +144,12 @@ void Initializations ( void )
 	camera.zNear = 1.0f;
 
 	// Fortose shaders
-	SetRelevantDir ( L"shaders" );
+//	SetRelevantDir ( L"shaders" );
 	basicShader = shaderManager.LoadShaderProgram ( "basic.vert" , "basic.frag" );
 	basicShader_texture = shaderManager.LoadShaderProgram ( "basic_withSingleTexture.vert" , "basic_withSingleTexture.frag" );
 
 	// Diabase tin geometria gia to bsp
-	SetRelevantDir ( L"" );
+//	SetRelevantDir ( L"" );
 	bspTest.ReadGeometryFile ( "properMap2.bsp" );
 
 	// Kataskeuase bsp kai pvs
@@ -161,8 +159,8 @@ void Initializations ( void )
 	// Fortose dinamika andikeimena
 	C_3DSReader reader;
 
-	
-	SetRelevantDir ( L"models" );
+
+//	SetRelevantDir ( L"models" );
 	reader.Load3DSFile ( "statue.3ds" , &statue1 );
 	reader.Load3DSFile ( "statue.3ds" , &statue2 );
 	statue2.Translate ( 0.0f , 0.0f , 40.0f );
@@ -172,7 +170,7 @@ void Initializations ( void )
 	reader.Load3DSFile ( "bunny.3ds" , &bunny , true , &scale );
 	bunny.SetPosition ( 80.0f , 0.0f , 0.0f );
 
-	SetRelevantDir ( L"models//narn" );
+//	SetRelevantDir ( L"models//narn" );
 	scale = C_Vector3 ( 0.1f , 0.1f , 0.1f );
 	reader.Load3DSFile ( "narn.3ds" , &narn , &scale );
 	narn.SetPosition ( -100.0f , 10.0f , 0.0f );
@@ -207,12 +205,14 @@ void Initializations ( void )
 	metaball[2].radius = 3.0f;
 
 	// Arhikopoiise ton timer
-	timer.Initialize ();
+//	timer.Initialize ();
 }
 
 
-void Draw ( void )
+static void Draw ( void )
 {
+	C_Vector3 cameraPosition = camera.GetPosition();
+
 	// Statheri tahitita peristrofis, aneksartita ta posa fps ehoume.
 	angle += 1.0f * timeElapsed;
 	if ( angle >= 360.0f ) angle = 0.0f;
@@ -228,11 +228,11 @@ void Draw ( void )
 	meshesInFrustum = 0;
 	meshesPolys = 0;
 	metaballPolys = 0;
-	
+
 	// To fos akolouthei tin camera kai peristrefete giro apo autin
-	float lightPos[] = { camera.GetPosition().x + 10.0f * sin(angle) ,
-						 camera.GetPosition().y ,
-						 camera.GetPosition().z + 10.0f * cos(angle) , 1.0f };
+	float lightPos[] = { cameraPosition.x + 10.0f * sin(angle) ,
+						 cameraPosition.y ,
+						 cameraPosition.z + 10.0f * cos(angle) , 1.0f };
 	float zero[] = { 0.0f , 0.0f , 0.0f , 1.0f };
 
 	// Shediase mia mikri sfaira sti thesi tou fotos
@@ -274,24 +274,23 @@ void Draw ( void )
 			glMaterialfv ( GL_FRONT , GL_AMBIENT , grey );
 		}
 
-		switch ( bspRenderingType )
-		{
+		switch ( bspRenderingType ) {
 			// Shediase ti fainetai kanonika.
 			case 0:
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				mapPolys = bspTest.Draw_PVS ( &(camera.GetPosition () ) );
+				mapPolys = bspTest.Draw_PVS (&cameraPosition);
 			break;
 
 			// Shediase olo to harti se wireframe
 			case 1:
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				mapPolys = bspTest.Draw2 ( &(camera.GetPosition () ) );
+				mapPolys = bspTest.Draw2 (&cameraPosition);
 			break;
 
 			// Shediase to PVS se wireframe
 			case 2:
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				mapPolys = bspTest.Draw_PVS ( &(camera.GetPosition () ) );
+				mapPolys = bspTest.Draw_PVS (&cameraPosition);
 			break;
 		}
 
@@ -340,7 +339,7 @@ void Draw ( void )
 		}
 		else
 			statue2.Draw ( );
-		
+
 
 	// Shediase to diastimoploio. Kanto na horopidaei.
 		narn.Rotate ( 0.0f , timeElapsed * 15.0f , 0.0f );
@@ -390,19 +389,19 @@ void Draw ( void )
 					   "x: Allagi methodou shediasis BSP" );
 
 	// Ananeose to hronometro.
-	timer.Update ();
+//	timer.Update ();
 	// H timeElapsed krataei to hrono pou hreiastike gia na sxediastei 1 frame.
-	timeElapsed = timer.GetDelta () / 1000.0f;
+//	timeElapsed = timer.GetDelta () / 1000.0f;
 
 	// Metrise ta fps
-	CountFPS ();
+//	CountFPS ();
 
 	// Zografise ton frame buffer!
 	_DrawFrameBuffer ();
 }
 
 // Sinartisi heirismou parathirou
-void reshape ( GLint w , GLint h )
+static void reshape ( GLint w , GLint h )
 {
 	windowWidth = w;
 	windowHeight = h;
@@ -412,14 +411,14 @@ void reshape ( GLint w , GLint h )
 }
 
 
-void idle ( void )
+static void idle ( void )
 {
 	glutPostRedisplay ();
 }
 
 
 // Sinartisi heirismou tou mouse
-void mouse_look ( int x , int y)
+static void mouse_look ( int x , int y)
 {
 	static int oldX = 0;
 	static int oldY = 0;
@@ -444,7 +443,7 @@ void mouse_look ( int x , int y)
 
 
 // Sinartisi heirismou keyboard.
-void hande_simple_keys (unsigned char key , int x , int y)
+static void hande_simple_keys (unsigned char key , int x , int y)
 {
 	switch( key )
 	{
@@ -481,12 +480,12 @@ void hande_simple_keys (unsigned char key , int x , int y)
 		default:
 			cout << int ( key ) << '\n';
 		break;
-	}	
+	}
 }
 
 
 // Sinartisi heirismou arrow keys.
-void handle_arrows( int key , int x , int y )
+static void handle_arrows( int key , int x , int y )
 {
 	switch( key )
 	{
@@ -528,7 +527,7 @@ int main(int argc, char* argv[])
 	winID = glutCreateWindow ( "..." );
 
 	// Arhikopoiisi tou directory.
-	GetCurrentDirectory ( 256 , szAppPath );
+//	GetCurrentDirectory ( 256 , szAppPath );
 
 	glutReshapeFunc ( reshape );
 	glutDisplayFunc ( Draw );
@@ -557,29 +556,29 @@ int main(int argc, char* argv[])
 
 
 
-void SetRelevantDir ( LPWSTR dir )
-{
-	LPWSTR szTempPath = (LPWSTR)new wchar_t[256];
-	wcscpy_s ( szTempPath , 256 , szAppPath );
-
-	if ( dir[0] != '\\' ) wcscat_s ( szTempPath , 256 , L"\\" );
-	wcscat_s ( szTempPath , 256 , dir );
-
-	SetCurrentDirectory ( szTempPath );
-	delete[] szTempPath;
-}
-
-
-void CountFPS ( void )
-{
-	static ULONG count = 0.0f;
-	ULONG delta = timer.GetTime () - start;
-	count++;
-
-	if ( delta >= 1000 )
-	{
-		fps = count;
-		start = timer.GetTime ();
-		count = 0;
-	}
-}
+//void SetRelevantDir ( LPWSTR dir )
+//{
+//	LPWSTR szTempPath = (LPWSTR)new wchar_t[256];
+//	wcscpy_s ( szTempPath , 256 , szAppPath );
+//
+//	if ( dir[0] != '\\' ) wcscat_s ( szTempPath , 256 , L"\\" );
+//	wcscat_s ( szTempPath , 256 , dir );
+//
+//	SetCurrentDirectory ( szTempPath );
+//	delete[] szTempPath;
+//}
+//
+//
+//void CountFPS ( void )
+//{
+//	static ULONG count = 0.0f;
+//	ULONG delta = timer.GetTime () - start;
+//	count++;
+//
+//	if ( delta >= 1000 )
+//	{
+//		fps = count;
+//		start = timer.GetTime ();
+//		count = 0;
+//	}
+//}

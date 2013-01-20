@@ -19,7 +19,7 @@
 
 #include "trimesh.h"
 #include <vector>
-#include <GL\GLUT.h>
+#include <GL/glut.h>
 
 using namespace std;
 
@@ -28,7 +28,7 @@ class C_MeshGroup
 	friend class C_3DSReader;
 
 	public:
-				
+
 		// Number of vertices
 		ULONG nVertices;
 		// Number of polys (= number of indices)

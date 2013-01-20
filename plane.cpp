@@ -15,7 +15,7 @@
 ****************************************/
 
 #include "plane.h"
-#include <GL\glut.h>
+#include <GL/glut.h>
 
 
 C_Plane::C_Plane ( float _a , float _b , float _c , float _d )

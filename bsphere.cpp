@@ -15,7 +15,7 @@
 ****************************************/
 
 #include "bsphere.h"
-#include <GL\glut.h>
+#include <GL/glut.h>
 
 
 C_BSphere::C_BSphere ( void )

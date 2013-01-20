@@ -17,7 +17,7 @@
 #ifndef _C_TIMER_H_
 #define _C_TIMER_H_
 
-#include <Windows.h>
+//#include <Windows.h>
 #include "globals.h"
 
 /*
@@ -32,7 +32,7 @@ DWORD timeGetTime () :
 
 DWORD GetTickCount () :
 //	The accuracy of this function is very much dependent upon the operating system it is ran on,
-//	and if too coarse to be relied upon for frame timing. 
+//	and if too coarse to be relied upon for frame timing.
 
 //	On the other hand, the low overhead of calling this function makes it ideal polling,
 //	and is a good candidate for timing low priority background tasks.
@@ -51,11 +51,11 @@ class C_Timer
 		bool perfFlag;					//Set to true if performance counter is available on tha machine
 		float timeFactor;				//To convert the time received
 
-		__int64 delta , d0 , d1;		//Used to calculate delta
-		__int64 freq;					//Timer frequency
+		int64_t delta , d0 , d1;		//Used to calculate delta
+		int64_t freq;					//Timer frequency
 
 		ULONG mmTimeStart;				//Multimedia timer start value
-		__int64 perfTimeStart;			//Performance timer start value
+		int64_t perfTimeStart;			//Performance timer start value
 
 	public:
 		C_Timer ( void );				//CTor

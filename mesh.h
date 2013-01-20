@@ -19,7 +19,7 @@
 
 #include "globals.h"
 #include "frustum.h"
-#include "..\oglRenderer\textureLoader\textureLoader.h"
+//#include "../oglRenderer/textureLoader/TextureLoader.h"
 
 class C_Mesh
 {

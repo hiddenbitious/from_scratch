@@ -15,7 +15,7 @@
 ****************************************/
 
 #include "meshgroup.h"
-#include "..\oglRenderer\oglDriver.h"
+#include "../oglRenderer/oglDriver.h"
 
 
 C_MeshGroup::C_MeshGroup ( void )
@@ -57,7 +57,7 @@ int C_MeshGroup::Draw ( C_Frustum* frustum )
 				// Translate and then rotate
 
 					// Both codes have the same result
-					
+
 					rotationQuaternion.QuaternionToAxisAngle ( x , y , z , a );
 					_ApplyTranslation ( position.x , position.y , position.z );
 					_ApplyRotation ( a , x , y , z );
@@ -109,7 +109,7 @@ int C_MeshGroup::Draw ( C_Frustum *frustum , int *nPolys )
 				// Translate and then rotate
 
 					// Both codes have the same result
-					
+
 					rotationQuaternion.QuaternionToAxisAngle ( x , y , z , a );
 					_ApplyTranslation ( position.x , position.y , position.z );
 					_ApplyRotation ( a , x , y , z );
@@ -158,7 +158,7 @@ void C_MeshGroup::Draw ( void )
 	// Translate and then rotate
 
 	// Both codes have the same result
-	
+
 	rotationQuaternion.QuaternionToAxisAngle ( x , y , z , a );
 	_ApplyTranslation ( position.x , position.y , position.z );
 	_ApplyRotation ( a , x , y , z );

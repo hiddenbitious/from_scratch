@@ -17,6 +17,10 @@
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
+#include <stdint.h>
+#include <string>
+#include <limits>
+
 typedef unsigned long ULONG;
 typedef unsigned int UINT;
 typedef unsigned short USHORT;
@@ -50,6 +54,35 @@ typedef struct
 {
 	UINT p0 , p1 , p2;
 } C_TriIndices;
+
+typedef enum {
+	txUnknown	= 0,	// images
+	txBmp		= 1,
+	txJpg		= 2,
+	txPng		= 3,
+	txTga		= 4,
+	txGif		= 5,
+	txIco		= 6,
+	txEmf		= 7,
+	txWmf		= 8,
+} eglTexType;
+
+typedef enum {
+	txNoFilter	= 0,
+	txBilinear	= 1,
+	txTrilinear	= 2,
+} eglTexFilterType;
+
+typedef	struct
+{
+	uint32_t 	TextureID;									// Texture ID Used To Select A Texture
+	eglTexType	TexType;									// Texture Format
+	uint32_t	Width;										// Image Width
+	uint32_t	Height;										// Image Height
+	uint32_t	Type;										// Image Type (GL_RGB, GL_RGBA)
+	uint32_t	Bpp;										// Image Color Depth In Bits Per Pixel
+	std::string	textureName;
+} glTexture;
 
 class C_3DSReader;
 class C_Camera;

@@ -20,17 +20,17 @@ bool box::LoadShaders ( void )
 
 bool box::LoadTextures ( const char* name )
 {
-	TextureLoader texLoader;
+//	TextureLoader texLoader;
 	bool textureLoaded = false;
 
-	textureLoaded = texLoader.LoadTextureFromDisk ( name , &texture );
-
-	if ( textureLoaded )
-	{
-		cout << "Texture " << name << " loaded ok.\n";
-	}
-	else
-		cout << "Error loading texture " << name << endl;
+//	textureLoaded = texLoader.LoadTextureFromDisk ( name , &texture );
+//
+//	if ( textureLoaded )
+//	{
+//		cout << "Texture " << name << " loaded ok.\n";
+//	}
+//	else
+//		cout << "Error loading texture " << name << endl;
 
 	return textureLoaded;
 }

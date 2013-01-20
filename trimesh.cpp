@@ -17,7 +17,7 @@
 #include "trimesh.h"
 
 #include <stdio.h>
-#include "..\oglRenderer\oglDriver.h"
+#include "../oglRenderer/oglDriver.h"
 
 
 C_TriMesh::C_TriMesh ( void )

@@ -1,27 +1,17 @@
-#include "logfile.h"
-
-
-
+#include "logFile.h"
 
 C_logFile::C_logFile ( const char* fileName )
 {
 	this->filename = fileName;
-
 	this->LOG_FILE_P.open ( this->filename );
-
 	this->writeHeader ();
-
-
 }
-
 
 C_logFile::~C_logFile ( void )
 {
 	LOG_FILE_P << "\n\n*End of log file*\n\n";
 	this->LOG_FILE_P.close ();
 }
-
-
 
 void C_logFile::writeToFile ( string msg )
 {
@@ -33,9 +23,6 @@ void C_logFile::writeToFile ( string msg )
 
 	this->LOG_FILE_P << msg;
 }
-
-
-
 
 void C_logFile::writeHeader ( void )
 {
@@ -50,15 +37,11 @@ void C_logFile::writeHeader ( void )
 	//cout << asctime( &when ) << '\n';
 
 	header = "*************************\n" + string ( asctime( &when ) ) + "*************************\n";
-	
-	
+
+
 	LOG_FILE_P << "*Start of log file*\n\n";
 	LOG_FILE_P << header << '\n';
-
 }
-
-
-
 
 void C_logFile::endLogging ( void )
 {

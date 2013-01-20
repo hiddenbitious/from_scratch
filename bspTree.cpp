@@ -20,19 +20,19 @@
 #include "bspHelperFunctions.h"
 
 #include <fstream>
-#include <gl\gl.h>
+#include <GL/gl.h>
 #include <iostream>
-#include <MMSYSTEM.H>
-#include <limits.h>
+#include <string.h>	// for memset (!)
+
+//#include <MMSYSTEM.H>
+//#include <limits.h>
 
 int polyCount;
 int leavesDrawn;
 int nodesDrawn;
 int nConvexRooms;
 
-
 vector<C_Vertex> debug;
-
 
 C_BspTree::C_BspTree ( USHORT depth )
 {
@@ -205,7 +205,7 @@ void C_BspTree::BuildPVS ( void )
 	bool pvsFileFound;
 	pvsFileFound = this->ReadPVSFile ( "PVS.txt" );
 
-	ULONG start = timeGetTime ();
+//	ULONG start = timeGetTime ();
 
 	cout << "Building PVS..." << endl;
 
@@ -234,9 +234,9 @@ void C_BspTree::BuildPVS ( void )
 
 	cout << "Done!" << endl << endl;
 
-	ULONG time = timeGetTime () - start;
+//	ULONG time = timeGetTime () - start;
 
-	cout << "Time elapsed: " << (float)(time/1000.0f) << " seconds.\n\n" << endl;
+//	cout << "Time elapsed: " << (float)(time/1000.0f) << " seconds.\n\n" << endl;
 
 	// An den eihe brethei arheio apothikeuse gia tin epomeni ektelesi
 	if ( !pvsFileFound )
@@ -257,7 +257,7 @@ void C_BspTree::TraceVisibility ( void )
 		{
 			if ( leaves[l1]->nodeID == leaves[l1]->PVS[l2]->nodeID )
 				continue;
-			
+
 			for ( int l3 = 0 ; l3 < leaves[l1]->PVS[l2]->PVS.size () ; l3++ )
 			{
 				if ( leaves[l1]->PVS[l2]->PVS[l3]->nodeID == leaves[l1]->PVS[l2]->nodeID )
@@ -352,14 +352,14 @@ void C_BspTree::BuildBspTree ( void )
 	cout << "***********************************************" << endl;
 	cout << "Building bsp tree...";
 
-	ULONG start = timeGetTime ();
+//	ULONG start = timeGetTime ();
 
 	headNode = new C_BspNode ( pRawPolys , nPolys );
 	C_BspNode::BuildBspTree ( headNode , this );
 
 	TessellatePolygons ();
 
-	ULONG time = timeGetTime () - start;
+//	ULONG time = timeGetTime () - start;
 
 	cout << "Done!" << endl;
 
@@ -371,7 +371,7 @@ void C_BspTree::BuildBspTree ( void )
 	cout << "\tMinimun number of polys assigned in node: " << lessPolysInNodeFound << endl;
 	cout << "\tMaximum depth allowed: " << maxDepth << endl;
 	cout << "\tDepth reached: " << depthReached << endl;
-	cout << "Time elapsed: " << (float)(time/1000.0f) << " seconds." << endl;
+//	cout << "Time elapsed: " << (float)(time/1000.0f) << " seconds." << endl;
 	cout << "***********************************************\n\n" << endl;
 }
 
@@ -407,7 +407,7 @@ int C_BspTree::Draw2 ( C_Vector3* cameraPosition )
 	}
 	glColor3f ( 1.0 , 1.0 , 1.0 );
 	glEnable ( GL_LIGHTING );
-*/	
+*/
 
 
 //	glDisable ( GL_COLOR_MATERIAL );
@@ -431,7 +431,7 @@ int C_BspTree::Draw_PVS ( C_Vector3* cameraPosition )
 	polyCount = 0;
 	leavesDrawn = 0;
 	nodesDrawn = 0;
-	
+
 	for ( int i = 0 ; i < leaves.size () ; i++ )
 		leaves[i]->drawn = false;
 /*

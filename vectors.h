@@ -54,8 +54,8 @@ class C_Vector3
 		C_Vector3 ( float x , float y , float z );
 		C_Vector3 ( C_Vertex* point );
 
-		bool C_Vector3::operator < ( C_Vector3* vec ) const;
-		bool C_Vector3::operator > ( C_Vector3* vec ) const;
+		bool operator < ( C_Vector3* vec ) const;
+		bool operator > ( C_Vector3* vec ) const;
 
 		C_Vector3 operator + ( C_Vector3 );
 		C_Vector3& operator += ( C_Vector3 );

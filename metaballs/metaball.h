@@ -2,7 +2,7 @@
 #define _METABALL_H_
 
 
-#include "..\globals.h"
+#include "../globals.h"
 
 class C_Metaball
 {
