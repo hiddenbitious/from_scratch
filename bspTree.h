@@ -27,9 +27,8 @@
 
 using namespace std;
 
-class C_BspTree
-{
-	friend class C_BspNode;
+class C_BspTree {
+		friend class C_BspNode;
 
 	private:
 		C_BspNode* headNode;
@@ -42,7 +41,7 @@ class C_BspTree
 		float scaleFactor;
 
 		// Calculate normal vectors
-		void CalcNorms ( void );
+		void CalcNorms(void);
 
 		vector<poly*> tessellatedPolys;
 		poly** pRawPolys;
@@ -52,30 +51,30 @@ class C_BspTree
 
 
 	public:
-		C_BspTree ( USHORT depth );
-		~C_BspTree ();
+		C_BspTree(USHORT depth);
+		~C_BspTree();
 
 		// Read geometry file
-		bool ReadGeometryFile ( const char* fileName );
+		bool ReadGeometryFile(const char* fileName);
 
-		void WritePVSFile ( const char *fileName );
-		bool ReadPVSFile ( const char *fileName );
+		void WritePVSFile(const char *fileName);
+		bool ReadPVSFile(const char *fileName);
 
-		void BuildBspTree ( void );
-		void BuildPVS ( void );
+		void BuildBspTree(void);
+		void BuildPVS(void);
 
-		void TraceVisibility ( void );
-		bool CheckVisibility ( C_BspNode *node1 , C_BspNode *node2 );
-		bool RayIntersectsSomethingInTree ( C_BspNode *node , C_Vertex *start , C_Vertex *end );
+		void TraceVisibility(void);
+		bool CheckVisibility(C_BspNode *node1 , C_BspNode *node2);
+		bool RayIntersectsSomethingInTree(C_BspNode *node , C_Vertex *start , C_Vertex *end);
 
-		void TessellatePolygons ( void );
+		void TessellatePolygons(void);
 
-		void CalculateBBoxes ( void );
+		void CalculateBBoxes(void);
 
-		void Draw ( void );
-		int Draw2 ( C_Vector3* cameraPosition );
-		void Draw3 ( void );
-		int Draw_PVS ( C_Vector3* cameraPosition );
+		void Draw(void);
+		int Draw2(C_Vector3* cameraPosition);
+		void Draw3(void);
+		int Draw_PVS(C_Vector3* cameraPosition);
 
 
 		// Max depth allowed
@@ -94,16 +93,16 @@ class C_BspTree
 		// Keep all the leaves for easy reference
 		vector<C_BspNode*> leaves;
 
-		void FindConnectedLeaves ( void );
+		void FindConnectedLeaves(void);
 
-		void IncreaseLeavesDrawn ();// { if ( nLeavesToDraw < nLeaves ) nLeavesToDraw++; cout << nLeavesToDraw << endl;}
-		void DecreaseLeavesDrawn ();// { if ( nLeavesToDraw > 0 ) nLeavesToDraw--; cout << nLeavesToDraw << endl;}
+		void IncreaseLeavesDrawn(); // { if ( nLeavesToDraw < nLeaves ) nLeavesToDraw++; cout << nLeavesToDraw << endl;}
+		void DecreaseLeavesDrawn(); // { if ( nLeavesToDraw > 0 ) nLeavesToDraw--; cout << nLeavesToDraw << endl;}
 
-		void IncreaseNodesDrawn ();// { if ( nLeavesToDraw < nLeaves ) nLeavesToDraw++; cout << nLeavesToDraw << endl;}
-		void DecreaseNodesDrawn ();// { if ( nLeavesToDraw > 0 ) nLeavesToDraw--; cout << nLeavesToDraw << endl;}
+		void IncreaseNodesDrawn(); // { if ( nLeavesToDraw < nLeaves ) nLeavesToDraw++; cout << nLeavesToDraw << endl;}
+		void DecreaseNodesDrawn(); // { if ( nLeavesToDraw > 0 ) nLeavesToDraw--; cout << nLeavesToDraw << endl;}
 
-		inline USHORT GetnLeavesToDraw () { return nLeavesToDraw; }
-		inline USHORT GetnNodesToDraw () { return nNodesToDraw; }
+		inline USHORT GetnLeavesToDraw() { return nLeavesToDraw; }
+		inline USHORT GetnNodesToDraw() { return nNodesToDraw; }
 };
 
 #endif

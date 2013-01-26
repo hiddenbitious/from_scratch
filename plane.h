@@ -23,39 +23,38 @@
 
 using namespace std;
 
-class C_Plane
-{
+class C_Plane {
 	public:
-	
-	float a , b , c , d;
 
-	C_Plane ( float a , float b , float c , float d );
-	C_Plane ( const C_Vector3* vec1 , const C_Vector3* vec2 , const C_Vector3* vec3 );
-	C_Plane ( const C_Vertex* vec1 , const C_Vertex* vec2 , const C_Vertex* vec3 );
-	C_Plane ( void );
+		float a , b , c , d;
 
-	void normalizePlane ( void );
-	void setPlane ( float , float , float , float );
-	void setPlane ( C_Plane* plane );
+		C_Plane(float a , float b , float c , float d);
+		C_Plane(const C_Vector3* vec1 , const C_Vector3* vec2 , const C_Vector3* vec3);
+		C_Plane(const C_Vertex* vec1 , const C_Vertex* vec2 , const C_Vertex* vec3);
+		C_Plane(void);
 
-	void getPlaneNormal ( float* x , float* y , float* z );
-	C_Vertex getPlaneNormal ( void );
+		void normalizePlane(void);
+		void setPlane(float , float , float , float);
+		void setPlane(C_Plane* plane);
 
-	float GetPlaneConstant ( void );
+		void getPlaneNormal(float* x , float* y , float* z);
+		C_Vertex getPlaneNormal(void);
 
-	C_Vertex pointOnPlane;
+		float GetPlaneConstant(void);
 
-	vector<C_Vertex> points;
+		C_Vertex pointOnPlane;
 
-	void Draw ( void );
+		vector<C_Vertex> points;
 
-	// These two functions works for normalized plane equations (so that a*a + b*b + c*c == 1)
-	// Dot product + d
-	inline float distanceFromPoint ( const C_Vector3* point )
-	{ return ( a * point->x + b * point->y + c * point->z + d ); }
+		void Draw(void);
 
-	inline float distanceFromPoint ( const C_Vertex* point )
-	{ return ( a * point->x + b * point->y + c * point->z + d ); }
+		// These two functions works for normalized plane equations (so that a*a + b*b + c*c == 1)
+		// Dot product + d
+		inline float distanceFromPoint(const C_Vector3* point)
+		{ return (a * point->x + b * point->y + c * point->z + d); }
+
+		inline float distanceFromPoint(const C_Vertex* point)
+		{ return (a * point->x + b * point->y + c * point->z + d); }
 
 };
 

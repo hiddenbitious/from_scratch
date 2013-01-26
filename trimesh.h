@@ -24,8 +24,7 @@
 #include <vector>
 using namespace std;
 
-typedef struct
-{
+typedef struct {
 	float ambient[4] , diffuse[4] , specular[4];
 	//Texture
 	glTexture texture;
@@ -33,13 +32,12 @@ typedef struct
 	unsigned char glossiness , specularStrength;
 } C_Material;
 
-class C_TriMesh
-{
-	friend class C_3DSReader;
-	friend class C_MeshGroup;
+class C_TriMesh {
+		friend class C_3DSReader;
+		friend class C_MeshGroup;
 
-	public : 
-		
+	public :
+
 		C_Material material;
 		// Texture
 		glTexture texture;
@@ -62,54 +60,54 @@ class C_TriMesh
 
 		// Used in the draw method to convert the quaternion into a rotation matrix
 		float rotationMatrix[16];
-		float x,y,z,a;
+		float x, y, z, a;
 
 		// Draw meshes without culling
-		void Draw ( void );
+		void Draw(void);
 
 	public:
 
-		C_TriMesh ( void );
+		C_TriMesh(void);
 
-		void Rotate ();
-		void Translate ();
+		void Rotate();
+		void Translate();
 
 		// Reference to a mesh
-		void RefMesh ( C_Mesh* _mesh );
+		void RefMesh(C_Mesh* _mesh);
 
 		// Clear data
-		void Clear ( void );
+		void Clear(void);
 
 		// Translate
-		void Translate ( const float x , const float y , const float z );
+		void Translate(const float x , const float y , const float z);
 		// Translate
-		void Translate ( const C_Vector3* vec );
+		void Translate(const C_Vector3* vec);
 
 		// Translates only bounding volumes. This is used my the group.
 		// Translate as the translation of the mesh is relative but the volumes translation must be absolute.
-		void TranslateBVolumes ( const float x , const float y , const float z );
-		void TranslateBVolumes ( const C_Vector3* vec );
+		void TranslateBVolumes(const float x , const float y , const float z);
+		void TranslateBVolumes(const C_Vector3* vec);
 
-		void Rotate ( const float x , const float y , const float z );
-		void Rotate ( const C_Quaternion* quat );
+		void Rotate(const float x , const float y , const float z);
+		void Rotate(const C_Quaternion* quat);
 
-		void Rotate ( const float x , const float y , const float z , const C_Vector3* vec );
+		void Rotate(const float x , const float y , const float z , const C_Vector3* vec);
 
-		void RotateBVolumes ( const float x , const float y , const float z , const C_Vector3* rotPoint );
-		void RotateBVolumes ( const C_Quaternion* quat , const C_Vector3* rotPoint );
+		void RotateBVolumes(const float x , const float y , const float z , const C_Vector3* rotPoint);
+		void RotateBVolumes(const C_Quaternion* quat , const C_Vector3* rotPoint);
 
 		// Draw the mesh
-		bool Draw ( C_Frustum* frustum );
+		bool Draw(C_Frustum* frustum);
 
-		void DrawBVolumes ( void );
+		void DrawBVolumes(void);
 
 		// Calculates bounding sphere
-		void CalcBSphere ( void );
+		void CalcBSphere(void);
 		// Calculates bounding box
-		void CalcBBox ( void );
-		
-		ULONG GetNPolys ( void ) { return mesh->nPolys; }
-		ULONG GetNVertices ( void ) { return mesh->nVertices; }
+		void CalcBBox(void);
+
+		ULONG GetNPolys(void) { return mesh->nPolys; }
+		ULONG GetNVertices(void) { return mesh->nVertices; }
 
 };
 

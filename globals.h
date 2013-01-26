@@ -26,32 +26,27 @@ typedef unsigned int UINT;
 typedef unsigned short USHORT;
 
 //Very simple struct to hold vertex information
-typedef struct
-{
+typedef struct {
 	float x , y , z;
 } C_Vertex;
 
 //Very simple struct to hold normal information
-typedef struct
-{
+typedef struct {
 	float nx , ny , nz;
 } C_Normal;
 
 //Very simple struct to hold texture coordinate information
-typedef struct
-{
+typedef struct {
 	float u , v;
 } C_TexCoord;
 
 //Very simple struct to hold color information
-typedef struct
-{
+typedef struct {
 	float r , g , b , a;
 } C_Color;
 
 //Very simple struct to hold index information
-typedef struct
-{
+typedef struct {
 	UINT p0 , p1 , p2;
 } C_TriIndices;
 
@@ -73,8 +68,7 @@ typedef enum {
 	txTrilinear	= 2,
 } eglTexFilterType;
 
-typedef	struct
-{
+typedef	struct {
 	uint32_t 	TextureID;									// Texture ID Used To Select A Texture
 	eglTexType	TexType;									// Texture Format
 	uint32_t	Width;										// Image Width

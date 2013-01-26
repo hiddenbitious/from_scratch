@@ -1,4 +1,3 @@
-
 #ifndef _CUBEGRID_H_
 #define _CUBEGRID_H_
 
@@ -16,31 +15,27 @@
 
 
 
-struct grid_cube_vertex
-{
+struct grid_cube_vertex {
 	float value;
 	C_Vertex position;
 	C_Vertex normal; // Me ton idio tropo pou kanoume interpolation gia na broume tis nees korifes kanoume kai gia tis normes
 };
 
 
-struct grid_cube
-{
+struct grid_cube {
 	grid_cube_vertex *vertices[8];
 };
 
 
-struct grid_triangle
-{
+struct grid_triangle {
 	C_Vertex vertices[3];
 	C_Vertex normals[3];
 };
 
 
-class C_CubeGrid
-{
+class C_CubeGrid {
 	public:
-		void Constructor ( float x , float y , float z );
+		void Constructor(float x , float y , float z);
 
 		// Whole's grid position
 		C_Vertex position;
@@ -56,7 +51,7 @@ class C_CubeGrid
 
 
 		// Oi korifes metaksi ton kibon tha moirazondai
-		grid_cube_vertex gridCubeVertices [ (CUBES_PER_AXIS+1)*(CUBES_PER_AXIS+1)*(CUBES_PER_AXIS+1) ];
+		grid_cube_vertex gridCubeVertices [(CUBES_PER_AXIS + 1) * (CUBES_PER_AXIS + 1) * (CUBES_PER_AXIS + 1) ];
 
 
 		unsigned long nGridCubes;
@@ -65,9 +60,9 @@ class C_CubeGrid
 
 		grid_triangle geometry[40000];
 
-		void Update ( C_Metaball *metaballs , unsigned short nBalls , C_Frustum *frustum );
-		int Draw ( C_Frustum *frustum );
-		void DrawGridCube ( void );
+		void Update(C_Metaball *metaballs , unsigned short nBalls , C_Frustum *frustum);
+		int Draw(C_Frustum *frustum);
+		void DrawGridCube(void);
 };
 
 #endif

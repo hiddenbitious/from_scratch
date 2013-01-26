@@ -22,8 +22,7 @@
 #include "quaternion.h"
 #include "frustum.h"
 
-class C_Camera
-{
+class C_Camera {
 	private:
 		float rotMatrix[16];
 
@@ -49,24 +48,24 @@ class C_Camera
 		//Camera coordinates
 		C_Vector3 position;
 
-		C_Camera ( void );
+		C_Camera(void);
 
 		float zNear , zFar , fov;
 
-		void Look ( void );
-		void setProjection ( int w , int h );
+		void Look(void);
+		void setProjection(int w , int h);
 
-		void Rotate ( const float x , const float y  );
-		void Move ( const float speed );
-		void Move ( const float x , const float y , const float z );
-		void MoveUp ( const float speed );
-		void MoveDown ( const float speed );
-		void StrafeLeft ( const float speed );
-		void StrafeRight ( const float speed );
+		void Rotate(const float x , const float y);
+		void Move(const float speed);
+		void Move(const float x , const float y , const float z);
+		void MoveUp(const float speed);
+		void MoveDown(const float speed);
+		void StrafeLeft(const float speed);
+		void StrafeRight(const float speed);
 
-		void PrintText ( int x , int y , float r , float g , float b , float a , const char *text  , ... );
+		void PrintText(int x , int y , float r , float g , float b , float a , const char *text  , ...);
 
-		inline C_Vector3 GetPosition ( void ) const { return position; }
+		inline C_Vector3 GetPosition(void) const { return position; }
 
 };
 

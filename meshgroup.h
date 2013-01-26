@@ -23,9 +23,8 @@
 
 using namespace std;
 
-class C_MeshGroup
-{
-	friend class C_3DSReader;
+class C_MeshGroup {
+		friend class C_3DSReader;
 
 	public:
 
@@ -52,36 +51,36 @@ class C_MeshGroup
 
 		// Used in the draw method to convert the quaternion into a rotation matrix
 		float rotationMatrix[16];
-		float x,y,z,a;
+		float x, y, z, a;
 		bool reverseFaces;
 
 	public:
-		C_MeshGroup ( void );
+		C_MeshGroup(void);
 
 		// Adds a triMesh in the group
-		void Add ( C_TriMesh* triMesh );
+		void Add(C_TriMesh* triMesh);
 
-		void Translate ( const float x , const float y , const float z );
-		void Translate ( const C_Vector3* vec );
+		void Translate(const float x , const float y , const float z);
+		void Translate(const C_Vector3* vec);
 
-		void SetPosition ( const float x , const float y , const float z );
-		void SetPosition ( const C_Vector3* vec );
+		void SetPosition(const float x , const float y , const float z);
+		void SetPosition(const C_Vector3* vec);
 
-		C_Vector3 GetPosition ( void );
+		C_Vector3 GetPosition(void);
 
-		void Rotate ( const float anglex , const float angley , const float anglez );
-		void Rotate ( const float anglex , const float angley , const float anglez , const C_Vector3* rotPoint );
-		void Rotate ( const C_Quaternion* quat , const C_Vector3* rotPoint );
+		void Rotate(const float anglex , const float angley , const float anglez);
+		void Rotate(const float anglex , const float angley , const float anglez , const C_Vector3* rotPoint);
+		void Rotate(const C_Quaternion* quat , const C_Vector3* rotPoint);
 
-		void Clear ( void );
+		void Clear(void);
 
-		int Draw ( C_Frustum* frustum );
-		int Draw ( C_Frustum* frustum , int *nPolys );
-		void Draw ( void );
-		void DrawBVolumes ( void );
+		int Draw(C_Frustum* frustum);
+		int Draw(C_Frustum* frustum , int *nPolys);
+		void Draw(void);
+		void DrawBVolumes(void);
 
-		void CalcBBox ( void );
-		void CalcBSphere ( void );
+		void CalcBBox(void);
+		void CalcBSphere(void);
 };
 
 #endif

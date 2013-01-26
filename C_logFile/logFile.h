@@ -9,23 +9,22 @@
 
 using namespace std;
 
-class C_logFile
-{
-private:
-	const char* filename;	//the name of the log file.
-	ofstream LOG_FILE_P;	//stream attached to previous file.
+class C_logFile {
+	private:
+		const char* filename;	//the name of the log file.
+		ofstream LOG_FILE_P;	//stream attached to previous file.
 
-	void writeHeader ( void );
+		void writeHeader(void);
 
-	time_t osBinaryTime;		// C run-time time (defined in <time.h>)
+		time_t osBinaryTime;		// C run-time time (defined in <time.h>)
 
-public:
+	public:
 
-	C_logFile ( const char* fileName );
-	~C_logFile ( void );
+		C_logFile(const char* fileName);
+		~C_logFile(void);
 
-	void writeToFile ( string );
-	void endLogging ( void );
+		void writeToFile(string);
+		void endLogging(void);
 };
 
 #endif

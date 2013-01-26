@@ -20,10 +20,9 @@
 #include "vectors.h"
 #include "quaternion.h"
 
-class C_BVolumes
-{
+class C_BVolumes {
 	public:
-		virtual void Draw ( void ) = 0;
+		virtual void Draw(void) = 0;
 };
 
 #endif

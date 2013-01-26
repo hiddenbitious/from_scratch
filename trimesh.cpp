@@ -20,7 +20,7 @@
 #include "../oglRenderer/oglDriver.h"
 
 
-C_TriMesh::C_TriMesh ( void )
+C_TriMesh::C_TriMesh(void)
 {
 	mesh = NULL;
 
@@ -30,39 +30,38 @@ C_TriMesh::C_TriMesh ( void )
 }
 
 
-void C_TriMesh::RefMesh ( C_Mesh* _mesh )
+void C_TriMesh::RefMesh(C_Mesh* _mesh)
 {
-	if ( !_mesh ) return;
+	if(!_mesh) { return; }
 	mesh = _mesh;
-	mesh->Ref ();
+	mesh->Ref();
 }
 
 
-void C_TriMesh::Clear ( void )
+void C_TriMesh::Clear(void)
 {
-	if ( mesh == NULL )
+	if(mesh == NULL) {
 		return;
+	}
 
-	mesh->UnRef ();
+	mesh->UnRef();
 
-	if ( mesh->GetRef () == 0 )
+	if(mesh->GetRef() == 0) {
 		delete mesh;
+	}
 
 	mesh = NULL;
 }
 
 
-bool C_TriMesh::Draw ( C_Frustum* frustum )
+bool C_TriMesh::Draw(C_Frustum* frustum)
 {
-	if ( frustum )
-	{
+	if(frustum) {
 		//First check is bsphere is in frustum
-		if ( frustum->sphereInFrustum ( &bsphere ) )
-		{
+		if(frustum->sphereInFrustum(&bsphere)) {
 			//Then check if bbox is too
-			if ( frustum->cubeInFrustum ( &bbox ) )
-			{
-				Draw ();
+			if(frustum->cubeInFrustum(&bbox)) {
+				Draw();
 				return true;
 			}
 		}
@@ -71,47 +70,47 @@ bool C_TriMesh::Draw ( C_Frustum* frustum )
 }
 
 
-void C_TriMesh::Draw ( void )
+void C_TriMesh::Draw(void)
 {
-	_PushTransMatrix ();
+	_PushTransMatrix();
 
 
 	// Translate and then rotate
 
-		// Both codes have the same result...
+	// Both codes have the same result...
 
-		rotationQuaternion.QuaternionToAxisAngle ( x , y , z , a );
-		_ApplyTranslation ( position.x , position.y , position.z );
-		_ApplyRotation ( a , x , y , z );
+	rotationQuaternion.QuaternionToAxisAngle(x , y , z , a);
+	_ApplyTranslation(position.x , position.y , position.z);
+	_ApplyRotation(a , x , y , z);
 
-/*
-		rotationQuaternion.QuaternionToMatrix16 ( rotationMatrix );
-		rotationMatrix[12] = position.x;
-		rotationMatrix[13] = position.y;
-		rotationMatrix[14] = position.z;
+	/*
+			rotationQuaternion.QuaternionToMatrix16 ( rotationMatrix );
+			rotationMatrix[12] = position.x;
+			rotationMatrix[13] = position.y;
+			rotationMatrix[14] = position.z;
 
-		_ApplyTransformation ( rotationMatrix );
-*/
+			_ApplyTransformation ( rotationMatrix );
+	*/
 
-		//Draw
-		_DrawMesh ( this );
+	//Draw
+	_DrawMesh(this);
 
-	_PopTransMatrix ();
+	_PopTransMatrix();
 }
 
 
-void C_TriMesh::DrawBVolumes ( void )
+void C_TriMesh::DrawBVolumes(void)
 {
 //	bsphere.Draw ();
-	bbox.Draw ();
+	bbox.Draw();
 }
 
 
-void C_TriMesh::CalcBSphere ( void )
+void C_TriMesh::CalcBSphere(void)
 {
-	if ( mesh == NULL ) return;
-	if ( mesh->vertices == NULL ) return;
-	if ( mesh->nVertices == 0 ) return;
+	if(mesh == NULL) { return; }
+	if(mesh->vertices == NULL) { return; }
+	if(mesh->nVertices == 0) { return; }
 
 	float minX , minY , minZ , maxX , maxY , maxZ;
 	float sx , sy , sz;
@@ -121,63 +120,63 @@ void C_TriMesh::CalcBSphere ( void )
 	minZ = maxZ = mesh->vertices[mesh->indices[0].p0].z;
 
 
-	sx = (maxX+minX) / 2.0f;
-	sy = (maxY+minY) / 2.0f;
-	sz = (maxZ+minZ) / 2.0f;
+	sx = (maxX + minX) / 2.0f;
+	sy = (maxY + minY) / 2.0f;
+	sz = (maxZ + minZ) / 2.0f;
 
-	float maxDist = C_Vector3::Magnitude ( sx , sy , sz , mesh->vertices[mesh->indices[0].p0].x , mesh->vertices[mesh->indices[0].p0].y , mesh->vertices[mesh->indices[0].p0].z );
+	float maxDist = C_Vector3::Magnitude(sx , sy , sz , mesh->vertices[mesh->indices[0].p0].x , mesh->vertices[mesh->indices[0].p0].y , mesh->vertices[mesh->indices[0].p0].z);
 	float dist;
 
-	for ( ULONG i = 0 ; i < mesh->nPolys ; i++ )
-	{
-		maxX = MAX ( maxX , mesh->vertices[mesh->indices[i].p0].x );
-		maxX = MAX ( maxX , mesh->vertices[mesh->indices[i].p1].x );
-		maxX = MAX ( maxX , mesh->vertices[mesh->indices[i].p2].x );
+	for(ULONG i = 0 ; i < mesh->nPolys ; i++) {
+		maxX = MAX(maxX , mesh->vertices[mesh->indices[i].p0].x);
+		maxX = MAX(maxX , mesh->vertices[mesh->indices[i].p1].x);
+		maxX = MAX(maxX , mesh->vertices[mesh->indices[i].p2].x);
 
-		maxY = MAX ( maxY , mesh->vertices[mesh->indices[i].p0].y );
-		maxY = MAX ( maxY , mesh->vertices[mesh->indices[i].p1].y );
-		maxY = MAX ( maxY , mesh->vertices[mesh->indices[i].p2].y );
+		maxY = MAX(maxY , mesh->vertices[mesh->indices[i].p0].y);
+		maxY = MAX(maxY , mesh->vertices[mesh->indices[i].p1].y);
+		maxY = MAX(maxY , mesh->vertices[mesh->indices[i].p2].y);
 
-		maxZ = MAX ( maxZ , mesh->vertices[mesh->indices[i].p0].z );
-		maxZ = MAX ( maxZ , mesh->vertices[mesh->indices[i].p1].z );
-		maxZ = MAX ( maxZ , mesh->vertices[mesh->indices[i].p2].z );
-
-
-		minX = MIN ( minX , mesh->vertices[mesh->indices[i].p0].x );
-		minX = MIN ( minX , mesh->vertices[mesh->indices[i].p1].x );
-		minX = MIN ( minX , mesh->vertices[mesh->indices[i].p2].x );
-
-		minY = MIN ( minY , mesh->vertices[mesh->indices[i].p0].y );
-		minY = MIN ( minY , mesh->vertices[mesh->indices[i].p1].y );
-		minY = MIN ( minY , mesh->vertices[mesh->indices[i].p2].y );
-
-		minZ = MIN ( minZ , mesh->vertices[mesh->indices[i].p0].z );
-		minZ = MIN ( minZ , mesh->vertices[mesh->indices[i].p1].z );
-		minZ = MIN ( minZ , mesh->vertices[mesh->indices[i].p2].z );
+		maxZ = MAX(maxZ , mesh->vertices[mesh->indices[i].p0].z);
+		maxZ = MAX(maxZ , mesh->vertices[mesh->indices[i].p1].z);
+		maxZ = MAX(maxZ , mesh->vertices[mesh->indices[i].p2].z);
 
 
-		sx = (maxX+minX) / 2.0f;
-		sy = (maxY+minY) / 2.0f;
-		sz = (maxZ+minZ) / 2.0f;
+		minX = MIN(minX , mesh->vertices[mesh->indices[i].p0].x);
+		minX = MIN(minX , mesh->vertices[mesh->indices[i].p1].x);
+		minX = MIN(minX , mesh->vertices[mesh->indices[i].p2].x);
 
-		dist = C_Vector3::Magnitude ( sx , sy , sz , maxX , maxY , maxZ );
-		if ( dist > maxDist )
+		minY = MIN(minY , mesh->vertices[mesh->indices[i].p0].y);
+		minY = MIN(minY , mesh->vertices[mesh->indices[i].p1].y);
+		minY = MIN(minY , mesh->vertices[mesh->indices[i].p2].y);
+
+		minZ = MIN(minZ , mesh->vertices[mesh->indices[i].p0].z);
+		minZ = MIN(minZ , mesh->vertices[mesh->indices[i].p1].z);
+		minZ = MIN(minZ , mesh->vertices[mesh->indices[i].p2].z);
+
+
+		sx = (maxX + minX) / 2.0f;
+		sy = (maxY + minY) / 2.0f;
+		sz = (maxZ + minZ) / 2.0f;
+
+		dist = C_Vector3::Magnitude(sx , sy , sz , maxX , maxY , maxZ);
+		if(dist > maxDist) {
 			maxDist = dist;
+		}
 	}
 
 //	bbox.SetMax ( maxX , maxY , maxZ );
 //	bbox.SetMin ( minX , minY , minZ );
 
-	bsphere.SetPosition ( sx , sy , sz );
-	bsphere.SetRadius ( maxDist );
+	bsphere.SetPosition(sx , sy , sz);
+	bsphere.SetRadius(maxDist);
 }
 
 
-void C_TriMesh::CalcBBox ( void )
+void C_TriMesh::CalcBBox(void)
 {
-	if ( mesh == NULL ) return;
-	if ( mesh->vertices == NULL ) return;
-	if ( mesh->nVertices == 0 ) return;
+	if(mesh == NULL) { return; }
+	if(mesh->vertices == NULL) { return; }
+	if(mesh->nVertices == 0) { return; }
 
 
 	float minX , minY , minZ , maxX , maxY , maxZ;
@@ -186,96 +185,95 @@ void C_TriMesh::CalcBBox ( void )
 	minY = maxY = mesh->vertices[mesh->indices[0].p0].y;
 	minZ = maxZ = mesh->vertices[mesh->indices[0].p0].z;
 
-	for ( ULONG i = 0 ; i < mesh->nPolys ; i++ )
-	{
-		maxX = MAX ( maxX , mesh->vertices[mesh->indices[i].p0].x );
-		maxX = MAX ( maxX , mesh->vertices[mesh->indices[i].p1].x );
-		maxX = MAX ( maxX , mesh->vertices[mesh->indices[i].p2].x );
+	for(ULONG i = 0 ; i < mesh->nPolys ; i++) {
+		maxX = MAX(maxX , mesh->vertices[mesh->indices[i].p0].x);
+		maxX = MAX(maxX , mesh->vertices[mesh->indices[i].p1].x);
+		maxX = MAX(maxX , mesh->vertices[mesh->indices[i].p2].x);
 
-		maxY = MAX ( maxY , mesh->vertices[mesh->indices[i].p0].y );
-		maxY = MAX ( maxY , mesh->vertices[mesh->indices[i].p1].y );
-		maxY = MAX ( maxY , mesh->vertices[mesh->indices[i].p2].y );
+		maxY = MAX(maxY , mesh->vertices[mesh->indices[i].p0].y);
+		maxY = MAX(maxY , mesh->vertices[mesh->indices[i].p1].y);
+		maxY = MAX(maxY , mesh->vertices[mesh->indices[i].p2].y);
 
-		maxZ = MAX ( maxZ , mesh->vertices[mesh->indices[i].p0].z );
-		maxZ = MAX ( maxZ , mesh->vertices[mesh->indices[i].p1].z );
-		maxZ = MAX ( maxZ , mesh->vertices[mesh->indices[i].p2].z );
+		maxZ = MAX(maxZ , mesh->vertices[mesh->indices[i].p0].z);
+		maxZ = MAX(maxZ , mesh->vertices[mesh->indices[i].p1].z);
+		maxZ = MAX(maxZ , mesh->vertices[mesh->indices[i].p2].z);
 
 
-		minX = MIN ( minX , mesh->vertices[mesh->indices[i].p0].x );
-		minX = MIN ( minX , mesh->vertices[mesh->indices[i].p1].x );
-		minX = MIN ( minX , mesh->vertices[mesh->indices[i].p2].x );
+		minX = MIN(minX , mesh->vertices[mesh->indices[i].p0].x);
+		minX = MIN(minX , mesh->vertices[mesh->indices[i].p1].x);
+		minX = MIN(minX , mesh->vertices[mesh->indices[i].p2].x);
 
-		minY = MIN ( minY , mesh->vertices[mesh->indices[i].p0].y );
-		minY = MIN ( minY , mesh->vertices[mesh->indices[i].p1].y );
-		minY = MIN ( minY , mesh->vertices[mesh->indices[i].p2].y );
+		minY = MIN(minY , mesh->vertices[mesh->indices[i].p0].y);
+		minY = MIN(minY , mesh->vertices[mesh->indices[i].p1].y);
+		minY = MIN(minY , mesh->vertices[mesh->indices[i].p2].y);
 
-		minZ = MIN ( minZ , mesh->vertices[mesh->indices[i].p0].z );
-		minZ = MIN ( minZ , mesh->vertices[mesh->indices[i].p1].z );
-		minZ = MIN ( minZ , mesh->vertices[mesh->indices[i].p2].z );
+		minZ = MIN(minZ , mesh->vertices[mesh->indices[i].p0].z);
+		minZ = MIN(minZ , mesh->vertices[mesh->indices[i].p1].z);
+		minZ = MIN(minZ , mesh->vertices[mesh->indices[i].p2].z);
 	}
 
-	bbox.SetMax ( maxX , maxY , maxZ );
-	bbox.SetMin ( minX , minY , minZ );
-	bbox.SetVertices ();
+	bbox.SetMax(maxX , maxY , maxZ);
+	bbox.SetMin(minX , minY , minZ);
+	bbox.SetVertices();
 }
 
 
-void C_TriMesh::Translate ( const float x , const float y , const float z )
+void C_TriMesh::Translate(const float x , const float y , const float z)
 {
-	position.Translate ( x , y , z );
-	bbox.Translate ( x , y , z );
-	bsphere.Translate ( x , y , z );
+	position.Translate(x , y , z);
+	bbox.Translate(x , y , z);
+	bsphere.Translate(x , y , z);
 }
 
 
-void C_TriMesh::Translate ( const C_Vector3 *vec )
+void C_TriMesh::Translate(const C_Vector3 *vec)
 {
-	position.Translate ( vec );
-	bbox.Translate ( vec );
-	bsphere.Translate ( vec );
+	position.Translate(vec);
+	bbox.Translate(vec);
+	bsphere.Translate(vec);
 }
 
 
-void C_TriMesh::Rotate ( const float anglex , const float angley , const float anglez )
-{
-	C_Quaternion tempQuat;
-	tempQuat.Rotate ( anglex , angley , anglez );
-
-	//Aplly rotation
-	rotationQuaternion.Mult ( &tempQuat );
-	//Rotate BVOlumes
-	RotateBVolumes ( anglex , angley , anglez , &position );
-}
-
-
-void C_TriMesh::Rotate ( const float anglex , const float angley , const float anglez , const C_Vector3* rotPoint )
+void C_TriMesh::Rotate(const float anglex , const float angley , const float anglez)
 {
 	C_Quaternion tempQuat;
-	tempQuat.Rotate ( anglex , angley , anglez );
+	tempQuat.Rotate(anglex , angley , anglez);
 
 	//Aplly rotation
-	rotationQuaternion.Mult ( &tempQuat );
+	rotationQuaternion.Mult(&tempQuat);
 	//Rotate BVOlumes
-	RotateBVolumes ( anglex , angley , anglez , rotPoint );
+	RotateBVolumes(anglex , angley , anglez , &position);
 }
 
 
-void C_TriMesh::RotateBVolumes ( const float anglex , const float angley , const float anglez , const C_Vector3* rotPoint )
+void C_TriMesh::Rotate(const float anglex , const float angley , const float anglez , const C_Vector3* rotPoint)
 {
-	bbox.Rotate ( anglex , angley , anglez , rotPoint );
-	bsphere.Rotate ( anglex , angley , anglez , rotPoint );
+	C_Quaternion tempQuat;
+	tempQuat.Rotate(anglex , angley , anglez);
+
+	//Aplly rotation
+	rotationQuaternion.Mult(&tempQuat);
+	//Rotate BVOlumes
+	RotateBVolumes(anglex , angley , anglez , rotPoint);
 }
 
 
-void C_TriMesh::TranslateBVolumes ( const float x , const float y , const float z )
+void C_TriMesh::RotateBVolumes(const float anglex , const float angley , const float anglez , const C_Vector3* rotPoint)
 {
-	bbox.Translate ( x , y , z );
-	bsphere.Translate ( x , y , z );
+	bbox.Rotate(anglex , angley , anglez , rotPoint);
+	bsphere.Rotate(anglex , angley , anglez , rotPoint);
 }
 
 
-void C_TriMesh::TranslateBVolumes ( const C_Vector3 *vec )
+void C_TriMesh::TranslateBVolumes(const float x , const float y , const float z)
 {
-	bbox.Translate ( vec );
-	bsphere.Translate ( vec );
+	bbox.Translate(x , y , z);
+	bsphere.Translate(x , y , z);
+}
+
+
+void C_TriMesh::TranslateBVolumes(const C_Vector3 *vec)
+{
+	bbox.Translate(vec);
+	bsphere.Translate(vec);
 }

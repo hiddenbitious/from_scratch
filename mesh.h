@@ -21,9 +21,8 @@
 #include "frustum.h"
 //#include "../oglRenderer/textureLoader/TextureLoader.h"
 
-class C_Mesh
-{
-	friend class C_3DSReader;
+class C_Mesh {
+		friend class C_3DSReader;
 
 	public:
 
@@ -50,21 +49,21 @@ class C_Mesh
 
 	public:
 
-		C_Mesh ( void );
+		C_Mesh(void);
 
-		ULONG GetnVertices ( void ) { return nVertices; }
-		ULONG GetnPolys ( void ) { return nPolys; }
+		ULONG GetnVertices(void) { return nVertices; }
+		ULONG GetnPolys(void) { return nPolys; }
 
 		//return number of references to this mesh
-		UINT GetRef ( void ) { return nReferences; }
+		UINT GetRef(void) { return nReferences; }
 
 		//A triMesh is making a reference to this mesh. Increase counter.
-		void Ref ( void );
+		void Ref(void);
 		//Decrease references by 1.
 		//If references <= 0 then the object is destroyed.
-		void UnRef ( void );
+		void UnRef(void);
 
-		void CalcNormals ( bool invertNormals );
+		void CalcNormals(bool invertNormals);
 };
 
 #endif

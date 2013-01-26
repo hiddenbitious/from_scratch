@@ -45,11 +45,10 @@
 #define UPPER_LIMIT (value , limit )		{ if ( value > limit ) value = limit; }
 #define ABS(value)		{	 if ( value < 0 )	value *= -1.0;	}
 
-namespace math
-{
-	void Normalize ( float* x , float* y , float* z);
-	float Magnitude ( float x , float y , float z );
-	float PointToPointDistance ( C_Vertex *p1 , C_Vertex *p2 );
+namespace math {
+void Normalize(float* x , float* y , float* z);
+float Magnitude(float x , float y , float z);
+float PointToPointDistance(C_Vertex *p1 , C_Vertex *p2);
 }
 
 #endif

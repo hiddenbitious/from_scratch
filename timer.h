@@ -45,8 +45,7 @@ BOOL QueryPerformanceFrequency (LARGE_INTEGER *lpFrequency)
 This class uses the performance counter and if it's not available uses the multimedia timer (timeGetTime) instead.
 */
 
-class C_Timer
-{
+class C_Timer {
 	private:
 		bool perfFlag;					//Set to true if performance counter is available on tha machine
 		float timeFactor;				//To convert the time received
@@ -58,13 +57,13 @@ class C_Timer
 		int64_t perfTimeStart;			//Performance timer start value
 
 	public:
-		C_Timer ( void );				//CTor
-		void Initialize ( void );		//Initializes timer
-		ULONG GetTime ( void );			//Returns since the timer initialization
+		C_Timer(void);				//CTor
+		void Initialize(void);		//Initializes timer
+		ULONG GetTime(void);			//Returns since the timer initialization
 
-		void Update ( void );			//Updates the delta variable
+		void Update(void);			//Updates the delta variable
 
-		inline ULONG GetDelta ( void )	//Returns the delta variable
+		inline ULONG GetDelta(void)	//Returns the delta variable
 		{ return (ULONG)delta; }
 };
 

@@ -14,8 +14,7 @@
 #include "../oglRenderer/shaders/glsl.h"
 //#include "../oglRenderer/textureLoader/TextureLoader.h"
 
-class box
-{
+class box {
 	private:
 
 		float scalex , scaley , scalez;
@@ -38,38 +37,38 @@ class box
 
 		// Used in the draw method to convert the quaternion into a rotation matrix
 		float rotationMatrix[16];
-		float x,y,z,a;
+		float x, y, z, a;
 
 
 
-		void TranslateBVolumes ( const float x , const float y , const float z );
-		void TranslateBVolumes ( const C_Vector3* vec );
-		void RotateBVolumes ( const float x , const float y , const float z , const C_Vector3* rotPoint );
-		void RotateBVolumes ( const C_Quaternion* quat , const C_Vector3* rotPoint );
+		void TranslateBVolumes(const float x , const float y , const float z);
+		void TranslateBVolumes(const C_Vector3* vec);
+		void RotateBVolumes(const float x , const float y , const float z , const C_Vector3* rotPoint);
+		void RotateBVolumes(const C_Quaternion* quat , const C_Vector3* rotPoint);
 
 
 	public:
-		box ( void );
-		bool LoadShaders ( void );
-		bool LoadTextures ( const char *name );
+		box(void);
+		bool LoadShaders(void);
+		bool LoadTextures(const char *name);
 
-		void SetPosition ( const float x , const float y , const float z );
-		void SetPosition ( const C_Vector3* vec );
+		void SetPosition(const float x , const float y , const float z);
+		void SetPosition(const C_Vector3* vec);
 
-		void Rotate ( const float anglex , const float angley , const float anglez );
-		void Rotate ( const C_Quaternion* quat );
-		void Rotate ( const float anglex , const float angley , const float anglez , const C_Vector3* rotPoint );
-		void Rotate ( const C_Quaternion* quat , const C_Vector3* rotPoint );
+		void Rotate(const float anglex , const float angley , const float anglez);
+		void Rotate(const C_Quaternion* quat);
+		void Rotate(const float anglex , const float angley , const float anglez , const C_Vector3* rotPoint);
+		void Rotate(const C_Quaternion* quat , const C_Vector3* rotPoint);
 
 		// Translate
-		void Translate ( const float x , const float y , const float z );
+		void Translate(const float x , const float y , const float z);
 		// Translate
-		void Translate ( const C_Vector3* vec );
+		void Translate(const C_Vector3* vec);
 
 
 
-		void Draw ( void );
-		int Draw ( C_Frustum* frustum );
+		void Draw(void);
+		int Draw(C_Frustum* frustum);
 };
 
 

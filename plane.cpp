@@ -18,7 +18,7 @@
 #include <GL/glut.h>
 
 
-C_Plane::C_Plane ( float _a , float _b , float _c , float _d )
+C_Plane::C_Plane(float _a , float _b , float _c , float _d)
 {
 	a = _a;
 	b = _b;
@@ -27,14 +27,14 @@ C_Plane::C_Plane ( float _a , float _b , float _c , float _d )
 }
 
 
-C_Plane::C_Plane ( const C_Vector3* vec1 , const C_Vector3* vec2 , const C_Vector3* vec3 )
+C_Plane::C_Plane(const C_Vector3* vec1 , const C_Vector3* vec2 , const C_Vector3* vec3)
 {
-	C_Vector3 temp = C_Vector3::CrossProduct ( vec1 , vec2 , vec3 );
+	C_Vector3 temp = C_Vector3::CrossProduct(vec1 , vec2 , vec3);
 	a = temp.x;
 	b = temp.y;
 	c = temp.z;
 
-	d = -C_Vector3::DotProduct ( &temp , vec1 );
+	d = -C_Vector3::DotProduct(&temp , vec1);
 
 	pointOnPlane.x = vec1->x;
 	pointOnPlane.y = vec1->y;
@@ -42,10 +42,10 @@ C_Plane::C_Plane ( const C_Vector3* vec1 , const C_Vector3* vec2 , const C_Vecto
 }
 
 
-C_Plane::C_Plane ( const C_Vertex* vec1 , const C_Vertex* vec2 , const C_Vertex* vec3 )
+C_Plane::C_Plane(const C_Vertex* vec1 , const C_Vertex* vec2 , const C_Vertex* vec3)
 {
 	// Calculate the plane's normal vector
-	C_Vector3 temp = C_Vector3::CrossProduct2 ( vec1 , vec2 , vec3 );
+	C_Vector3 temp = C_Vector3::CrossProduct2(vec1 , vec2 , vec3);
 	a = temp.x;
 	b = temp.y;
 	c = temp.z;
@@ -53,21 +53,21 @@ C_Plane::C_Plane ( const C_Vertex* vec1 , const C_Vertex* vec2 , const C_Vertex*
 	C_Vertex vert;
 	vert.x = temp.x; vert.y = temp.y; vert.z = temp.z;
 
-	d = -C_Vector3::DotProduct ( &vert , vec1 );
+	d = -C_Vector3::DotProduct(&vert , vec1);
 
-	this->normalizePlane ();
+	this->normalizePlane();
 
 	pointOnPlane.x = vec1->x;
 	pointOnPlane.y = vec1->y;
 	pointOnPlane.z = vec1->z;
 
-	points.push_back ( *vec1 );
-	points.push_back ( *vec2 );
-	points.push_back ( *vec3 );
+	points.push_back(*vec1);
+	points.push_back(*vec2);
+	points.push_back(*vec3);
 }
 
 
-C_Plane::C_Plane ( void )
+C_Plane::C_Plane(void)
 {
 	a = 0.0f;
 	b = 0.0f;
@@ -80,9 +80,9 @@ C_Plane::C_Plane ( void )
 }
 
 
-void C_Plane::normalizePlane ( void )
+void C_Plane::normalizePlane(void)
 {
-	float magn = math::Magnitude ( a , b , c );
+	float magn = math::Magnitude(a , b , c);
 
 	a /= magn;
 	b /= magn;
@@ -91,7 +91,7 @@ void C_Plane::normalizePlane ( void )
 }
 
 
-void C_Plane::setPlane ( float _a , float _b , float _c , float _d )
+void C_Plane::setPlane(float _a , float _b , float _c , float _d)
 {
 	a = _a;
 	b = _b;
@@ -100,7 +100,7 @@ void C_Plane::setPlane ( float _a , float _b , float _c , float _d )
 }
 
 
-void C_Plane::setPlane ( C_Plane* plane )
+void C_Plane::setPlane(C_Plane* plane)
 {
 	a = plane->a;
 	b = plane->b;
@@ -111,22 +111,19 @@ void C_Plane::setPlane ( C_Plane* plane )
 	pointOnPlane.y = plane->pointOnPlane.y;
 	pointOnPlane.z = plane->pointOnPlane.z;
 
-	if ( points.size () )
-	{
+	if(points.size()) {
 		points[0] = plane->points[0];
 		points[1] = plane->points[1];
 		points[2] = plane->points[2];
-	}
-	else
-	{
-		points.push_back ( plane->points[0] );
-		points.push_back ( plane->points[1] );
-		points.push_back ( plane->points[2] );
+	} else {
+		points.push_back(plane->points[0]);
+		points.push_back(plane->points[1]);
+		points.push_back(plane->points[2]);
 	}
 }
 
 
-void C_Plane::getPlaneNormal ( float* x , float* y , float* z )
+void C_Plane::getPlaneNormal(float* x , float* y , float* z)
 {
 	*x = a;
 	*y = b;
@@ -134,7 +131,7 @@ void C_Plane::getPlaneNormal ( float* x , float* y , float* z )
 }
 
 
-C_Vertex C_Plane::getPlaneNormal ( void )
+C_Vertex C_Plane::getPlaneNormal(void)
 {
 	C_Vertex point;
 
@@ -146,23 +143,23 @@ C_Vertex C_Plane::getPlaneNormal ( void )
 }
 
 
-float C_Plane::GetPlaneConstant ( void )
+float C_Plane::GetPlaneConstant(void)
 {
 	return d;
 }
 
 
-void C_Plane::Draw ( void )
+void C_Plane::Draw(void)
 {
-	glDisable ( GL_TRIANGLES );
-	glColor3f ( .5 , 0.5 , 0.0 );
+	glDisable(GL_TRIANGLES);
+	glColor3f(.5 , 0.5 , 0.0);
 
-	glBegin ( GL_TRIANGLES );
-		glVertex3f ( points[0].x , points[0].y , points[0].z );
-		glVertex3f ( points[1].x , points[1].y , points[1].z );
-		glVertex3f ( points[2].x , points[2].y , points[2].z );
-	glEnd ();
+	glBegin(GL_TRIANGLES);
+	glVertex3f(points[0].x , points[0].y , points[0].z);
+	glVertex3f(points[1].x , points[1].y , points[1].z);
+	glVertex3f(points[2].x , points[2].y , points[2].z);
+	glEnd();
 
-	glColor3f ( 1.0 , 1.0 , 1.0 );
-	glEnable ( GL_LIGHTING );
+	glColor3f(1.0 , 1.0 , 1.0);
+	glEnable(GL_LIGHTING);
 }
