@@ -14,8 +14,8 @@
 *     ***************************       *
 ****************************************/
 
-#include "meshgroup.h"
 #include "../oglRenderer/oglDriver.h"
+#include "meshgroup.h"
 
 
 C_MeshGroup::C_MeshGroup ( void )

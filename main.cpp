@@ -90,7 +90,7 @@ static C_Vector3 center ( 0.0f , 0.0f , 0.0f );
 // Metablites hronometrisis
 //C_Timer timer;
 //ULONG start = timer.GetTime ();
-float timeElapsed = 0.0f;
+static float timeElapsed = 0.0f;
 static float fps;
 
 // Metaballs
@@ -518,7 +518,7 @@ int main(int argc, char* argv[])
 	glutInit ( &argc , argv );
 
 	// Double buffer me depth buffer
-	glutInitDisplayMode ( GL_DOUBLE | GLUT_RGB | GLUT_DEPTH );
+	glutInitDisplayMode ( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
 
 	// Kataskeui window
 	glutInitWindowSize ( windowWidth , windowHeight );
