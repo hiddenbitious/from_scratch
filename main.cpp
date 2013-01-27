@@ -152,7 +152,6 @@ static void Initializations(void)
 	// Fortose dinamika andikeimena
 //	C_3DSReader reader;
 
-
 //	reader.Load3DSFile("models/statue.3ds" , &statue2);
 	statue2.Translate(0.0f , 0.0f , 40.0f);
 	statue1.Rotate(0.0f , -45.0f , 0.0f);
@@ -167,11 +166,9 @@ static void Initializations(void)
 	narn.SetPosition(-100.0f , 10.0f , 0.0f);
 	narn.Rotate(90.0f , 0.0f , 0.0f);
 
-
 	// Energopoiise textures
 //	glTexEnvi(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_MODULATE);
 //	glEnable(GL_TEXTURE_2D);
-
 
 	// Arhikopoiiseis Metaballs
 	grid.Constructor(-250.0f , 0.0f , 200.0f);
@@ -181,7 +178,6 @@ static void Initializations(void)
 	metaball[0].position.y = 10.0f;
 	metaball[0].position.z = 10.0f;
 	metaball[0].radius = 5.0f;
-
 
 	metaball[1].Constructor();
 	metaball[1].position.x = 10.0f;
@@ -211,7 +207,6 @@ static void Draw(void)
 	angle2 += 2.0f * timeElapsed;
 	if(angle2 >= 360.0f) { angle2 = 0.0f; }
 
-
 	// These to hroma tou parathirou sto default kai katharise ton depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -223,9 +218,7 @@ static void Draw(void)
 	// To fos akolouthei tin camera kai peristrefete giro apo autin
 	float lightPos[] = { cameraPosition.x + 10.0f * (float)sin(angle),
 						 cameraPosition.y,
-						 cameraPosition.z + 10.0f * (float)cos(angle), 1.0f
-					   };
-//	float zero[] = { 0.0f , 0.0f , 0.0f , 1.0f };
+						 cameraPosition.z + 10.0f * (float)cos(angle), 1.0f};
 
 	// Shediase mia mikri sfaira sti thesi tou fotos
 	glPushMatrix();
@@ -538,8 +531,7 @@ void CountFPS (void)
 	float delta = timer.GetTime () - start;
 	count++;
 
-	if ( delta >= 1000.0f )
-	{
+	if(delta >= 1000.0f) {
 		fps = count;
 		start = timer.GetTime ();
 		count = 0;

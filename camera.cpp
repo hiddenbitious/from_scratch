@@ -31,8 +31,6 @@ void *glutFonts[7] = {
 	GLUT_BITMAP_HELVETICA_18
 };
 
-
-
 C_Camera::C_Camera(void)
 {
 	position = C_Vector3::Zero();
@@ -54,7 +52,6 @@ C_Camera::C_Camera(void)
 
 	rotation = translation = true;
 }
-
 
 void C_Camera::Look(void)
 {
@@ -89,7 +86,6 @@ void C_Camera::Look(void)
 	}
 }
 
-
 void C_Camera::Rotate(const float xRotation , const float yRotation)
 {
 	C_Quaternion qq , qy;
@@ -108,7 +104,6 @@ void C_Camera::Rotate(const float xRotation , const float yRotation)
 	updateFrustum = true;
 	rotation = true;
 }
-
 
 void C_Camera::Move(const float x , const float y , const float z)
 {
@@ -183,31 +178,28 @@ void C_Camera::StrafeRight(const float speed)
 
 void C_Camera::setProjection(int w , int h)
 {
-//	float ratio = float(w) / float(h);
 	this->w = w;
 	this->h = h;
 
-	glViewport(0 , 0 , w , h);
+	glViewport(0, 0, w, h);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
+//	float ratio = float(w) / float(h);
 //	gluPerspective ( fov , ratio , zNear , zFar );
 
 	float aspect = (float)w / (float)h;
 	float f = cos(fov * DEGREES_TO_RADIANS) / sin(fov * DEGREES_TO_RADIANS);
 
-	float projMatrix[16] = { f / aspect	, 0.0f	, 0.0f							, 0.0f ,
-							 0.0f		, f		, 0.0f							, 0.0f ,
-							 0.0f		, 0.0f	, (zFar + zNear) / (zNear - zFar)		, -1.0f ,
-							 0.0f		, 0.0f	, (2 * zFar * zNear) / (zNear - zFar)	, 0.0f
-						   };
+	float projMatrix[16] = { f / aspect, 0.0f,	0.0f,									0.0f ,
+							 0.0f,		 f,		0.0f,									0.0f ,
+							 0.0f,		 0.0f,	(zFar + zNear) / (zNear - zFar),		-1.0f ,
+							 0.0f,		 0.0f, 	(2 * zFar * zNear) / (zNear - zFar),	0.0f};
 
 	glMultMatrixf(projMatrix);
-
 	glMatrixMode(GL_MODELVIEW);
 }
-
 
 void C_Camera::PrintText(int x , int y , float r , float g , float b, float a , const char *string , ...)
 {
