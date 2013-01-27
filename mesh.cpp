@@ -81,7 +81,7 @@ void C_Mesh::CalcNormals(bool invertNormals)
 	if(normals != NULL) { delete normals; }
 
 	C_Vector3 tempVec;
-	int i;
+	ULONG i;
 
 	normals = new C_Normal[nVertices];
 	USHORT* connections = new USHORT[nVertices];

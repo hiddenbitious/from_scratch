@@ -221,11 +221,11 @@ static void Draw(void)
 	metaballPolys = 0;
 
 	// To fos akolouthei tin camera kai peristrefete giro apo autin
-	float lightPos[] = { cameraPosition.x + 10.0f * sin(angle) ,
-						 cameraPosition.y ,
-						 cameraPosition.z + 10.0f * cos(angle) , 1.0f
+	float lightPos[] = { cameraPosition.x + 10.0f * (float)sin(angle),
+						 cameraPosition.y,
+						 cameraPosition.z + 10.0f * (float)cos(angle), 1.0f
 					   };
-	float zero[] = { 0.0f , 0.0f , 0.0f , 1.0f };
+//	float zero[] = { 0.0f , 0.0f , 0.0f , 1.0f };
 
 	// Shediase mia mikri sfaira sti thesi tou fotos
 	glPushMatrix();

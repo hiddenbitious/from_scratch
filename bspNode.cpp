@@ -266,7 +266,7 @@ void C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
 
 bool C_BspNode::SelectPartitionfromList(poly** geometry , int nPolys , C_Plane* finalPlane)
 {
-	unsigned int nFront , nBack , nSplits , bestPlane, bestSplits = INT_MAX;
+	unsigned int nFront , nBack , nSplits , bestPlane = 0, bestSplits = INT_MAX;
 	C_Plane tempPlane;
 	bool found = false;
 

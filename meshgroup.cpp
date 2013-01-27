@@ -73,7 +73,7 @@ int C_MeshGroup::Draw(C_Frustum* frustum)
 					glFrontFace(GL_CCW);
 				}
 
-				for(int i = 0 ; i < nTriMeshes ; i++) {
+				for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 					ret = meshes[i]->Draw(frustum);
 					if(ret) { count++; }
 				}
@@ -122,7 +122,7 @@ int C_MeshGroup::Draw(C_Frustum *frustum , int *nPolys)
 					glFrontFace(GL_CCW);
 				}
 
-				for(int i = 0 ; i < nTriMeshes ; i++) {
+				for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 					ret = meshes[i]->Draw(frustum);
 					if(ret) {
 						count++;
@@ -144,8 +144,6 @@ int C_MeshGroup::Draw(C_Frustum *frustum , int *nPolys)
 
 void C_MeshGroup::Draw(void)
 {
-	bool ret;
-
 	glPushMatrix();
 
 	// Translate and then rotate
@@ -162,7 +160,7 @@ void C_MeshGroup::Draw(void)
 		glFrontFace(GL_CCW);
 	}
 
-	for(int i = 0 ; i < nTriMeshes ; i++) {
+	for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 		meshes[i]->Draw();
 	}
 
@@ -172,7 +170,7 @@ void C_MeshGroup::Draw(void)
 void C_MeshGroup::DrawBVolumes(void)
 {
 	glDisable(GL_CULL_FACE);
-	for(int i = 0 ; i < nTriMeshes ; i++) {
+	for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 		meshes[i]->DrawBVolumes();
 	}
 
@@ -189,7 +187,7 @@ void C_MeshGroup::SetPosition(const float x , const float y , const float z)
 
 	moveVec = position - moveVec;
 
-	for(int i = 0 ; i < nTriMeshes ; i++) {
+	for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 		meshes[i]->TranslateBVolumes(&moveVec);
 	}
 
@@ -208,7 +206,7 @@ void C_MeshGroup::Translate(const float x , const float y , const float z)
 {
 	position.Translate(x , y , z);
 
-	for(int i = 0 ; i < nTriMeshes ; i++) {
+	for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 		meshes[i]->TranslateBVolumes(x , y , z);
 	}
 
@@ -221,7 +219,7 @@ void C_MeshGroup::Translate(const C_Vector3 *vec)
 {
 	position.Translate(vec);
 
-	for(int i = 0 ; i < nTriMeshes ; i++) {
+	for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 		meshes[i]->TranslateBVolumes(vec);
 	}
 
@@ -243,7 +241,7 @@ void C_MeshGroup::Rotate(const float anglex , const float angley , const float a
 	newMax.SetVector(SMALLEST_FLOAT , SMALLEST_FLOAT , SMALLEST_FLOAT);
 	newMin.SetVector(GREATEST_FLOAT , GREATEST_FLOAT , GREATEST_FLOAT);
 
-	for(int i = 0 ; i < nTriMeshes ; i++) {
+	for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 		//Rotate bbox of every mesh in group
 		meshes[i]->RotateBVolumes(anglex , angley , anglez , &position);
 
@@ -280,7 +278,7 @@ void C_MeshGroup::Rotate(const float anglex , const float angley , const float a
 	newMax.SetVector(SMALLEST_FLOAT , SMALLEST_FLOAT , SMALLEST_FLOAT);
 	newMin.SetVector(GREATEST_FLOAT , GREATEST_FLOAT , GREATEST_FLOAT);
 
-	for(int i = 0 ; i < nTriMeshes ; i++) {
+	for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 		meshes[i]->RotateBVolumes(anglex , angley , anglez , rotPoint);
 
 		meshes[i]->bbox.GetMax(&tmpMax);
@@ -305,7 +303,7 @@ void C_MeshGroup::Rotate(const float anglex , const float angley , const float a
 
 void C_MeshGroup::Clear(void)
 {
-	for(int i = 0 ; i < nTriMeshes ; i++) {
+	for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 		meshes[i]->Clear();
 		delete meshes[i];
 		meshes.pop_back();
@@ -358,15 +356,17 @@ void C_MeshGroup::CalcBSphere(void)
 	C_TriMesh* currentMesh;
 
 	float minX , minY , minZ , maxX , maxY , maxZ;
-	float sx , sy , sz;
+	float sx = 0.0f , sy = 0.0f , sz = 0.0f;
 	float maxDist , dist;
 
 	maxX = maxY = maxZ = SMALLEST_FLOAT;
 	minX = minY = minZ = GREATEST_FLOAT;
 	maxDist = -1.0f;
 
+	assert(nTriMeshes);
 	for(ULONG i = 0 ; i < nTriMeshes ; i++) {
 		currentMesh = meshes[i];
+		assert(currentMesh->mesh->nVertices);
 		for(ULONG k = 0 ; k < currentMesh->mesh->nVertices ; k++) {
 			if(currentMesh->mesh->vertices[k].x > maxX) {
 				maxX = currentMesh->mesh->vertices[k].x;

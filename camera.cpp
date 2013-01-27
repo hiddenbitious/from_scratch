@@ -183,7 +183,7 @@ void C_Camera::StrafeRight(const float speed)
 
 void C_Camera::setProjection(int w , int h)
 {
-	float ratio = float(w) / float(h);
+//	float ratio = float(w) / float(h);
 	this->w = w;
 	this->h = h;
 

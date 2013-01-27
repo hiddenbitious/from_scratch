@@ -90,7 +90,7 @@ void box::Draw(void)
 
 	glMateriali(GL_FRONT , GL_SHININESS , 70);
 	glutSolidCube(70.0);
-	float tmp;
+//	float tmp;
 	//shader->GetUniformfv ( "textureWidth" , &tmp );
 	shader->End();
 
