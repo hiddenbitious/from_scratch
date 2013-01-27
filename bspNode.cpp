@@ -19,6 +19,8 @@
 #include "bspHelperFunctions.h"
 #include <GL/glut.h>
 
+#include <stdio.h>
+
 #define MINIMUMRELATION			0.5f
 #define MINIMUMRELATIONSCALE	2.0f
 
@@ -79,12 +81,20 @@ int C_BspNode::ClassifyVertex(C_Plane *plane , C_Vertex *vertex)
 {
 	float dist = plane->distanceFromPoint(vertex);
 
-	if(dist > EPSILON) {
-		return FRONT;
-	} else if(dist < -EPSILON) {
-		return BACK;
-	} else if(dist >= -EPSILON && dist <= EPSILON) {
+//	if(dist > EPSILON) {
+//		return FRONT;
+//	} else if(dist < -EPSILON) {
+//		return BACK;
+//	} else if(dist >= -EPSILON && dist <= EPSILON) {
+//		return COINCIDENT;
+//	}
+
+	if(dist >= -EPSILON && dist <= EPSILON) {
 		return COINCIDENT;
+	} else 	if(dist > EPSILON) {
+		return FRONT;
+	} else {
+		return BACK;
 	}
 }
 
@@ -141,8 +151,6 @@ bool C_BspNode::IsConvex(poly** polys , int nPolys)
 void C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
 {
 	static int ID = 0;
-	static int splits = 0;
-
 	static int maxDepth = tree->maxDepth;
 	node->tree = tree;
 
@@ -258,15 +266,15 @@ void C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
 
 bool C_BspNode::SelectPartitionfromList(poly** geometry , int nPolys , C_Plane* finalPlane)
 {
-	int nFront , nBack , nSplits , bestPlane;
-	int tempDiafora = INT_MAX;
-	int bestSplits = INT_MAX;
+	unsigned int nFront , nBack , nSplits , bestPlane, bestSplits = INT_MAX;
 	C_Plane tempPlane;
 	bool found = false;
 
 	float relation , bestRelation , minRelation;
 	bestRelation = 0.0f;
 	minRelation = MINIMUMRELATION;
+
+	assert(nPolys);
 
 	while(!found) {
 		for(int currentPlane = 0 ; currentPlane < nPolys ; currentPlane++) {
@@ -275,9 +283,11 @@ bool C_BspNode::SelectPartitionfromList(poly** geometry , int nPolys , C_Plane* 
 			}
 
 			nBack = nFront = nSplits = 0;
-			tempPlane = C_Plane(&(geometry[currentPlane]->pVertices[0]) , &(geometry[currentPlane]->pVertices[1]) , &(geometry[currentPlane]->pVertices[2]));
+			tempPlane = C_Plane(&(geometry[currentPlane]->pVertices[0]),
+								&(geometry[currentPlane]->pVertices[1]),
+								&(geometry[currentPlane]->pVertices[2]));
 
-			for(int i = 0 ; i < nPolys ; i++) {
+			for(int i = 0; i < nPolys; i++) {
 				if(i == currentPlane) {
 					continue;
 				}
@@ -294,26 +304,27 @@ bool C_BspNode::SelectPartitionfromList(poly** geometry , int nPolys , C_Plane* 
 			}
 
 			relation = (float)MIN(nFront, nBack) / (float)MAX(nFront, nBack);
+//			printf("bestSplits: %u\n", bestSplits);
+//			printf("nFront: %u\n", nFront);
+//			printf("nBack: %u\n", nBack);
+//			printf("nSplits: %u\n", nSplits);
 
-			if((relation > minRelation && nSplits < bestSplits) ||
-					(nSplits == bestSplits && relation > bestRelation)) {
+			if((relation > minRelation && nSplits < bestSplits) || (nSplits == bestSplits && relation > bestRelation)) {
 				finalPlane->setPlane(&tempPlane);
 				bestSplits = nSplits;
 				bestRelation = relation;
-
 				bestPlane = currentPlane;
-
 				found = true;
+//				printf("****\n");
 			}
 		}
 
-		// An ehoun dokimastei ola ta polygona kai den ehei brethei akoma epipedo diahorismou
-		// halarose ligo ta kritiria kai ksanapsakse
+		/// An ehoun dokimastei ola ta polygona kai den ehei brethei akoma epipedo diahorismou
+		/// halarose ligo ta kritiria kai ksanapsakse
 		minRelation /= MINIMUMRELATIONSCALE;
 	}
 
 	geometry[bestPlane]->usedAsDivider = true;
-
 	// Keep plane's information so we can draw it
 	debug.push_back(finalPlane->points[0]);
 	debug.push_back(finalPlane->points[1]);
@@ -454,7 +465,7 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
 		node->drawn = true;
 		node->Draw();
 
-		for(int i = 0 ; i < node->PVS.size() ; i++) {
+		for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
 			if(node->PVS[i]->drawn) {
 				continue;
 			}
@@ -498,8 +509,8 @@ void C_BspNode::CalculateBBox(void)
 	maxX = maxY = maxZ = SMALLEST_FLOAT;
 	minX = minY = minZ = GREATEST_FLOAT;
 
-	for(ULONG i = 0 ; i < nPolys ; i++) {
-		for(ULONG k = 0 ; k < geometry[i]->nVertices; k++) {
+	for(int i = 0 ; i < nPolys ; i++) {
+		for(int k = 0 ; k < geometry[i]->nVertices; k++) {
 			maxX = MAX(maxX , geometry[i]->pVertices[k].x);
 			maxY = MAX(maxY , geometry[i]->pVertices[k].y);
 			maxZ = MAX(maxZ , geometry[i]->pVertices[k].z);
@@ -708,7 +719,7 @@ void C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
 
 void C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points)
 {
-	int cPoint = 0;
+	unsigned int cPoint = 0;
 
 	// Remove points outside the bbox
 	while(cPoint < points.size()) {
@@ -751,12 +762,12 @@ void C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& point
 		frontPoints = node->pointSet;
 		backPoints = node->pointSet;
 
-		for(int i = 0 ; i < points.size() ; i++) {
+		for(unsigned int i = 0 ; i < points.size() ; i++) {
 			dist = node->partitionPlane.distanceFromPoint(&points[i]);
 
-			if(dist > 0) {
+			if(dist > 0.0f) {
 				frontPoints.push_back(points[i]);
-			} else if(dist < 0) {
+			} else if(dist < 0.0f) {
 				backPoints.push_back(points[i]);
 			} else {
 				frontPoints.push_back(points[i]);
@@ -779,10 +790,10 @@ void C_BspNode::DistributePointsAlongPartitionPlane(void)
 	vector<C_Vertex> intersectionPoints = FindBBoxPlaneIntersections(&bbox , &partitionPlane);
 
 	float maxU , maxV , minU , minV;
-	float tmpU , tmpV , tmpDist , dist;
+	float tmpU , tmpV;
 	maxU = maxV = SMALLEST_FLOAT;
 	minU = minV = GREATEST_FLOAT;
-	dist = SMALLEST_FLOAT;
+//	dist = SMALLEST_FLOAT;
 
 	for(USHORT i = 0 ; i < intersectionPoints.size() ; i++) {
 		CalculateUV(&partitionPlane , &intersectionPoints[i] , &tmpU , &tmpV);

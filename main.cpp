@@ -139,8 +139,8 @@ static void Initializations(void)
 
 	// Fortose shaders
 //	SetRelevantDir ( L"shaders" );
-	basicShader = shaderManager.LoadShaderProgram("shaders/basic.vert" , "shaders/basic.frag");
-	basicShader_texture = shaderManager.LoadShaderProgram("shaders/basic_withSingleTexture.vert" , "shaders/basic_withSingleTexture.frag");
+	basicShader = shaderManager.LoadShaderProgram("basic.vert" , "basic.frag");
+	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
 
 	// Diabase tin geometria gia to bsp
 	bspTest.ReadGeometryFile("properMap2.BSP");
@@ -150,29 +150,27 @@ static void Initializations(void)
 	bspTest.BuildPVS();
 
 	// Fortose dinamika andikeimena
-	C_3DSReader reader;
+//	C_3DSReader reader;
 
 
-//	SetRelevantDir ( L"models" );
-	reader.Load3DSFile("statue.3ds" , &statue1);
-	reader.Load3DSFile("statue.3ds" , &statue2);
+//	reader.Load3DSFile("models/statue.3ds" , &statue2);
 	statue2.Translate(0.0f , 0.0f , 40.0f);
 	statue1.Rotate(0.0f , -45.0f , 0.0f);
 
 	C_Vector3 scale = C_Vector3(150.0f , 150.0f , 150.0f);
-	reader.Load3DSFile("bunny.3ds" , &bunny , true , &scale);
+//	reader.Load3DSFile("models/bunny.3ds" , &bunny , true , &scale);
 	bunny.SetPosition(80.0f , 0.0f , 0.0f);
 
 //	SetRelevantDir ( L"models//narn" );
 	scale = C_Vector3(0.1f , 0.1f , 0.1f);
-	reader.Load3DSFile("narn.3ds" , &narn , &scale);
+//	reader.Load3DSFile("models/narn/narn.3DS" , &narn , &scale);
 	narn.SetPosition(-100.0f , 10.0f , 0.0f);
 	narn.Rotate(90.0f , 0.0f , 0.0f);
 
 
 	// Energopoiise textures
-	glTexEnvi(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_MODULATE);
-	glEnable(GL_TEXTURE_2D);
+//	glTexEnvi(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_MODULATE);
+//	glEnable(GL_TEXTURE_2D);
 
 
 	// Arhikopoiiseis Metaballs

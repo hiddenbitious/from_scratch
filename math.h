@@ -36,8 +36,10 @@
 #define FLT_MIN numeric_limits<float>::min()
 #define INT_MAX numeric_limits<int>::min()
 #define INT_MIN numeric_limits<int>::min()
+#define UINT_MAX numeric_limits<unsigned int>::min()
+#define UINT_MIN numeric_limits<unsigned int>::min()
 
-#define SMALLEST_FLOAT -1*( FLT_MAX - 1 )
+#define SMALLEST_FLOAT FLT_MIN
 #define GREATEST_FLOAT FLT_MAX
 
 /// limits a value to low and high

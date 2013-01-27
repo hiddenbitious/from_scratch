@@ -24,9 +24,6 @@
 #include <iostream>
 #include <string.h>	// for memset (!)
 
-//#include <MMSYSTEM.H>
-//#include <limits.h>
-
 int polyCount;
 int leavesDrawn;
 int nodesDrawn;
@@ -93,10 +90,12 @@ void C_BspTree::DecreaseNodesDrawn()
 
 bool C_BspTree::ReadGeometryFile(const char* fileName)
 {
+	printf("%s\n", __FUNCTION__);
+
 	ifstream file(fileName , ios::in | ios::binary);
 
 	if(!file.is_open()) {
-		cout << "Couldn't find bsp file. Quiting." << endl;
+		cout << "Couldn't find bsp file." << endl;
 		return false;
 	}
 
@@ -169,6 +168,7 @@ void C_BspTree::Draw(void)
 
 void C_BspTree::CalcNorms(void)
 {
+	printf("%s\n", __FUNCTION__);
 	C_Vector3 norm;
 
 	// For each brush
@@ -190,16 +190,18 @@ void C_BspTree::CalcNorms(void)
 
 void C_BspTree::BuildPVS(void)
 {
+	printf("%s\n", __FUNCTION__);
+
 	// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound;
-	pvsFileFound = this->ReadPVSFile("PVS.txt");
+	pvsFileFound = this->ReadPVSFile("pvs_.txt");
 
 //	ULONG start = timeGetTime ();
 
 	cout << "Building PVS..." << endl;
 
 	cout << "\tDistributing sample points...";
-	C_BspNode::DistributeSamplePoints(headNode , headNode->pointSet);
+//	C_BspNode::DistributeSamplePoints(headNode , headNode->pointSet);
 	cout << "Done!" << endl;
 
 	cout << "\tFinding conected leaves...";
@@ -218,7 +220,6 @@ void C_BspTree::BuildPVS(void)
 		cout << "Done!" << endl << endl;
 	}
 
-
 	cout << "Done!" << endl << endl;
 
 //	ULONG time = timeGetTime () - start;
@@ -227,10 +228,9 @@ void C_BspTree::BuildPVS(void)
 
 	// An den eihe brethei arheio apothikeuse gia tin epomeni ektelesi
 	if(!pvsFileFound) {
-		WritePVSFile("PVS.txt");
+		WritePVSFile("pvs.txt");
 	}
 }
-
 
 void C_BspTree::TraceVisibility(void)
 {
@@ -239,13 +239,13 @@ void C_BspTree::TraceVisibility(void)
 
 	cout << "\n\t0%|---------50---------|100%\n\t   ";
 
-	for(int l1 = 0 ; l1 < leaves.size() ; l1++) {
-		for(int l2 = 0 ; l2 < leaves[l1]->PVS.size() ; l2++) {
+	for(unsigned int l1 = 0 ; l1 < leaves.size() ; l1++) {
+		for(unsigned int l2 = 0 ; l2 < leaves[l1]->PVS.size() ; l2++) {
 			if(leaves[l1]->nodeID == leaves[l1]->PVS[l2]->nodeID) {
 				continue;
 			}
 
-			for(int l3 = 0 ; l3 < leaves[l1]->PVS[l2]->PVS.size() ; l3++) {
+			for(unsigned int l3 = 0 ; l3 < leaves[l1]->PVS[l2]->PVS.size() ; l3++) {
 				if(leaves[l1]->PVS[l2]->PVS[l3]->nodeID == leaves[l1]->PVS[l2]->nodeID) {
 					continue;
 				}
@@ -285,8 +285,8 @@ void C_BspTree::TraceVisibility(void)
 
 bool C_BspTree::CheckVisibility(C_BspNode *node1 , C_BspNode *node2)
 {
-	for(int p1 = 0 ; p1 < node1->pointSet.size() ; p1++) {
-		for(int p2 = 0 ; p2 < node2->pointSet.size() ; p2++) {
+	for(unsigned int p1 = 0 ; p1 < node1->pointSet.size() ; p1++) {
+		for(unsigned int p2 = 0 ; p2 < node2->pointSet.size() ; p2++) {
 			if(false == C_BspTree::RayIntersectsSomethingInTree(headNode , &node1->pointSet[p1] , &node2->pointSet[p2])) {
 				return true;
 			}
@@ -409,7 +409,7 @@ void C_BspTree::Draw3(void)
 	leaves[nLeavesToDraw]->Draw();
 	glColor3f(1.0f , 1.0f , 1.0f);
 
-	for(int j = 0 ; j < leaves[nLeavesToDraw]->connectedLeaves.size() ; j++) {
+	for(unsigned int j = 0 ; j < leaves[nLeavesToDraw]->connectedLeaves.size() ; j++) {
 		leaves[nLeavesToDraw]->connectedLeaves[j]->Draw();
 	}
 }
@@ -421,7 +421,7 @@ int C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
 	leavesDrawn = 0;
 	nodesDrawn = 0;
 
-	for(int i = 0 ; i < leaves.size() ; i++) {
+	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
 		leaves[i]->drawn = false;
 	}
 	/*
@@ -480,7 +480,6 @@ void C_BspTree::TessellatePolygons(void)
 
 void C_BspTree::FindConnectedLeaves(void)
 {
-
 	for(int i = 0 ; i < nLeaves ; i++) {
 		leaves[i]->visibleFrom = new bool[nNodes];
 		leaves[i]->checkedVisibilityWith = new bool[nNodes];
@@ -495,8 +494,8 @@ void C_BspTree::FindConnectedLeaves(void)
 				continue;
 			}
 
-			for(int p1 = 0 ; p1 < leaves[i]->pointSet.size(); p1++) {
-				for(int p2 = 0 ; p2 < leaves[j]->pointSet.size(); p2++) {
+			for(unsigned int p1 = 0 ; p1 < leaves[i]->pointSet.size(); p1++) {
+				for(unsigned int p2 = 0 ; p2 < leaves[j]->pointSet.size(); p2++) {
 					if((leaves[i]->pointSet[p1].x == leaves[j]->pointSet[p2].x) &&
 							(leaves[i]->pointSet[p1].y == leaves[j]->pointSet[p2].y) &&
 							(leaves[i]->pointSet[p1].z == leaves[j]->pointSet[p2].z)) {
@@ -533,7 +532,7 @@ void C_BspTree::WritePVSFile(const char *fileName)
 	for(int i = 0 ; i < nLeaves ; i++) {
 		filestr << leaves[i]->nodeID << " * " << leaves[i]->PVS.size();
 
-		for(int j = 0 ; j < leaves[i]->PVS.size() ; j++) {
+		for(unsigned int j = 0 ; j < leaves[i]->PVS.size() ; j++) {
 			filestr << " " << leaves[i]->PVS[j]->nodeID;
 		}
 
@@ -555,7 +554,8 @@ bool C_BspTree::ReadPVSFile(const char *fileName)
 	filestr >> nLeaves;
 
 	for(int i = 0 ; i < nLeaves ; i++) {
-		int nodeId , size;
+		ULONG nodeId;
+		int size;
 
 		filestr >> nodeId;
 		filestr.ignore(3);

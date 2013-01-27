@@ -17,10 +17,8 @@
 #ifndef _BSPHELPERFUNCTIONS_H_
 #define _BSPHELPERFUNCTIONS_H_
 
-
 #include "bspNode.h"
 #include "bspTree.h"
-
 
 void CalculateUV(C_Plane* plane , C_Vertex* P , float* u , float* v);
 vector<C_Vertex> FindBBoxPlaneIntersections(C_BBox* bbox , C_Plane* plane);

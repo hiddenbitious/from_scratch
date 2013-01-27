@@ -61,7 +61,7 @@ public:
 	void Update(void);				//Updates the delta variable
 
 	/// Returns the delta variable
-	inline float GetDelta(void) { return (ULONG)delta; }
+	inline float GetDelta(void) { return delta; }
 };
 
 #endif

@@ -101,10 +101,10 @@ class C_BspNode {
 		static void Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
 		void Draw(void);
 
-		// Brakes down CONVEX polygon of 4 or 5 vertices into triangles.
-		// Also it frees any memory reserved for the previous polygons
-		// (not the data itself but the pointers).
-		// New pointers are stored at the triangles var.
+		/// Brakes down CONVEX polygon of 4 or 5 vertices into triangles.
+		/// Also it frees any memory reserved for the previous polygons
+		/// (not the data itself but the pointers).
+		/// New pointers are stored at the triangles var.
 		static void TessellatePolygonsInLeaves(C_BspNode* node);
 };
 

@@ -49,7 +49,6 @@ class C_BspTree {
 		USHORT nLeavesToDraw;
 		USHORT nNodesToDraw;
 
-
 	public:
 		C_BspTree(USHORT depth);
 		~C_BspTree();
@@ -75,7 +74,6 @@ class C_BspTree {
 		int Draw2(C_Vector3* cameraPosition);
 		void Draw3(void);
 		int Draw_PVS(C_Vector3* cameraPosition);
-
 
 		// Max depth allowed
 		USHORT maxDepth;
