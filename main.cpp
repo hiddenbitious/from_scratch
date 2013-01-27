@@ -26,7 +26,7 @@
 #include "quaternion.h"
 #include "meshgroup.h"
 #include "3dsReader/3dsReader.h"
-//#include "timer.h"
+#include "timer.h"
 #include "bspTree.h"
 
 #include "../oglRenderer/oglDriver.h"
@@ -82,8 +82,8 @@ static float grey[] = { 0.3f , 0.3f , 0.3f , 0.3f };
 static C_Vector3 center(0.0f , 0.0f , 0.0f);
 
 // Metablites hronometrisis
-//C_Timer timer;
-//ULONG start = timer.GetTime ();
+C_Timer timer;
+float start = timer.GetTime ();
 static float timeElapsed = 0.0f;
 static float fps;
 
@@ -91,6 +91,7 @@ static float fps;
 static C_CubeGrid grid;
 static C_Metaball metaball[3];
 
+void CountFPS (void);
 
 // Sinartisi arhikpoiiseon
 static void Initializations(void)
@@ -138,12 +139,11 @@ static void Initializations(void)
 
 	// Fortose shaders
 //	SetRelevantDir ( L"shaders" );
-	basicShader = shaderManager.LoadShaderProgram("basic.vert" , "basic.frag");
-	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
+	basicShader = shaderManager.LoadShaderProgram("shaders/basic.vert" , "shaders/basic.frag");
+	basicShader_texture = shaderManager.LoadShaderProgram("shaders/basic_withSingleTexture.vert" , "shaders/basic_withSingleTexture.frag");
 
 	// Diabase tin geometria gia to bsp
-//	SetRelevantDir ( L"" );
-	bspTest.ReadGeometryFile("properMap2.bsp");
+	bspTest.ReadGeometryFile("properMap2.BSP");
 
 	// Kataskeuase bsp kai pvs
 	bspTest.BuildBspTree();
@@ -198,7 +198,7 @@ static void Initializations(void)
 	metaball[2].radius = 3.0f;
 
 	// Arhikopoiise ton timer
-//	timer.Initialize ();
+	timer.Initialize ();
 }
 
 
@@ -254,7 +254,7 @@ static void Draw(void)
 		bunny.Draw();
 	}
 
-	bunny.Rotate(0.0f , timeElapsed * 15.0f , 0.0f);
+	bunny.Rotate(0.0f, timeElapsed * 15.0f, 0.0f);
 
 
 	// Shediase to dendro. To dendro den ehei textures.
@@ -341,9 +341,6 @@ static void Draw(void)
 	basicShader_texture->End();
 
 
-
-
-
 	// Tipose dedomena stin othoni
 	int line = 1;
 	int lineHeight = 18;
@@ -375,12 +372,12 @@ static void Draw(void)
 					 "x: Allagi methodou shediasis BSP");
 
 	// Ananeose to hronometro.
-//	timer.Update ();
+	timer.Update ();
 	// H timeElapsed krataei to hrono pou hreiastike gia na sxediastei 1 frame.
-//	timeElapsed = timer.GetDelta () / 1000.0f;
+	timeElapsed = timer.GetDelta () / 1000.0f;
 
 	// Metrise ta fps
-//	CountFPS ();
+	CountFPS ();
 
 	// Zografise ton frame buffer!
 	_DrawFrameBuffer();
@@ -537,31 +534,16 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
+void CountFPS (void)
+{
+	static ULONG count = 0.0f;
+	float delta = timer.GetTime () - start;
+	count++;
 
-
-//void SetRelevantDir ( LPWSTR dir )
-//{
-//	LPWSTR szTempPath = (LPWSTR)new wchar_t[256];
-//	wcscpy_s ( szTempPath , 256 , szAppPath );
-//
-//	if ( dir[0] != '\\' ) wcscat_s ( szTempPath , 256 , L"\\" );
-//	wcscat_s ( szTempPath , 256 , dir );
-//
-//	SetCurrentDirectory ( szTempPath );
-//	delete[] szTempPath;
-//}
-//
-//
-//void CountFPS ( void )
-//{
-//	static ULONG count = 0.0f;
-//	ULONG delta = timer.GetTime () - start;
-//	count++;
-//
-//	if ( delta >= 1000 )
-//	{
-//		fps = count;
-//		start = timer.GetTime ();
-//		count = 0;
-//	}
-//}
+	if ( delta >= 1000.0f )
+	{
+		fps = count;
+		start = timer.GetTime ();
+		count = 0;
+	}
+}

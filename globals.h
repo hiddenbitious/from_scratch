@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <string>
 #include <limits>
+#include <assert.h>
 
 typedef unsigned long ULONG;
 typedef unsigned int UINT;

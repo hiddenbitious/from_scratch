@@ -17,7 +17,7 @@
 #ifndef _C_TIMER_H_
 #define _C_TIMER_H_
 
-//#include <Windows.h>
+#include <sys/time.h>
 #include "globals.h"
 
 /*
@@ -46,25 +46,22 @@ This class uses the performance counter and if it's not available uses the multi
 */
 
 class C_Timer {
-	private:
-		bool perfFlag;					//Set to true if performance counter is available on tha machine
-		float timeFactor;				//To convert the time received
+private:
+	float timeFactor;				//To convert the time received
+	int64_t freq;					//Timer frequency
 
-		int64_t delta , d0 , d1;		//Used to calculate delta
-		int64_t freq;					//Timer frequency
+	float delta, d0, d1;			//Used to calculate delta
+	timeval mmTimeStart;			//Multimedia timer start value
 
-		ULONG mmTimeStart;				//Multimedia timer start value
-		int64_t perfTimeStart;			//Performance timer start value
+public:
+	C_Timer(void);					//CTor
+	void Initialize(void);			//Initializes timer
+	float GetTime(void);			//Returns since the timer initialization
 
-	public:
-		C_Timer(void);				//CTor
-		void Initialize(void);		//Initializes timer
-		ULONG GetTime(void);			//Returns since the timer initialization
+	void Update(void);				//Updates the delta variable
 
-		void Update(void);			//Updates the delta variable
-
-		inline ULONG GetDelta(void)	//Returns the delta variable
-		{ return (ULONG)delta; }
+	/// Returns the delta variable
+	inline float GetDelta(void) { return (ULONG)delta; }
 };
 
 #endif
