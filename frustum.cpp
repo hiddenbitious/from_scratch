@@ -34,7 +34,6 @@ C_Frustum::C_Frustum(void)
 	frustumPlanes[0] = top;
 }
 
-
 C_Frustum::~C_Frustum(void)
 {
 	if(back)		{ delete back; back = NULL; }
@@ -44,7 +43,6 @@ C_Frustum::~C_Frustum(void)
 	if(top)		{ delete top; top = NULL; }
 	if(bottom)	{ delete bottom; bottom = NULL; }
 }
-
 
 void C_Frustum::calculateFrustum(void)
 {

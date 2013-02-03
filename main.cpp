@@ -23,11 +23,7 @@
 
 #include "camera.h"
 #include "vectors.h"
-#include "quaternion.h"
-#include "meshgroup.h"
-#include "3dsReader/3dsReader.h"
 #include "timer.h"
-#include "bspTree.h"
 
 #include "../oglRenderer/oglDriver.h"
 #include "../oglRenderer/shaders/glsl.h"
@@ -37,23 +33,23 @@
 
 using namespace std;
 
-// Shaders. Tha hrisimopoiithoun 2 shaders
+/// Shaders
 static C_GLShaderManager shaderManager;
 static C_GLShader* basicShader;
 static C_GLShader* basicShader_texture;
 
-// Camera kai frustum
+/// Camera and frustum
 static C_Camera camera;
 static C_Frustum frustum;
 
-// Metablites gia to parathiro
+/// window stuff
 static int winID;
 static int windowWidth = 800;
 static int windowHeight = 500;
 static int windowPositionX = 100;
 static int windowPositionY = 200;
 
-// Tahitita metakinisis cameras
+/// movement vars
 static float speed = 7.0f;
 static float angle = 0.5f;
 static float angle2 = 0.5f;
@@ -61,23 +57,21 @@ static float angle2 = 0.5f;
 static int metaballPolys = 0;
 static bool frustumCulling = true;
 
-// Hrisimes statheres
-//static float red[] = { 1.0f , 0.0f , 0.0f , 1.0f };
 static float white[] = { 1.0f , 1.0f , 1.0f , 1.0f };
 static float grey[] = { 0.3f , 0.3f , 0.3f , 0.3f };
 static C_Vector3 center(0.0f , 0.0f , 0.0f);
 
-// Metablites hronometrisis
+/// Timer vars
 C_Timer timer;
 float start = timer.GetTime ();
 static float timeElapsed = 0.0f;
 static float fps;
 
-// Metaballs
+/// Metaballs
 static C_CubeGrid grid;
 static C_Metaball metaball[3];
 
-void CountFPS (void);
+static void CountFPS (void);
 
 // Sinartisi arhikpoiiseon
 static void Initializations(void)
@@ -119,7 +113,7 @@ static void Initializations(void)
 	camera.zNear = 1.0f;
 
 	/// Load shaders
-	basicShader = shaderManager.LoadShaderProgram("basic.vert" , "basic.frag");
+	basicShader = shaderManager.LoadShaderProgram("basic.vert", "basic.frag");
 	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
 
 	/// metaballs initialization
@@ -312,7 +306,7 @@ int main(int argc, char* argv[])
 {
 	glutInit(&argc , argv);
 
-	// Double buffer me depth buffer
+	/// Double buffering with depth buffer
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
 	/// Create window
@@ -328,17 +322,12 @@ int main(int argc, char* argv[])
 	glutKeyboardFunc(hande_simple_keys);
 	glutIdleFunc(idle);
 
-	// Arhikopoiisi tou glew
 	InitGLExtensions();
-
-	// Eleghei an einai diathesimoi oi shaders (GLSL)
 	CheckGLSL();
-
-	// Kalese ti sinartisi arhikopoiisis
 	Initializations();
 
-	// Ksekina to loop
 	glutMainLoop();
+
 	return 0;
 }
 

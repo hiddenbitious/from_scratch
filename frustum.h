@@ -17,15 +17,12 @@
 #ifndef _CFRUSTUM_H_
 #define _CFRUSTUM_H_
 
-
 #include "plane.h"
 #include "bsphere.h"
 #include "bbox.h"
 #include "vectors.h"
 
-
 class C_Frustum {
-
 	private:
 		C_Plane* front;
 		C_Plane* back;
@@ -58,4 +55,3 @@ class C_Frustum {
 };
 
 #endif
-
