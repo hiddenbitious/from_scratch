@@ -164,10 +164,10 @@ static void Draw(void)
 						 cameraPosition.z + 10.0f * (float)cos(angle), 1.0f};
 
 	/// Visuallize light by placing a low poly sphere at it's position
-	glPushMatrix();
-	glTranslatef(lightPos[0], lightPos[1], lightPos[2]);
-	glutSolidSphere(1.5, 5, 5);
-	glPopMatrix();
+//	glPushMatrix();
+//	glTranslatef(lightPos[0], lightPos[1], lightPos[2]);
+//	glutSolidSphere(1.5, 5, 5);
+//	glPopMatrix();
 
 	/// Place light source
 	glLightfv(GL_LIGHT0 , GL_POSITION , lightPos);

@@ -22,4 +22,4 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm *.o metaballs/*.o 3dsReader/*.o $(EXECUTABLE)
+	rm *.o metaballs/*.o $(EXECUTABLE)
