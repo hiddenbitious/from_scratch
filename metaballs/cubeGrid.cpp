@@ -181,7 +181,7 @@ void C_CubeGrid::Update(C_Metaball *metaballs , int nBalls , C_Frustum *frustum)
 		}
 
 
-		for(int k = 0 ; triTable[cubeIndex][k] != -1 ; k += 3) {
+		for(int k = 0 ; triTable[cubeIndex][k] != 127 ; k += 3) {
 			geometry[nTriangles].vertices[0].x = edgeVertices[triTable[cubeIndex][k  ]].vertex.x;
 			geometry[nTriangles].vertices[0].y = edgeVertices[triTable[cubeIndex][k  ]].vertex.y;
 			geometry[nTriangles].vertices[0].z = edgeVertices[triTable[cubeIndex][k  ]].vertex.z;
