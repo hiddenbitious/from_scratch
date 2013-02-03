@@ -4,20 +4,17 @@
 #include <GL/glut.h>
 #include "../math.h"
 
-
-
 struct grid_vertex {
 	C_Vertex vertex;
 	C_Vertex normal;
 };
 
-
 inline float fieldFormula(float q , float r)
 {
-	return (q / r * 5);
+	return q / r * 5;
 }
 
-void C_CubeGrid::Constructor(float x , float y , float z)
+void C_CubeGrid::Constructor(float x, float y, float z)
 {
 	position.x = x;
 	position.y = y;
@@ -27,9 +24,9 @@ void C_CubeGrid::Constructor(float x , float y , float z)
 	nGridCubeVertices = (CUBES_PER_AXIS + 1) * (CUBES_PER_AXIS + 1) * (CUBES_PER_AXIS + 1);
 	nTriangles = 0;
 
-	unsigned long cc = 0;
+	unsigned int cc = 0;
 
-	// Arhikopoiisi ton korifon ton kibon
+	/// Initialize vertices
 	for(int x = 0 ; x < CUBES_PER_AXIS + 1 ; x++) {
 		for(int y = 0 ; y < CUBES_PER_AXIS + 1 ; y++) {
 			for(int z = 0 ; z < CUBES_PER_AXIS + 1 ; z++) {
@@ -44,9 +41,8 @@ void C_CubeGrid::Constructor(float x , float y , float z)
 		}
 	}
 
-	// Sindesi ton kibon me tis korifes tous
+	/// Initialize cubes by setting the pointers to the appropriate cube vertices
 	cc = 0;
-
 	for(int x = 0 ; x < CUBES_PER_AXIS ; x++) {
 		for(int y = 0 ; y < CUBES_PER_AXIS ; y++) {
 			for(int z = 0 ; z < CUBES_PER_AXIS ; z++) {
@@ -73,7 +69,7 @@ void C_CubeGrid::Constructor(float x , float y , float z)
 }
 
 
-void C_CubeGrid::Update(C_Metaball *metaballs , unsigned short nBalls , C_Frustum *frustum)
+void C_CubeGrid::Update(C_Metaball *metaballs , int nBalls , C_Frustum *frustum)
 {
 	if(frustum != NULL) {
 		if(!frustum->cubeInFrustum(&bbox)) {
@@ -81,38 +77,33 @@ void C_CubeGrid::Update(C_Metaball *metaballs , unsigned short nBalls , C_Frustu
 		}
 	}
 
-	float rad , dist , normalScale;
+	float rad, dist, normalScale;
 	C_Vertex pos;
 	C_Vertex ballToPoint;
 
-
-	// Katharise ta palia values kai normes
-	for(int i = 0 ; i < nGridCubeVertices ; i++) {
+	/// Initialize
+	nTriangles = 0;
+	/// TODO: Replace loop with memset. Struct has to change
+	for(unsigned int i = 0 ; i < nGridCubeVertices ; i++) {
 		gridCubeVertices[i].value = 0.0f;
 		gridCubeVertices[i].normal.x = gridCubeVertices[i].normal.y = gridCubeVertices[i].normal.z = 0.0f;
 	}
 	//memset ( gridCubeVertices , 0 , nGridCubeVertices * sizeof ( grid_cube_vertex ) );
 
-
-	// Midenismos metriti
-	nTriangles = 0;
-
-
-
-	// For each metaball
+	/// For each metaball
 	for(int cb = 0 ; cb < nBalls ; cb++) {
 		rad = metaballs[cb].radius;
 		pos.x = metaballs[cb].position.x; pos.y = metaballs[cb].position.y; pos.z = metaballs[cb].position.z;
 
-		// For each gridCubeVertex
-		for(int cv = 0 ; cv < nGridCubeVertices ; cv++) {
-			ballToPoint.x = gridCubeVertices[cv].position.x - metaballs[cb].position.x;
-			ballToPoint.y = gridCubeVertices[cv].position.y - metaballs[cb].position.y;
-			ballToPoint.z = gridCubeVertices[cv].position.z - metaballs[cb].position.z;
+		/// Calculate field values and norms for each grid vertex
+		for(unsigned int cv = 0 ; cv < nGridCubeVertices ; cv++) {
+			ballToPoint.x = gridCubeVertices[cv].position.x - pos.x;
+			ballToPoint.y = gridCubeVertices[cv].position.y - pos.y;
+			ballToPoint.z = gridCubeVertices[cv].position.z - pos.z;
 
 			dist = ballToPoint.x * ballToPoint.x + ballToPoint.y * ballToPoint.y + ballToPoint.z * ballToPoint.z;
 
-			if(dist <= 0.0001f) {
+			if(dist < 0.0001f) {
 				dist = 0.0001f;
 			}
 
@@ -128,18 +119,16 @@ void C_CubeGrid::Update(C_Metaball *metaballs , unsigned short nBalls , C_Frustu
 	}
 
 	// Kanonikopoisi normon.... Poli akribo etsi opos einai...
-	for(int cv = 0 ; cv < nGridCubeVertices ; cv++) {
+	for(unsigned int cv = 0 ; cv < nGridCubeVertices ; cv++) {
 		math::Normalize(&gridCubeVertices[cv].normal.x , &gridCubeVertices[cv].normal.y , &gridCubeVertices[cv].normal.z);
 	}
-
-
 
 	// Ipologismos poligonon
 	grid_vertex edgeVertices[12];
 
 	// Gia kathe kibo...
-	for(int cb = 0 ; cb < nGridCubes ; cb++) {
-		unsigned char cubeIndex = 0x00;
+	for(unsigned int cb = 0 ; cb < nGridCubes ; cb++) {
+		int cubeIndex = 0x00;
 
 		if(gridCubes[cb].vertices[0]->value < THRESHOLD) {
 			cubeIndex |= 1;
@@ -176,7 +165,7 @@ void C_CubeGrid::Update(C_Metaball *metaballs , unsigned short nBalls , C_Frustu
 
 		for(int currentEdge = 0 ; currentEdge < 12 ; currentEdge++) {
 			if(usedEdges && 1 << currentEdge) {
-				grid_cube_vertex *v1 = gridCubes[cb].vertices[verticesAtEndsOfEdges[currentEdge * 2  ]];
+				grid_cube_vertex *v1 = gridCubes[cb].vertices[verticesAtEndsOfEdges[currentEdge * 2    ]];
 				grid_cube_vertex *v2 = gridCubes[cb].vertices[verticesAtEndsOfEdges[currentEdge * 2 + 1]];
 
 				float delta = (THRESHOLD - v1->value) / (v2->value - v1->value);
@@ -226,7 +215,6 @@ void C_CubeGrid::Update(C_Metaball *metaballs , unsigned short nBalls , C_Frustu
 	}
 }
 
-
 int C_CubeGrid::Draw(C_Frustum *frustum)
 {
 	if(frustum != NULL) {
@@ -258,7 +246,6 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 
 	return nTriangles;
 }
-
 
 void C_CubeGrid::DrawGridCube(void)
 {
