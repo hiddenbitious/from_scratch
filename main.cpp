@@ -113,11 +113,11 @@ static void Initializations(void)
 	camera.zNear = 1.0f;
 
 	/// Load shaders
-	basicShader = shaderManager.LoadShaderProgram("basic.vert", "basic.frag");
-	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
+	basicShader = shaderManager.LoadShaderProgram("shaders/basic.vert", "shaders/basic.frag");
+//	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
 
 	/// metaballs initialization
-	grid.Constructor(-250.0f , 0.0f , 200.0f);
+	grid.Constructor(20.0f , 0.0f , 20.0f);
 
 	metaball[0].Constructor();
 	metaball[0].position.x = 10.0f;
@@ -146,10 +146,10 @@ static void Draw(void)
 	C_Vector3 cameraPosition = camera.GetPosition();
 
 	/// Make the angle rotation independant of the cpu speed
-	angle += 1.0f * timeElapsed;
+	angle += .2f * timeElapsed;
 	if(angle >= 360.0f) { angle = 0.0f; }
 
-	angle2 += 2.0f * timeElapsed;
+	angle2 += .05f * timeElapsed;
 	if(angle2 >= 360.0f) { angle2 = 0.0f; }
 
 	/// Clear buffers
@@ -174,10 +174,10 @@ static void Draw(void)
 
 	glColor3fv(white);
 	/// In case shaders are not available
-	if(!basicShader->GetisLinked() || !CheckGLSL()) {
-		glMaterialfv(GL_FRONT , GL_DIFFUSE , white);
-		glMaterialfv(GL_FRONT , GL_AMBIENT , grey);
-	}
+//	if(!basicShader->GetisLinked() || !CheckGLSL()) {
+//		glMaterialfv(GL_FRONT , GL_DIFFUSE , white);
+//		glMaterialfv(GL_FRONT , GL_AMBIENT , grey);
+//	}
 
 	/// Draw metaballs
 	metaball[0].position.y = 20.0f + 5 * cos(angle2);
@@ -187,6 +187,8 @@ static void Draw(void)
 	metaball[1].position.z = 20.0f + 5.0f * cos(angle);
 
 	metaball[2].position.z = 15.0f + 10.0f * cos(angle);
+
+	basicShader->Begin();
 	if(frustumCulling) {
 		grid.Update(metaball , 3 , camera.frustum);
 		metaballPolys = grid.Draw(camera.frustum);
@@ -195,6 +197,7 @@ static void Draw(void)
 		grid.Update(metaball , 3 , NULL);
 		grid.Draw(NULL);
 	}
+	basicShader->End();
 
 	/// Print text on screem
 	int line = 1;

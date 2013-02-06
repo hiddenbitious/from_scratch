@@ -6,7 +6,7 @@
 #include "metaball.h"
 #include "../frustum.h"
 
-#define CUBES_PER_AXIS	40
+#define CUBES_PER_AXIS	50
 #define CUBE_SIZE		1
 #define THRESHOLD		1.0f
 #define MAX_TRIANGLES	5000
