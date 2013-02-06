@@ -139,8 +139,8 @@ static void Initializations(void)
 
 	// Fortose shaders
 //	SetRelevantDir ( L"shaders" );
-	basicShader = shaderManager.LoadShaderProgram("basic.vert" , "basic.frag");
-	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
+	basicShader = shaderManager.LoadShaderProgram("shaders/basic.vert" , "shaders/basic.frag");
+//	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
 
 	// Diabase tin geometria gia to bsp
 	bspTest.ReadGeometryFile("properMap2.BSP");
@@ -299,7 +299,7 @@ static void Draw(void)
 
 
 	// Shediase ta dinamika andikeimena pou hrisimopoioun textures
-	basicShader_texture->Begin();
+//	basicShader_texture->Begin();
 	glColor3fv(white);
 	if(frustumCulling) {
 		meshesInFrustum  += statue1.Draw(camera.frustum , &meshesPolys);
@@ -329,7 +329,7 @@ static void Draw(void)
 		narn.Draw();
 	}
 
-	basicShader_texture->End();
+//	basicShader_texture->End();
 
 
 	// Tipose dedomena stin othoni
