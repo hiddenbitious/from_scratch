@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="from_scratch" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/from_scratch" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/from_scratch" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="3dsReader/3dsReader.cpp" />
+		<Unit filename="3dsReader/3dsReader.h" />
+		<Unit filename="3dsReader/chunk.h" />
+		<Unit filename="3dsReader/my_3ds_additions.cpp" />
+		<Unit filename="C_logFile/logFile.cpp" />
+		<Unit filename="C_logFile/logFile.h" />
+		<Unit filename="Makefile" />
+		<Unit filename="bbox.cpp" />
+		<Unit filename="bbox.h" />
+		<Unit filename="box.cpp" />
+		<Unit filename="box.h" />
+		<Unit filename="bspCommon.h" />
+		<Unit filename="bspHelperFunctions.cpp" />
+		<Unit filename="bspHelperFunctions.h" />
+		<Unit filename="bspNode.cpp" />
+		<Unit filename="bspNode.h" />
+		<Unit filename="bspTree.cpp" />
+		<Unit filename="bspTree.h" />
+		<Unit filename="bsphere.cpp" />
+		<Unit filename="bsphere.h" />
+		<Unit filename="bvolumes.h" />
+		<Unit filename="camera.cpp" />
+		<Unit filename="camera.h" />
+		<Unit filename="frustum.cpp" />
+		<Unit filename="frustum.h" />
+		<Unit filename="globals.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="math.cpp" />
+		<Unit filename="math.h" />
+		<Unit filename="mesh.cpp" />
+		<Unit filename="mesh.h" />
+		<Unit filename="meshgroup.cpp" />
+		<Unit filename="meshgroup.h" />
+		<Unit filename="metaballs/cubeGrid.cpp" />
+		<Unit filename="metaballs/cubeGrid.h" />
+		<Unit filename="metaballs/metaball.h" />
+		<Unit filename="metaballs/tables.h" />
+		<Unit filename="plane.cpp" />
+		<Unit filename="plane.h" />
+		<Unit filename="quaternion.cpp" />
+		<Unit filename="quaternion.h" />
+		<Unit filename="timer.cpp" />
+		<Unit filename="timer.h" />
+		<Unit filename="trimesh.cpp" />
+		<Unit filename="trimesh.h" />
+		<Unit filename="vectors.cpp" />
+		<Unit filename="vectors.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
