@@ -34,9 +34,10 @@
 using namespace std;
 
 /// Shaders
-static C_GLShaderManager shaderManager;
-static C_GLShader* basicShader;
-static C_GLShader* basicShader_texture;
+//static C_GLShaderManager shaderManager;
+//static C_GLShader* basicShader;
+//static C_GLShader* metaballShader;
+//static C_GLShader* basicShader_texture;
 
 /// Camera and frustum
 static C_Camera camera;
@@ -57,8 +58,8 @@ static float angle2 = 0.5f;
 static int metaballPolys = 0;
 static bool frustumCulling = true;
 
-static float white[] = { 1.0f , 1.0f , 1.0f , 1.0f };
-static float grey[] = { 0.3f , 0.3f , 0.3f , 0.3f };
+//static float white[] = { 1.0f , 1.0f , 1.0f , 1.0f };
+//static float grey[] = { 0.3f , 0.3f , 0.3f , 0.3f };
 static C_Vector3 center(0.0f , 0.0f , 0.0f);
 
 /// Timer vars
@@ -113,11 +114,10 @@ static void Initializations(void)
 	camera.zNear = 1.0f;
 
 	/// Load shaders
-	basicShader = shaderManager.LoadShaderProgram("shaders/basic.vert", "shaders/basic.frag");
 //	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
 
 	/// metaballs initialization
-	grid.Constructor(20.0f , 0.0f , 20.0f);
+	grid.Constructor(-50.0f , 0.0f , -150.0f);
 
 	metaball[0].Constructor();
 	metaball[0].position.x = 10.0f;
@@ -172,7 +172,7 @@ static void Draw(void)
 	/// Place light source
 	glLightfv(GL_LIGHT0 , GL_POSITION , lightPos);
 
-	glColor3fv(white);
+//	glColor3fv(white);
 	/// In case shaders are not available
 //	if(!basicShader->GetisLinked() || !CheckGLSL()) {
 //		glMaterialfv(GL_FRONT , GL_DIFFUSE , white);
@@ -188,7 +188,7 @@ static void Draw(void)
 
 	metaball[2].position.z = 15.0f + 10.0f * cos(angle);
 
-	basicShader->Begin();
+//	basicShader->Begin();
 	if(frustumCulling) {
 		grid.Update(metaball , 3 , camera.frustum);
 		metaballPolys = grid.Draw(camera.frustum);
@@ -197,7 +197,7 @@ static void Draw(void)
 		grid.Update(metaball , 3 , NULL);
 		grid.Draw(NULL);
 	}
-	basicShader->End();
+//	basicShader->End();
 
 	/// Print text on screem
 	int line = 1;
