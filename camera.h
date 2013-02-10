@@ -24,7 +24,8 @@
 
 class C_Camera {
 	private:
-		float rotMatrix[16];
+//		float rotMatrix[16];
+		ESMatrix ESrotMatrix;
 
 		//Where camera is looking at
 		C_Vector3 lookAt;

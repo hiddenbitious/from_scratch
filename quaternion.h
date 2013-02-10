@@ -31,7 +31,7 @@ class C_Quaternion {
 		C_Quaternion();
 		C_Quaternion(C_Vector3 point);
 
-		//(*this*) * quat
+		// (*this*) * quat
 		void Mult(const C_Quaternion* quat);
 		//q1*q2
 		C_Quaternion* Mult(const C_Quaternion* q1 , const C_Quaternion* q2);
@@ -51,6 +51,7 @@ class C_Quaternion {
 		void QuaternionToMatrix9(float*);
 		//Just the same as quaternionToMatrix16 ()...but this can go directly into glMultMatrixf ()
 		void QuaternionToMatrix16(float*);
+		void QuaternionToMatrix16(ESMatrix *);
 
 		//Rotate the current quaternion
 		void Rotate(float angleX , float angleY , float angleZ);

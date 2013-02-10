@@ -225,6 +225,37 @@ void C_Quaternion::QuaternionToMatrix16(float* matrix)
 	matrix[15]	= 1.0f;
 }
 
+void C_Quaternion::QuaternionToMatrix16(ESMatrix *matrix)
+{
+	float zz2 	= 2.0f * z * z;
+	float yy2 	= 2.0f * y * y;
+	float xx2 	= 2.0f * x * x;
+
+	float ax2 	= 2.0f * a * x;
+	float ay2 	= 2.0f * a * y;
+	float az2 	= 2.0f * a * z;
+
+	float xy2 	= 2.0f * x * y;
+	float xz2 	= 2.0f * x * z;
+	float yz2 	= 2.0f * y * z;
+
+	matrix->m[0][0]	= 1.0f - yy2 - zz2;
+	matrix->m[1][0]	= xy2 + az2;
+	matrix->m[2][0]	= xz2 - ay2;
+
+	matrix->m[0][1]	= xy2 - az2;
+	matrix->m[1][1]	= 1.0f - xx2 - zz2;
+	matrix->m[2][1]	= yz2 + ax2;
+
+	matrix->m[0][2]	= xz2 + ay2;
+	matrix->m[1][2]	= yz2 - ax2;
+	matrix->m[2][2]	= 1.0f - xx2 - yy2;
+
+	matrix->m[3][0]	= matrix->m[3][1] = matrix->m[3][2] = 0.0f;
+	matrix->m[0][3] = matrix->m[1][3] = matrix->m[2][3] = 0.0f;
+	matrix->m[3][3]	= 1.0f;
+}
+
 
 void C_Quaternion::Rotate(float angleX , float angleY , float angleZ)
 {

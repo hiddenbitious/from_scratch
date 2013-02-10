@@ -55,22 +55,23 @@ C_Camera::C_Camera(void)
 
 void C_Camera::Look(void)
 {
-	_UpdateCamera(&position , &lookAt , &up);
+//	_UpdateCamera(&position , &lookAt , &up);
 
-	/*
-		C_Quaternion revQ;
-		rotationQuaternion.GetReverseQuat ( &revQ );
-		revQ.QuaternionToMatrix16 ( rotMatrix );
+//	C_Quaternion revQ;
+//	rotationQuaternion.GetReverseQuat(&revQ);
+//	revQ.QuaternionToMatrix16(rotMatrix);
+	rotationQuaternion.QuaternionToMatrix16(&ESrotMatrix);
 
-		if ( rotation ) rotation = false;
-		if ( translation ) translation = false;
+	if(rotation) rotation = false;
+	if(translation) translation = false;
 
+	//Rotate and then translate.
+//	glLoadIdentity();
+//	glMultMatrixf (rotMatrix);
+//	glTranslatef(-position.x, -position.y, -position.z);
 
-		//Rotate and then translate.
-		glLoadIdentity ();
-		glMultMatrixf ( rotMatrix );
-		glTranslatef ( -position.x , -position.y , -position.z );
-	*/
+	esMatrixMultiply(&globalModelviewMatrix, &ESrotMatrix, &globalModelviewMatrix);
+	esTranslate(&globalModelviewMatrix, -position.x, -position.y, -position.z);
 
 	/*
 		//glMultMatrixf ( rotMatrix );
@@ -183,22 +184,26 @@ void C_Camera::setProjection(int w , int h)
 
 	glViewport(0, 0, w, h);
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	esMatrixLoadIdentity(&globalProjectionMatrix);
+	esPerspective(&globalProjectionMatrix, fov, float(w) / float(h), zNear, zFar);
 
-//	float ratio = float(w) / float(h);
-//	gluPerspective ( fov , ratio , zNear , zFar );
+//	glMatrixMode(GL_PROJECTION);
+//	glLoadIdentity();
+//
+////	float ratio = float(w) / float(h);
+////	gluPerspective ( fov , ratio , zNear , zFar );
+//
+//	float aspect = (float)w / (float)h;
+//	float f = cos(fov * DEGREES_TO_RADIANS) / sin(fov * DEGREES_TO_RADIANS);
+//
+//	float projMatrix[16] = { f / aspect, 0.0f,	0.0f,									0.0f ,
+//							 0.0f,		 f,		0.0f,									0.0f ,
+//							 0.0f,		 0.0f,	(zFar + zNear) / (zNear - zFar),		-1.0f ,
+//							 0.0f,		 0.0f, 	(2 * zFar * zNear) / (zNear - zFar),	0.0f};
+//
+//	glMultMatrixf(projMatrix);
 
-	float aspect = (float)w / (float)h;
-	float f = cos(fov * DEGREES_TO_RADIANS) / sin(fov * DEGREES_TO_RADIANS);
-
-	float projMatrix[16] = { f / aspect, 0.0f,	0.0f,									0.0f ,
-							 0.0f,		 f,		0.0f,									0.0f ,
-							 0.0f,		 0.0f,	(zFar + zNear) / (zNear - zFar),		-1.0f ,
-							 0.0f,		 0.0f, 	(2 * zFar * zNear) / (zNear - zFar),	0.0f};
-
-	glMultMatrixf(projMatrix);
-	glMatrixMode(GL_MODELVIEW);
+//	glMatrixMode(GL_MODELVIEW);
 }
 
 void C_Camera::PrintText(int x , int y , float r , float g , float b, float a , const char *string , ...)

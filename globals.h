@@ -21,6 +21,7 @@
 #include <string>
 #include <limits>
 #include <assert.h>
+#include <GL/glew.h>
 
 typedef unsigned long ULONG;
 typedef unsigned int UINT;
@@ -50,6 +51,12 @@ typedef struct {
 typedef struct {
 	UINT p0 , p1 , p2;
 } C_TriIndices;
+
+typedef struct {
+    GLfloat   m[4][4];
+} ESMatrix;
+
+extern ESMatrix globalModelviewMatrix, globalProjectionMatrix;
 
 typedef enum {
 	txUnknown	= 0,	// images

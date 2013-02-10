@@ -33,6 +33,9 @@
 
 using namespace std;
 
+/// Global variables
+ESMatrix globalModelviewMatrix, globalProjectionMatrix;
+
 /// Shaders
 //static C_GLShaderManager shaderManager;
 //static C_GLShader* basicShader;
@@ -155,6 +158,7 @@ static void Draw(void)
 	/// Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	esMatrixLoadIdentity(&globalModelviewMatrix);
 	camera.Look();
 	metaballPolys = 0;
 
@@ -189,14 +193,14 @@ static void Draw(void)
 	metaball[2].position.z = 15.0f + 10.0f * cos(angle);
 
 //	basicShader->Begin();
-	if(frustumCulling) {
-		grid.Update(metaball , 3 , camera.frustum);
-		metaballPolys = grid.Draw(camera.frustum);
-//		grid.DrawGridCube();
-	} else {
+//	if(frustumCulling) {
+//		grid.Update(metaball , 3 , camera.frustum);
+//		metaballPolys = grid.Draw(camera.frustum);
+////		grid.DrawGridCube();
+//	} else {
 		grid.Update(metaball , 3 , NULL);
 		grid.Draw(NULL);
-	}
+//	}
 //	basicShader->End();
 
 	/// Print text on screem

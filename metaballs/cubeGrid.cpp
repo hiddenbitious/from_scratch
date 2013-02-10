@@ -3,7 +3,7 @@
 #include "tables.h"
 #include "../math.h"
 
-#define USE_VERTEX_ARRAYS
+//#define FIXED_PIPELINE
 
 C_GLShaderManager C_CubeGrid::shaderManager;
 
@@ -69,7 +69,7 @@ void C_CubeGrid::Constructor(float x, float y, float z)
 	}
 
 	/// Initialize shader
-	#ifdef USE_VERTEX_ARRAYS
+	#ifndef FIXED_PIPELINE
 	shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
 
 	/// Get attribute locations
@@ -240,14 +240,11 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 		}
 	}
 
+#ifdef FIXED_PIPELINE
 	glPushMatrix();
-
 	glTranslatef(position.x , position.y , position.z);
-
 	glColor3f(1.0f , 1.0f , 1.0f);
 
-
-#ifndef USE_VERTEX_ARRAYS
 	glBegin(GL_TRIANGLES);
 	for(unsigned int i = 0 ; i < nTriangles ; i++) {
 		glNormal3f(geometry[i].normal0.x , geometry[i].normal0.y , geometry[i].normal0.z);
@@ -260,12 +257,27 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 		glVertex3f(geometry[i].vertex2.x , geometry[i].vertex2.y , geometry[i].vertex2.z);
 	}
 	glEnd();
+
+	glPopMatrix();
 #else
 	shader->Begin();
+
+	/// Pass matrices to shader
+	/// Combine modelview and projection transformations
+	ESMatrix mat;
+	/// Rotate
+	esMatrixMultiply(&mat, &globalModelviewMatrix, &globalProjectionMatrix);
+	/// Translate
+	esTranslate(&mat, position.x , position.y , position.z);
+	shader->setUniformMatrix4fv("u_mvpMatrix", 1, GL_FALSE, &mat.m[0][0]);
+
+//	shader->setUniformMatrix4fv("u_modelviewMatrix", 16, true, (GLfloat *)&globalModelviewMatrix);
+//	shader->setUniformMatrix4fv("u_projectionMatrix", 16, true, (GLfloat *)&globalProjectionMatrix);
 
 	/// Vertices
 	glEnableVertexAttribArray(verticesAttribLocation);
 	glVertexAttribPointer(verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), geometry);
+
 	/// Normals
 	glEnableVertexAttribArray(normalsAttribLocation);
 	glVertexAttribPointer(normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)geometry + 3 * sizeof(float));
@@ -274,8 +286,6 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 
 	shader->End();
 #endif
-
-	glPopMatrix();
 
 	return nTriangles;
 }
