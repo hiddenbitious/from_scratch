@@ -5,11 +5,13 @@ GL_PATH=/usr/lib/x86_64-linux-gnu/mesa/
 GLEW_PATH=/usr/lib/x86_64-linux-gnu/
 GLUT_PATH=/usr/lib/x86_64-linux-gnu/
 
-LDFLAGS=-Wl,-rpath=../oglRenderer
-LIBS=-L$(GLEW_PATH) -L$(GL_PATH) -lm -lGL -lglut -lGLU -lGLEW -L../oglRenderer -lOglRenderer
+#LDFLAGS=-Wl,-rpath=../oglRenderer
+LDFLAGS=
+#LIBS=-L$(GLEW_PATH) -L$(GL_PATH) -lm -lGL -lglut -lGLU -lGLEW -L../oglRenderer -lOglRenderer
+LIBS=-L$(GLEW_PATH) -L$(GL_PATH) -lm -lGL -lglut -lGLU -lGLEW
 
 SOURCES=main.cpp bbox.cpp metaballs/cubeGrid.cpp quaternion.cpp \
-		math.cpp frustum.cpp vectors.cpp plane.cpp camera.cpp timer.cpp
+		math.cpp frustum.cpp vectors.cpp plane.cpp camera.cpp timer.cpp glsl/glsl.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=from_scratch
 
@@ -22,4 +24,4 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm *.o metaballs/*.o $(EXECUTABLE)
+	rm *.o metaballs/*.o glsl/glsl.o $(EXECUTABLE)

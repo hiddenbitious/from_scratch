@@ -15,7 +15,7 @@
 ****************************************/
 
 #include "camera.h"
-#include "../oglRenderer/oglDriver.h"
+#include <GL/glut.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>

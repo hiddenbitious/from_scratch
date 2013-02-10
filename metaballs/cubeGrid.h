@@ -1,7 +1,7 @@
 #ifndef _CUBEGRID_H_
 #define _CUBEGRID_H_
 
-#include "../../oglRenderer/shaders/glsl.h"
+#include "../glsl/glsl.h"
 #include "../globals.h"
 #include "../bbox.h"
 #include "metaball.h"

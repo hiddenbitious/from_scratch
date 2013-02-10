@@ -25,8 +25,7 @@
 #include "vectors.h"
 #include "timer.h"
 
-#include "../oglRenderer/oglDriver.h"
-#include "../oglRenderer/shaders/glsl.h"
+#include "glsl/glsl.h"
 
 #include "metaballs/cubeGrid.h"
 #include "metaballs/metaball.h"
@@ -219,7 +218,8 @@ static void Draw(void)
 
 	CountFPS ();
 
-	_DrawFrameBuffer();
+//	_DrawFrameBuffer();
+	glutSwapBuffers();
 }
 
 // Sinartisi heirismou parathirou
