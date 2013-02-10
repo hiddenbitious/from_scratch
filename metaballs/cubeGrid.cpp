@@ -265,14 +265,14 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 	/// Pass matrices to shader
 	/// Combine modelview and projection transformations
 	ESMatrix mat;
-	/// Rotate
-	esMatrixMultiply(&mat, &globalModelviewMatrix, &globalProjectionMatrix);
-	/// Translate
-	esTranslate(&mat, position.x , position.y , position.z);
-	shader->setUniformMatrix4fv("u_mvpMatrix", 1, GL_FALSE, &mat.m[0][0]);
+	/// Transform
+	esTranslate(&globalModelviewMatrix, position.x , position.y , position.z);
+	/// Concatenate transforms
+//	esMatrixMultiply(&mat, &globalModelviewMatrix, &globalProjectionMatrix);
+//	shader->setUniformMatrix4fv("u_mvpMatrix", 1, GL_FALSE, &mat.m[0][0]);
 
-//	shader->setUniformMatrix4fv("u_modelviewMatrix", 16, true, (GLfloat *)&globalModelviewMatrix);
-//	shader->setUniformMatrix4fv("u_projectionMatrix", 16, true, (GLfloat *)&globalProjectionMatrix);
+	shader->setUniformMatrix4fv("u_modelviewMatrix", 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
+	shader->setUniformMatrix4fv("u_projectionMatrix", 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
 	/// Vertices
 	glEnableVertexAttribArray(verticesAttribLocation);
