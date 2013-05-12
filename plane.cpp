@@ -61,9 +61,9 @@ C_Plane::C_Plane(const C_Vertex* vec1 , const C_Vertex* vec2 , const C_Vertex* v
 	pointOnPlane.y = vec1->y;
 	pointOnPlane.z = vec1->z;
 
-	points.push_back(*vec1);
-	points.push_back(*vec2);
-	points.push_back(*vec3);
+	points[0] = *vec1;
+	points[1] = *vec2;
+	points[2] = *vec3;
 }
 
 
@@ -111,15 +111,15 @@ void C_Plane::setPlane(C_Plane* plane)
 	pointOnPlane.y = plane->pointOnPlane.y;
 	pointOnPlane.z = plane->pointOnPlane.z;
 
-	if(points.size()) {
+//	if(points.size()) {
 		points[0] = plane->points[0];
 		points[1] = plane->points[1];
 		points[2] = plane->points[2];
-	} else {
-		points.push_back(plane->points[0]);
-		points.push_back(plane->points[1]);
-		points.push_back(plane->points[2]);
-	}
+//	} else {
+//		points.push_back(plane->points[0]);
+//		points.push_back(plane->points[1]);
+//		points.push_back(plane->points[2]);
+//	}
 }
 
 

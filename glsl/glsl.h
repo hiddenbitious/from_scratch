@@ -17,44 +17,48 @@
 #ifndef _GLSL_H_
 #define _GLSL_H_
 
+#include "../globals.h"
+#define MAX_SHADERS 2
+
+//#ifdef JNI_COMPATIBLE
+//#	include <jni.h>
+//#	include <android/log.h>
+//
+//#	include <GLES2/gl2.h>
+//#	include <GLES2/gl2ext.h>
+//#else
+//#	include <GL/glew.h>
+//#	include <iostream>
+//#endif
+
 #include <GL/glew.h>
 #include <iostream>
-#include <string>
-#include <vector>
+#include <string.h>
 
 using namespace std;
 class C_GLShader;
+typedef enum{NO_SHADER, VERTEX_SHADER, FRAGMENT_SHADER} shader_type_t;
 
 class C_GLShaderObject {
 		friend class C_GLShader;
-
 
 	public:
 		C_GLShaderObject();
 		virtual ~C_GLShaderObject();
 
-		//Load shader program from file
-		bool LoadShaderProgram(const char* filename);
+		bool LoadShaderProgram(const char *);
+
 		//Compile shader
 		bool compile(bool printSource);
-
-		// Log returner after compiling the shader
-		string compilerLog;
+		char *compilerLog;
 
 	protected:
-
 		// shader object
 		GLuint shaderObject;
-		// 1 = Vertex shader, 2 = Fragment shader, 0 = none
-		int type;
-
-		// Shader's source code
+		shader_type_t type;
 		GLubyte* shaderSource;
-
-		// Set to true if compilation was successful.
 		bool isCompiled;
 };
-
 
 class C_GLVertexShader : public C_GLShaderObject {
 	public:
@@ -62,13 +66,11 @@ class C_GLVertexShader : public C_GLShaderObject {
 		~C_GLVertexShader(void);
 };
 
-
 class C_GLFragmentShader : public C_GLShaderObject {
 	public:
 		C_GLFragmentShader(void);
 		~C_GLFragmentShader(void);
 };
-
 
 class C_GLShader {
 	public:
@@ -78,17 +80,13 @@ class C_GLShader {
 		// Add a vertex or fragment shader
 		void AddShader(C_GLShaderObject* shader);
 
+		char *linkerLog;
+
 		// Link shaders
 		bool Link(void);
-		// Start using shader
 		void Begin(void);
-		// Stop using shader
 		void End(void);
-
 		inline bool GetisLinked(void) { return isLinked; }
-
-		// Log returned after linking
-		string linkerLog;
 
 		// Uniform Variables
 		bool setUniform1f(char* varname, GLfloat v0);  //!< set float uniform to program
@@ -125,34 +123,14 @@ class C_GLShader {
 
 	private:
 		// Holds all the shaders
-		vector<C_GLShaderObject*> shaderList;
-
+		C_GLShaderObject* shaderList[MAX_SHADERS];
+		int nShaders;
 		GLuint programObject;
+		bool isLinked;
+		bool inUse;
 
 		GLint GetUniLoc(const GLcharARB *name);
-
-
-		// Set to true if linking was successfull
-		bool isLinked;
-
-		bool inUse;
 };
-
-
-/*
-C_GLShaderManager was written to easy the procedure of loading, compiling and linking vertex and fragment
-shader files into shader objects ready for use. A typical use of this class is as follows :
-
-C_GLShader* myShader;
-C_GLShaderManager shaderManager;
-myShader = shaderManager.LoadShaderProgram ( "shader.vert" , "shader.frag" );
-
-
-// Draw function
-myShader->Begin ();
-// Draw something
-myShader->End ();
-*/
 
 class C_GLShaderManager {
 	public :
@@ -160,16 +138,18 @@ class C_GLShaderManager {
 		~C_GLShaderManager();
 
 		// Load a vertex and a fragment shader and returns a pointer to a C_GLShader object that holds both
-		C_GLShader* LoadShaderProgram(const char* vertexFile , const char* fragmentFile);
+		C_GLShader* LoadShaderProgram(const char *, const char *);
 
 	private:
-		vector<C_GLShader*> shaderList;
+		C_GLShader* shaderList;
 };
 
 //Initializes extensions using glew
+//#ifndef JNI_COMPATIBLE
 bool InitGLExtensions(void);
+//#endif
+
 //Checks if glsl can be used
 bool CheckGLSL(void);
-
 
 #endif

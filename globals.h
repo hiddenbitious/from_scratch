@@ -17,11 +17,24 @@
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
-#include <stdint.h>
-#include <string>
-#include <limits>
-#include <assert.h>
-#include <GL/glew.h>
+//#define JNI_COMPATIBLE
+
+#ifdef JNI_COMPATIBLE
+#	include <jni.h>
+#	include <android/log.h>
+
+#	define  LOGI(...)	__android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#	define  LOGE(...)	__android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+#else
+#	define  LOGI 		printf
+#	define  LOGE		printf
+
+#	include <stdint.h>
+#	include <string>
+#	include <limits>
+#	include <assert.h>
+#	include <GL/glew.h>
+#endif
 
 typedef unsigned long ULONG;
 typedef unsigned int UINT;

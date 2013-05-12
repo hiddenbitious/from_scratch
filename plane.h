@@ -19,7 +19,7 @@
 
 #include "math.h"
 #include "vectors.h"
-#include <vector>
+//#include <vector>
 
 using namespace std;
 
@@ -44,7 +44,8 @@ class C_Plane {
 
 		C_Vertex pointOnPlane;
 
-		vector<C_Vertex> points;
+//		vector<C_Vertex> points;
+		C_Vertex points[3];
 
 		void Draw(void);
 

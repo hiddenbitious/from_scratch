@@ -58,6 +58,8 @@
 		<Unit filename="frustum.cpp" />
 		<Unit filename="frustum.h" />
 		<Unit filename="globals.h" />
+		<Unit filename="glsl/glsl.cpp" />
+		<Unit filename="glsl/glsl.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="math.cpp" />
 		<Unit filename="math.h" />

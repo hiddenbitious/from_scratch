@@ -18,8 +18,17 @@
 #include <sstream>
 #include <time.h>
 
-#include <GL/glew.h>
-#include <GL/glut.h>
+#ifndef JNI_COMPATIBLE
+#	include <GL/glew.h>
+#	include <GL/glut.h>
+#else
+#	include <GLES2/gl2.h>
+#	include <GLES2/gl2ext.h>
+
+#	include <stdio.h>
+#	include <stdlib.h>
+#	include <math.h>
+#endif
 
 #include "camera.h"
 #include "vectors.h"
@@ -119,7 +128,7 @@ static void Initializations(void)
 //	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
 
 	/// metaballs initialization
-	grid.Constructor(-50.0f , 0.0f , -150.0f);
+	grid.Constructor(0.0f , 0.0f , -80.0f);
 
 	metaball[0].Constructor();
 	metaball[0].position.x = 10.0f;
@@ -173,7 +182,7 @@ static void Draw(void)
 //	glPopMatrix();
 
 	/// Place light source
-	glLightfv(GL_LIGHT0 , GL_POSITION , lightPos);
+//	glLightfv(GL_LIGHT0 , GL_POSITION , lightPos);
 
 //	glColor3fv(white);
 	/// In case shaders are not available
@@ -202,6 +211,7 @@ static void Draw(void)
 //	}
 //	basicShader->End();
 
+#ifndef JNI_COMPATIBLE
 	/// Print text on screem
 	int line = 1;
 	int lineHeight = 18;
@@ -218,10 +228,12 @@ static void Draw(void)
 
 	CountFPS ();
 
-//	_DrawFrameBuffer();
 	glutSwapBuffers();
+#endif
 }
 
+
+#ifndef JNI_COMPATIBLE
 // Sinartisi heirismou parathirou
 static void reshape(GLint w , GLint h)
 {
@@ -306,11 +318,12 @@ static void handle_arrows(int key , int x , int y)
 
 	glutPostRedisplay();
 }
-
+#endif
 
 // Main program entry point
 int main(int argc, char* argv[])
 {
+#ifndef JNI_COMPATIBLE
 	glutInit(&argc , argv);
 
 	/// Double buffering with depth buffer
@@ -334,6 +347,10 @@ int main(int argc, char* argv[])
 	Initializations();
 
 	glutMainLoop();
+#else
+	CheckGLSL();
+	Initializations();
+#endif
 
 	return 0;
 }

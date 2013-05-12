@@ -12,6 +12,26 @@ struct grid_vertex {
 	C_Vertex normal;
 };
 
+
+static const char vertexShaderSource [] = {
+"attribute vec4 a_vertices;\n\
+attribute vec4 a_normals;\n\
+\n\
+uniform mat4 u_modelviewMatrix;\n\
+uniform mat4 u_projectionMatrix;\n\
+void main ( void )\n\
+{\n\
+	mat4 mvpMatrix = u_projectionMatrix * u_modelviewMatrix;\n\
+	gl_Position = mvpMatrix * a_vertices;\n\
+	gl_FrontColor = a_normals;\n\
+}\0"};
+
+static const char fragmentShaderSource [] = {
+"void main (void)\n\
+{\n\
+	gl_FragColor = gl_Color;\n\
+}\0" };
+
 static grid_vertex edgeVertices[12];
 
 inline float fieldFormula(float q , float r)
@@ -70,8 +90,11 @@ void C_CubeGrid::Constructor(float x, float y, float z)
 
 	/// Initialize shader
 	#ifndef FIXED_PIPELINE
+	#ifndef JNI_COMPATIBLE
 	shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
-
+	#else
+	shader = shaderManager.LoadShaderProgram(vertexShaderSource, fragmentShaderSource);
+	#endif
 	/// Get attribute locations
 	verticesAttribLocation = shader->getAttribLocation("a_vertices");
 	assert(verticesAttribLocation >= 0);
