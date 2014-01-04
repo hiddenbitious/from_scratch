@@ -37,10 +37,10 @@ class C_BspTree {
 		int nBrushes;
 		int nPolys;
 
-		// Scale the map
+		/// Scale the map
 		float scaleFactor;
 
-		// Calculate normal vectors
+		/// Calculate normal vectors
 		void CalcNorms(void);
 
 		vector<poly*> tessellatedPolys;
@@ -53,7 +53,7 @@ class C_BspTree {
 		C_BspTree(USHORT depth);
 		~C_BspTree();
 
-		// Read geometry file
+		/// Read geometry file
 		bool ReadGeometryFile(const char* fileName);
 
 		void WritePVSFile(const char *fileName);
@@ -75,12 +75,12 @@ class C_BspTree {
 		void Draw3(void);
 		int Draw_PVS(C_Vector3* cameraPosition);
 
-		// Max depth allowed
+		/// Max depth allowed
 		USHORT maxDepth;
-		// Number of polygon splits happen while building the tree
+		/// Number of polygon splits happen while building the tree
 		ULONG nSplits;
 
-		// Limits reached
+		/// Limits reached
 		int depthReached;
 		int lessPolysInNodeFound;
 
@@ -88,7 +88,7 @@ class C_BspTree {
 		USHORT nNodes;
 		USHORT nConvexRooms;
 
-		// Keep all the leaves for easy reference
+		/// Keep all the leaves for easy reference
 		vector<C_BspNode*> leaves;
 
 		void FindConnectedLeaves(void);

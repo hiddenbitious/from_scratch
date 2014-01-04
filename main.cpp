@@ -18,8 +18,8 @@
 #include <sstream>
 #include <time.h>
 
-#include <GL/glew.h>
-#include <GL/glut.h>
+//#include <GL/glew.h>
+//#include <GL/glut.h>
 
 #include "camera.h"
 #include "vectors.h"
@@ -44,7 +44,7 @@ static C_BspTree bspTest(15);
 // Shaders. Tha hrisimopoiithoun 2 shaders
 static C_GLShaderManager shaderManager;
 static C_GLShader* basicShader;
-static C_GLShader* basicShader_texture;
+//static C_GLShader* basicShader_texture;
 
 // Dinamika 3D antikeimena
 static C_MeshGroup bunny;

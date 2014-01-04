@@ -88,7 +88,7 @@ char edge_vertexTable[12][2] = {
 short neighborTable[256] = {0};
 void generateNeighborTable ( void )
 {
-/*
+
 	for ( l = 0 ; l < 256 ; l++ )
 	{
 		k = 0;

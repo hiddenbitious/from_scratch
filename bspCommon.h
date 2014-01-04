@@ -33,16 +33,15 @@ extern int nConvexRooms;
 extern vector<C_Vertex> debug;
 
 struct poly {
-	int nVertices;
 	C_Vertex* pVertices;
 	C_Vertex* pNorms;
-
+	int nVertices;
 	bool usedAsDivider;
 };
 
 struct brush {
-	int nPolys;
 	poly* pPolys;
+	int nPolys;
 };
 
 #endif

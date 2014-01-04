@@ -48,8 +48,8 @@ class C_Plane {
 
 		void Draw(void);
 
-		// These two functions works for normalized plane equations (so that a*a + b*b + c*c == 1)
-		// Dot product + d
+		/// These two functions works for normalized plane equations (so that a*a + b*b + c*c == 1)
+		/// Dot product + d
 		inline float distanceFromPoint(const C_Vector3* point)
 		{ return (a * point->x + b * point->y + c * point->z + d); }
 
