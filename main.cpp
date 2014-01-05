@@ -1,19 +1,3 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #include <iostream>
 #include <sstream>
 #include <time.h>
@@ -31,6 +15,7 @@
 #endif
 
 #include "camera.h"
+#include "bspTree.h"
 #include "vectors.h"
 #include "timer.h"
 
@@ -41,14 +26,13 @@
 
 using namespace std;
 
+// BSP
+// Orise ena dendro me megisto bathos 15
+static C_BspTree bspTest(15);
+int mapPolys;
+
 /// Global variables
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
-
-/// Shaders
-//static C_GLShaderManager shaderManager;
-//static C_GLShader* basicShader;
-//static C_GLShader* metaballShader;
-//static C_GLShader* basicShader_texture;
 
 /// Camera and frustum
 static C_Camera camera;
@@ -68,6 +52,7 @@ static float angle2 = 0.5f;
 
 static int metaballPolys = 0;
 static bool frustumCulling = true;
+static int bspRenderingType = 0;
 
 //static float white[] = { 1.0f , 1.0f , 1.0f , 1.0f };
 //static float grey[] = { 0.3f , 0.3f , 0.3f , 0.3f };
@@ -85,7 +70,7 @@ static C_Metaball metaball[3];
 
 static void CountFPS (void);
 
-// Sinartisi arhikpoiiseon
+
 static void Initializations(void)
 {
 	/// Set clear color
@@ -102,11 +87,6 @@ static void Initializations(void)
 	/// XXX: Disable normalizing ???
 	glDisable(GL_NORMALIZE);
 	glEnable(GL_LIGHTING);
-
-	/// vertex arrays
-//	glEnableClientState(GL_VERTEX_ARRAY);
-//	glEnableClientState(GL_NORMAL_ARRAY);
-//	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	/// Lighting parameters
 	float ambient[] = { 1.0f , 1.0f , 1.0f , 1.0f };
@@ -126,6 +106,13 @@ static void Initializations(void)
 
 	/// Load shaders
 //	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
+
+	// Diabase tin geometria gia to bsp
+	bspTest.ReadGeometryFile("properMap2.BSP");
+
+	// Kataskeuase bsp kai pvs
+	bspTest.BuildBspTree();
+	bspTest.BuildPVS();
 
 	/// metaballs initialization
 	grid.Constructor(0.0f , 0.0f , -80.0f);
@@ -166,6 +153,7 @@ static void Draw(void)
 	/// Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+   glLoadIdentity();
 	esMatrixLoadIdentity(&globalModelviewMatrix);
 	camera.Look();
 	metaballPolys = 0;
@@ -190,6 +178,26 @@ static void Draw(void)
 //		glMaterialfv(GL_FRONT , GL_DIFFUSE , white);
 //		glMaterialfv(GL_FRONT , GL_AMBIENT , grey);
 //	}
+
+	switch(bspRenderingType) {
+			// Shediase ti fainetai kanonika.
+		case 0:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			mapPolys = bspTest.Draw_PVS(&cameraPosition);
+			break;
+
+			// Shediase olo to harti se wireframe
+		case 1:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			mapPolys = bspTest.Draw2(&cameraPosition);
+			break;
+
+			// Shediase to PVS se wireframe
+		case 2:
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			mapPolys = bspTest.Draw_PVS(&cameraPosition);
+			break;
+	}
 
 	/// Draw metaballs
 	metaball[0].position.y = 20.0f + 5 * cos(angle2);
@@ -286,6 +294,13 @@ static void hande_simple_keys(unsigned char key , int x , int y)
 
 		case 's' : case 'S' :
 			frustumCulling = !frustumCulling;
+			break;
+
+		case 'x' : case 'X' :
+			bspRenderingType++;
+			if(bspRenderingType > 2) {
+				bspRenderingType = 0;
+			}
 			break;
 
 		default:

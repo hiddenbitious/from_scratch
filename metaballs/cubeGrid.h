@@ -8,18 +8,9 @@
 #include "../frustum.h"
 
 #define CUBES_PER_AXIS	50
-#define CUBE_SIZE		1
-#define THRESHOLD		1.0f
+#define CUBE_SIZE		   1
+#define THRESHOLD		   1.0f
 #define MAX_TRIANGLES	5000
-
-struct grid_triangle {
-	C_Vertex vertex0;
-	C_Vertex normal0;
-	C_Vertex vertex1;
-	C_Vertex normal1;
-	C_Vertex vertex2;
-	C_Vertex normal2;
-};
 
 struct grid_cube_vertex {
 	float value;
@@ -50,7 +41,7 @@ public:
 	unsigned int nGridCubeVertices;
 
 	/// Actual geometry
-	grid_triangle *geometry;
+	triangle_vn *geometry;
 
 	/// Updates ball positions
 	void Update(C_Metaball *metaballs , int nBalls , C_Frustum *frustum);

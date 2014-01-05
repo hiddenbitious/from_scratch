@@ -69,6 +69,27 @@ typedef struct {
     GLfloat   m[4][4];
 } ESMatrix;
 
+struct triangle_vn {
+	C_Vertex vertex0;
+	C_Vertex normal0;
+	C_Vertex vertex1;
+	C_Vertex normal1;
+	C_Vertex vertex2;
+	C_Vertex normal2;
+};
+
+struct triangle_vnt {
+	C_Vertex vertex0;
+	C_Vertex normal0;
+	C_TexCoord  tex0;
+	C_Vertex vertex1;
+	C_Vertex normal1;
+	C_TexCoord  tex1;
+	C_Vertex vertex2;
+	C_Vertex normal2;
+	C_TexCoord  tex2;
+};
+
 extern ESMatrix globalModelviewMatrix, globalProjectionMatrix;
 
 typedef enum {

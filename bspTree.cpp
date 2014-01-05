@@ -95,32 +95,32 @@ bool C_BspTree::ReadGeometryFile(const char* fileName)
 	ifstream file(fileName , ios::in | ios::binary);
 
 	if(!file.is_open()) {
-		cout << "Couldn't find bsp file." << endl;
+		cout << "Couldn't open \"" << fileName << "\"" << endl;
 		return false;
 	}
 
 	file.read((char*)&nPolys , sizeof(int));
 	cout << nPolys << endl;
-	pRawPolys = new(poly*[nPolys]);
+	pRawPolys = new poly*[nPolys];
 	int currentPoly = 0;
 
-	// Read number of brushes/meshes
+	/// Read number of brushes/meshes
 	file.read((char*)&nBrushes , sizeof(int));
 	cout << nBrushes << endl;
 
 	pBrushes = new brush[nBrushes];
 
-	// For each brush...
+	/// For each brush...
 	for(int i = 0 ; i < nBrushes ; i++) {
-		// ...read number of polys
+		/// ...read number of polys
 		file.read((char*)&pBrushes[i].nPolys , sizeof(int));
 
 		pBrushes[i].pPolys = new poly[pBrushes[i].nPolys];
 
-		// For each poly in brush
+		/// For each poly in brush
 		for(int j = 0 ; j < pBrushes[i].nPolys ; j++) {
-			// Read number of vertices
-			file.read((char*)&pBrushes[i].pPolys[j].nVertices , sizeof(int));
+			/// Read number of vertices
+			file.read((char*)&pBrushes[i].pPolys[j].nVertices, sizeof(int));
 
 			pBrushes[i].pPolys[j].pVertices = new C_Vertex[pBrushes[i].pPolys[j].nVertices];
 			pBrushes[i].pPolys[j].pNorms = new C_Vertex[pBrushes[i].pPolys[j].nVertices];
@@ -129,7 +129,7 @@ bool C_BspTree::ReadGeometryFile(const char* fileName)
 			pRawPolys[currentPoly]->usedAsDivider = false;
 			currentPoly++;
 
-			// Read vertices
+			/// Read vertices
 			for(int k = 0 ; k < pBrushes[i].pPolys[j].nVertices ; k++) {
 				file.read((char*)&pBrushes[i].pPolys[j].pVertices[k].x , sizeof(float));
 				file.read((char*)&pBrushes[i].pPolys[j].pVertices[k].y , sizeof(float));

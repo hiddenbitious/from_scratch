@@ -12,7 +12,7 @@ struct grid_vertex {
 	C_Vertex normal;
 };
 
-
+#ifdef JNI_COMPATIBLE
 static const char vertexShaderSource [] = {
 "attribute vec4 a_vertices;\n\
 attribute vec4 a_normals;\n\
@@ -31,6 +31,7 @@ static const char fragmentShaderSource [] = {
 {\n\
 	gl_FragColor = gl_Color;\n\
 }\0" };
+#endif
 
 static grid_vertex edgeVertices[12];
 
@@ -45,7 +46,7 @@ void C_CubeGrid::Constructor(float x, float y, float z)
 	position.y = y;
 	position.z = z;
 
-	geometry = new grid_triangle[MAX_TRIANGLES];
+	geometry = new triangle_vn[MAX_TRIANGLES];
 
 	nGridCubes = CUBES_PER_AXIS * CUBES_PER_AXIS * CUBES_PER_AXIS;
 	nGridCubeVertices = (CUBES_PER_AXIS + 1) * (CUBES_PER_AXIS + 1) * (CUBES_PER_AXIS + 1);
@@ -286,15 +287,11 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 	shader->Begin();
 
 	/// Pass matrices to shader
-	/// Combine modelview and projection transformations
-	ESMatrix mat;
-	/// Transform
-	esTranslate(&globalModelviewMatrix, position.x , position.y , position.z);
-	/// Concatenate transforms
-//	esMatrixMultiply(&mat, &globalModelviewMatrix, &globalProjectionMatrix);
-//	shader->setUniformMatrix4fv("u_mvpMatrix", 1, GL_FALSE, &mat.m[0][0]);
+	/// Keep a copy of global movelview matrix
+	ESMatrix mat = globalModelviewMatrix;
+	esTranslate(&mat, position.x , position.y , position.z);
 
-	shader->setUniformMatrix4fv("u_modelviewMatrix", 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
+	shader->setUniformMatrix4fv("u_modelviewMatrix", 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
 	shader->setUniformMatrix4fv("u_projectionMatrix", 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
 	/// Vertices
