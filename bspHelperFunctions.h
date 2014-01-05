@@ -28,7 +28,7 @@ vector<C_Vertex> FindBBoxPlaneIntersections(C_BBox* bbox , C_Plane* plane);
 C_Vertex FindIntersectionPoint(C_Vertex *ptA , C_Vertex *ptB , C_Plane *plane);
 bool FindIntersectionPoint_withCheck(C_Vertex *ptA , C_Vertex *ptB , C_Plane *plane , C_Vertex* intePoint);
 
-bool PointInTriangle(C_Vertex* points , poly* triangle);
-bool RayTriangleIntersection(C_Vertex* p1 , C_Vertex* p2 , poly* triangle);
+bool PointInTriangle(C_Vertex* points, triangle_vn *triangle);
+bool RayTriangleIntersection(C_Vertex* p1 , C_Vertex* p2 , triangle_vn *triangle);
 
 #endif

@@ -48,8 +48,7 @@ class C_BspNode {
 
 		/// Same poly tesselated into tirangles
 		int nTriangles;
-		poly* triangles;
-
+		triangle_vn *triangles;
 
 		/// Children nodes
 		C_BspNode* frontNode;
