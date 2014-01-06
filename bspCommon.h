@@ -35,15 +35,15 @@ extern int nConvexRooms;
 
 extern vector<C_Vertex> debug;
 
-struct poly {
+struct poly_t {
 	C_Vertex* pVertices;
 	C_Vertex* pNorms;
 	int nVertices;
 	bool usedAsDivider;
 };
 
-struct brush {
-	poly* pPolys;
+struct brush_t {
+	poly_t* pPolys;
 	int nPolys;
 };
 

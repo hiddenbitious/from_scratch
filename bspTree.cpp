@@ -1,19 +1,3 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #include "bspTree.h"
 #include "bspNode.h"
 #include "vectors.h"
@@ -50,6 +34,10 @@ C_BspTree::C_BspTree(USHORT depth)
 	nLeavesToDraw = 0;
 	nNodesToDraw = 0;
 	nNodes = 0;
+
+   shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
+   assert(shader->verticesAttribLocation >= 0);
+   assert(shader->normalsAttribLocation >= 0);
 }
 
 
@@ -101,21 +89,21 @@ bool C_BspTree::ReadGeometryFile(const char* fileName)
 
 	file.read((char*)&nPolys , sizeof(int));
 	cout << nPolys << endl;
-	pRawPolys = new poly*[nPolys];
+	pRawPolys = new poly_t*[nPolys];
 	int currentPoly = 0;
 
 	/// Read number of brushes/meshes
 	file.read((char*)&nBrushes , sizeof(int));
 	cout << nBrushes << endl;
 
-	pBrushes = new brush[nBrushes];
+	pBrushes = new brush_t[nBrushes];
 
 	/// For each brush...
 	for(int i = 0 ; i < nBrushes ; i++) {
 		/// ...read number of polys
 		file.read((char*)&pBrushes[i].nPolys , sizeof(int));
 
-		pBrushes[i].pPolys = new poly[pBrushes[i].nPolys];
+		pBrushes[i].pPolys = new poly_t[pBrushes[i].nPolys];
 
 		/// For each poly in brush
 		for(int j = 0 ; j < pBrushes[i].nPolys ; j++) {
@@ -142,8 +130,9 @@ bool C_BspTree::ReadGeometryFile(const char* fileName)
 //			TessellatePolygon ( &pBrushes[i].pPolys[j] );
 		}
 	}
-
 	file.close();
+
+	assert(currentPoly == nPolys);
 
 	CalcNorms();
 	return true;
@@ -364,7 +353,7 @@ void C_BspTree::BuildBspTree(void)
 }
 
 
-int C_BspTree::Draw2(C_Vector3* cameraPosition, C_GLShader *shader)
+int C_BspTree::Draw2(C_Vector3* cameraPosition)
 {
 	polyCount = 0;
 	leavesDrawn = 0;
@@ -374,11 +363,15 @@ int C_BspTree::Draw2(C_Vector3* cameraPosition, C_GLShader *shader)
 
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
+	shader->Begin();
 	ESMatrix mat = globalModelviewMatrix;
 	esTranslate(&mat, position.x , position.y , position.z);
 
-	shader->setUniformMatrix4fv("u_modelviewMatrix", 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-	C_BspNode::Draw(cameraPosition, headNode, this, shader);
+	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+	C_BspNode::Draw(cameraPosition, headNode, this);
+	glFlush();
+	shader->End();
 //	glFrontFace(GL_CCW);
 
 // Sxediase to epipedo diahorismou tis rizas tou dendrou
@@ -410,7 +403,7 @@ int C_BspTree::Draw2(C_Vector3* cameraPosition, C_GLShader *shader)
 }
 
 
-void C_BspTree::Draw3(C_GLShader *shader)
+void C_BspTree::Draw3(void)
 {
 	glColor3f(1.0f , 0.0f , 0.0f);
 	leaves[nLeavesToDraw]->Draw(shader);
@@ -422,7 +415,7 @@ void C_BspTree::Draw3(C_GLShader *shader)
 }
 
 
-int C_BspTree::Draw_PVS(C_Vector3* cameraPosition, C_GLShader *shader)
+int C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
 {
 	polyCount = 0;
 	leavesDrawn = 0;
@@ -441,14 +434,19 @@ int C_BspTree::Draw_PVS(C_Vector3* cameraPosition, C_GLShader *shader)
 	*/
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
+	shader->Begin();
+	glEnableVertexAttribArray(shader->verticesAttribLocation);
+	glEnableVertexAttribArray(shader->normalsAttribLocation);
 	ESMatrix mat = globalModelviewMatrix;
 	esTranslate(&mat, position.x , position.y , position.z);
 
-	shader->setUniformMatrix4fv("u_modelviewMatrix", 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
 	glFrontFace(GL_CW);
-	C_BspNode::Draw_PVS(cameraPosition, headNode, this, shader);
+	C_BspNode::Draw_PVS(cameraPosition, headNode, this);
 	glFrontFace(GL_CCW);
+	shader->End();
 	/*
 		glDisable ( GL_LIGHTING );
 		glColor3f ( 1.0f , 0.0f , 0.0f );

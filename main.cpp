@@ -18,23 +18,19 @@
 #include "bspTree.h"
 #include "vectors.h"
 #include "timer.h"
-
 #include "glsl/glsl.h"
-
 #include "metaballs/cubeGrid.h"
 #include "metaballs/metaball.h"
 
 using namespace std;
 
 // BSP
-// Orise ena dendro me megisto bathos 15
 static C_BspTree *bspTest;
 int mapPolys;
 
-C_GLShader* shader;
-
 /// Global variables
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
+C_GLShaderManager shaderManager;
 
 /// Camera and frustum
 static C_Camera camera;
@@ -135,12 +131,6 @@ static void Initializations(void)
 	metaball[2].position.z = 15.0f;
 	metaball[2].radius = 3.0f;
 
-
-	C_GLShaderManager shaderManager;
-   shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
-	assert(shader->verticesAttribLocation >= 0);
-	assert(shader->normalsAttribLocation >= 0);
-
 	/// timer initialization
 	timer.Initialize ();
 }
@@ -184,11 +174,6 @@ static void Draw(void)
 //		glMaterialfv(GL_FRONT , GL_AMBIENT , grey);
 //	}
 
-shader->Begin();
-	shader->setUniformMatrix4fv("u_projectionMatrix", 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
-  	glEnableVertexAttribArray(shader->verticesAttribLocation);
-	glEnableVertexAttribArray(shader->normalsAttribLocation);
-
 	/// Draw metaballs
 	metaball[0].position.y = 20.0f + 5 * cos(angle2);
 	metaball[0].position.x = 20.0f + 10 * cos(angle2);
@@ -199,29 +184,28 @@ shader->Begin();
 	metaball[2].position.z = 15.0f + 10.0f * cos(angle);
 
    grid.Update(metaball , 3 , NULL);
-   grid.Draw(NULL, shader);
+   grid.Draw(NULL);
 
 	switch(bspRenderingType) {
       // Shediase ti fainetai kanonika.
 		case 0:
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			mapPolys = bspTest->Draw_PVS(&cameraPosition, shader);
+			mapPolys = bspTest->Draw_PVS(&cameraPosition);
 			break;
 
       // Shediase olo to harti se wireframe
       case 1:
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			mapPolys = bspTest->Draw2(&cameraPosition, shader);
+			mapPolys = bspTest->Draw2(&cameraPosition);
 			break;
 
 		// Shediase to PVS se wireframe
 		case 2:
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			mapPolys = bspTest->Draw_PVS(&cameraPosition, shader);
+			mapPolys = bspTest->Draw_PVS(&cameraPosition);
 			break;
 	}
 
-shader->End();
 #ifndef JNI_COMPATIBLE
 	/// Print text on screem
 	int line = 1;

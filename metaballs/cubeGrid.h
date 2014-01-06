@@ -47,8 +47,9 @@ public:
 	void Update(C_Metaball *metaballs , int nBalls , C_Frustum *frustum);
 
 	/// Drawing functions
-	int Draw(C_Frustum *frustum, C_GLShader *shader);
+	int Draw(C_Frustum *frustum);
 	void DrawGridCube(void);
+	C_GLShader *shader;
 };
 
 #endif

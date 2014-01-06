@@ -26,8 +26,8 @@
 #	define  LOGI(...)	__android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #	define  LOGE(...)	__android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 #else
-#	define  LOGI 		printf
-#	define  LOGE		printf
+#	define  LOGI(...) 	fprintf(stdout, __VA_ARGS__)
+#	define  LOGE(...)		fprintf(stderr, __VA_ARGS__)
 
 #	include <stdint.h>
 #	include <string>
@@ -90,8 +90,6 @@ struct triangle_vnt {
 	C_TexCoord  tex2;
 };
 
-extern ESMatrix globalModelviewMatrix, globalProjectionMatrix;
-
 typedef enum {
 	txUnknown	= 0,	// images
 	txBmp		= 1,
@@ -125,5 +123,9 @@ class C_Camera;
 class C_Quaternion;
 class vector2;
 class C_Vector3;
+class C_GLShaderManager;
+
+extern ESMatrix globalModelviewMatrix, globalProjectionMatrix;
+extern C_GLShaderManager shaderManager;
 
 #endif

@@ -33,7 +33,7 @@ class C_BspTree {
 	private:
 		C_BspNode* headNode;
 
-		brush* pBrushes;
+		brush_t* pBrushes;
 		int nBrushes;
 		int nPolys;
 		C_Vertex position;
@@ -44,8 +44,8 @@ class C_BspTree {
 		/// Calculate normal vectors
 		void CalcNorms(void);
 
-		vector<poly*> tessellatedPolys;
-		poly** pRawPolys;
+		vector<poly_t*> tessellatedPolys;
+		poly_t** pRawPolys;
 
 		USHORT nLeavesToDraw;
 		USHORT nNodesToDraw;
@@ -69,12 +69,10 @@ class C_BspTree {
 
 		void TessellatePolygons(void);
 
-		void CalculateBBoxes(void);
-
 		void Draw(void);
-		int Draw2(C_Vector3* cameraPosition, C_GLShader *shader);
-		void Draw3(C_GLShader *shader);
-		int Draw_PVS(C_Vector3* cameraPosition, C_GLShader *shader);
+		int Draw2(C_Vector3* cameraPosition);
+		void Draw3(void);
+		int Draw_PVS(C_Vector3* cameraPosition);
 
 		/// Max depth allowed
 		USHORT maxDepth;
@@ -102,6 +100,8 @@ class C_BspTree {
 
 		inline USHORT GetnLeavesToDraw() { return nLeavesToDraw; }
 		inline USHORT GetnNodesToDraw() { return nNodesToDraw; }
+
+		C_GLShader *shader;
 };
 
 #endif

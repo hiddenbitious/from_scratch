@@ -88,9 +88,9 @@ void C_CubeGrid::Constructor(float x, float y, float z)
 	/// Initialize shader
 	#ifndef FIXED_PIPELINE
 	#ifndef JNI_COMPATIBLE
-//	shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
-//	assert(shader->verticesAttribLocation >= 0);
-//	assert(shader->normalsAttribLocation >= 0);
+	shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
+	assert(shader->verticesAttribLocation >= 0);
+	assert(shader->normalsAttribLocation >= 0);
 	#else
 	shader = shaderManager.LoadShaderProgram(vertexShaderSource, fragmentShaderSource);
 	#endif
@@ -248,7 +248,7 @@ void C_CubeGrid::Update(C_Metaball *metaballs , int nBalls , C_Frustum *frustum)
 	}
 }
 
-int C_CubeGrid::Draw(C_Frustum *frustum, C_GLShader *shader)
+int C_CubeGrid::Draw(C_Frustum *frustum)
 {
 	if(frustum != NULL) {
 		if(frustum->cubeInFrustum(&bbox) == false) {
@@ -278,20 +278,23 @@ int C_CubeGrid::Draw(C_Frustum *frustum, C_GLShader *shader)
 #else
 	/// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
+	shader->Begin();
 	ESMatrix mat = globalModelviewMatrix;
 	esTranslate(&mat, position.x , position.y , position.z);
 
-	shader->setUniformMatrix4fv("u_modelviewMatrix", 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-
+	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 	/// Vertices
-//	glEnableVertexAttribArray(shader->verticesAttribLocation);
+	glEnableVertexAttribArray(shader->verticesAttribLocation);
 	glVertexAttribPointer(shader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), geometry);
 
 	/// Normals
-//	glEnableVertexAttribArray(shader->normalsAttribLocation);
+	glEnableVertexAttribArray(shader->normalsAttribLocation);
 	glVertexAttribPointer(shader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)geometry + 3 * sizeof(float));
 
 	glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
+	glFlush();
+	shader->End();
 #endif
 
 	return nTriangles;

@@ -33,6 +33,7 @@
 
 #include <GL/glew.h>
 #include <iostream>
+#include <vector>
 #include <string.h>
 
 #define VERTEX_ATTRIBUTE_VARIABLE_NAME_VERTICES    "a_vertices"
@@ -160,7 +161,7 @@ public :
    C_GLShader* LoadShaderProgram(const char *, const char *);
 
 private:
-   C_GLShader* shaderList;
+   vector<C_GLShader *> shaderList;
 };
 
 //Initializes extensions using glew

@@ -44,7 +44,7 @@ class C_BspNode {
 		int nPolys;
 
 		/// Actual polygon data
-		poly** geometry;
+		poly_t** geometry;
 
 		/// Same poly tesselated into tirangles
 		int nTriangles;
@@ -57,28 +57,25 @@ class C_BspNode {
 		C_BspTree* tree;
 
 		/// Node's bounding box.
-		C_BBox bbox;
+		C_BBox *bbox;
 
 		/// Algorithm that chooses a polygon from a given geometry set and returns it as a splitting plane
-		static bool SelectPartitionfromList(poly** geometry , int nPolys , C_Plane* finalPlane);
+		static bool SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane);
 		/// Tests if polygon is in front, back, coincident or it spans the given plane
-		static int ClassifyPolygon(C_Plane* plane , poly* polygon);
+		static int ClassifyPolygon(C_Plane* plane , poly_t* polygon);
 		/// Tests if a vertex against a plane
 		static int ClassifyVertex(C_Plane* plane , C_Vertex* vertex);
 		/// Splits the given polygon in two new polygon. The polygon must be spanning the plane given
-		static void SplitPolygon(C_Plane* plane , poly* polygon , poly** front , poly** back);
+		static void SplitPolygon(C_Plane* plane , poly_t* polygon , poly_t** front , poly_t** back);
 
 		static bool IsConvex(C_BspNode *node);
 
 		C_BspNode();
-		C_BspNode(poly** geom , int nPolys);
+		C_BspNode(poly_t** geom , int nPolys);
 		~C_BspNode();
 
 		/// Recursively builds the tree
 		static void BuildBspTree(C_BspNode* node , C_BspTree* tree);
-
-		/// Recursively calculates the bbox on leaves. Uses the polygon data. Not the triangles.
-		static void CalculateBBoxes(C_BspNode* node);
 
 		/// Calculate node's bbox
 		void CalculateBBox(void);
@@ -96,8 +93,8 @@ class C_BspNode {
 		void DrawPointSet(void);
 
 
-		static void Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, C_GLShader *shader);
-		static void Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, C_GLShader *shader);
+		static void Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
+		static void Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
 		void Draw(C_GLShader *shader);
 
 		/// Brakes down CONVEX polygon of 4 or 5 vertices into triangles.

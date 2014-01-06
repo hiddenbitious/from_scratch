@@ -43,10 +43,11 @@ C_BspNode::C_BspNode(void)
    triangles = NULL;
    checkedVisibilityWith = NULL;
    visibleFrom = NULL;
+   bbox = NULL;
 }
 
 
-C_BspNode::C_BspNode(poly** geometry , int nPolys)
+C_BspNode::C_BspNode(poly_t** geometry , int nPolys)
 {
    this->geometry = geometry;
    isLeaf = false;
@@ -55,7 +56,7 @@ C_BspNode::C_BspNode(poly** geometry , int nPolys)
    frontNode = NULL;
    backNode = NULL;
    fatherNode = NULL;
-
+   bbox = NULL;
    nTriangles = 0;
    triangles = NULL;
    depth = 0;
@@ -75,6 +76,8 @@ C_BspNode::~C_BspNode()
    if(visibleFrom != NULL) {
       delete[] visibleFrom;
    }
+
+   delete bbox;
 }
 
 
@@ -92,7 +95,7 @@ int C_BspNode::ClassifyVertex(C_Plane *plane , C_Vertex *vertex)
 }
 
 
-int C_BspNode::ClassifyPolygon(C_Plane* plane , poly* polygon)
+int C_BspNode::ClassifyPolygon(C_Plane *plane, poly_t *polygon)
 {
    int front = 0, back = 0;
 
@@ -120,17 +123,15 @@ int C_BspNode::ClassifyPolygon(C_Plane* plane , poly* polygon)
 
 bool C_BspNode::IsConvex(C_BspNode *node)
 {
-   poly** polys = node->geometry;
+   poly_t** polys = node->geometry;
    int nPolys = node->nPolys;
 
    for(int i = 0; i < nPolys; i++) {
       C_Plane plane = C_Plane(&polys[i]->pVertices[0] , &polys[i]->pVertices[1] , &polys[i]->pVertices[2]);
 
       for(int j = 0; j < nPolys; j++) {
-         if(i == j) {
+         if(i == j)
             continue;
-         }
-
          int type = ClassifyPolygon(&plane , polys[j]);
          if(type == BACK || type == INTERSECTS) {
             return false;
@@ -169,11 +170,14 @@ void C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
          tree->lessPolysInNodeFound = node->nPolys;
       }
 
+      /// Calculate leaf's bbox
+      node->CalculateBBox();
+
       return;
    }
 
    /// Diaforetika prepei na psaksoume gia epipedo diahorismou
-   SelectPartitionfromList(node->geometry , node->nPolys , &tempPlane);
+   SelectPartitionfromList(node, &tempPlane);
 
    node->partitionPlane.setPlane(&tempPlane);
    node->frontNode = new C_BspNode();
@@ -184,22 +188,22 @@ void C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
    node->backNode->depth = node->depth + 1;
    node->backNode->fatherNode = node;
 
-   int result, nFront, nBack;
+   int result, nFront, nBack, i;
    nFront = nBack = 0;
 
    /// Classify all polygons in this node
-   for(int i = 0; i < node->nPolys; i++) {
+   for(i = 0; i < node->nPolys; i++) {
       result = C_BspNode::ClassifyPolygon(&node->partitionPlane , node->geometry[i]);
 
       if(result == FRONT) {
-         nFront++;
+         ++nFront;
       } else if(result == BACK) {
-         nBack++;
+         ++nBack;
       } else if(result == INTERSECTS) {
-         nFront++;
-         nBack++;
+         ++nFront;
+         ++nBack;
       } else if(result == COINCIDENT) {
-         nFront++;
+         ++nFront;
       }
    }
 
@@ -207,41 +211,43 @@ void C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
    tree->nNodes = ID;
 
    /// Allocate memory
-   node->backNode->geometry = nBack ? new poly *[nBack] : NULL;
+   node->backNode->geometry = nBack ? new poly_t *[nBack] : NULL;
    node->backNode->nPolys = nBack;
    node->backNode->nodeID = ID++;
 
-   node->frontNode->geometry = nFront ? new poly *[nFront] : NULL;
+   node->frontNode->geometry = nFront ? new poly_t *[nFront] : NULL;
    node->frontNode->nPolys = nFront;
    node->frontNode->nodeID = ID++;
 
    nFront = nBack = 0;
 
    /// Distribute the geometry to the two new nodes
-   for(int i = 0; i < node->nPolys; i++) {
-      result = C_BspNode::ClassifyPolygon(&node->partitionPlane , node->geometry[i]);
+   for(i = 0; i < node->nPolys; i++) {
+      result = C_BspNode::ClassifyPolygon(&node->partitionPlane, node->geometry[i]);
 
       if(result == FRONT) {
          node->frontNode->geometry[nFront] = node->geometry[i];
-         nFront++;
+         ++nFront;
       } else if(result == BACK) {
          node->backNode->geometry[nBack] = node->geometry[i];
-         nBack++;
+         ++nBack;
       } else if(result == INTERSECTS) {
-         C_BspNode::SplitPolygon(&node->partitionPlane , node->geometry[i] , &node->frontNode->geometry[nFront++] , &node->backNode->geometry[nBack++]);
+         C_BspNode::SplitPolygon(&node->partitionPlane , node->geometry[i] , &node->frontNode->geometry[nFront] , &node->backNode->geometry[nBack]);
          tree->nSplits++;
+         ++nFront;
+         ++nBack;
       } else if(result == COINCIDENT) {
-         node->frontNode->geometry[nFront++] = node->geometry[i];
+         node->frontNode->geometry[nFront] = node->geometry[i];
+         ++nFront;
       }
    }
 
+   /// Calculate node's (not leaf) bbox
    node->CalculateBBox();
 
    if(nFront) {
       C_BspNode::BuildBspTree(node->frontNode, tree);
 
-      /// XXX: bbox is calculated twice??!!
-      node->frontNode->CalculateBBox();
       if(node->frontNode->isLeaf == false) {
          delete[] node->frontNode->geometry;
          node->frontNode->geometry = NULL;
@@ -250,8 +256,6 @@ void C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
    if(nBack) {
       C_BspNode::BuildBspTree(node->backNode, tree);
 
-      /// XXX: bbox is calculated twice??!!
-      node->backNode->CalculateBBox();
       if(node->backNode->isLeaf == false) {
          delete[] node->backNode->geometry;
          node->backNode->geometry = NULL;
@@ -260,11 +264,13 @@ void C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
 }
 
 
-bool C_BspNode::SelectPartitionfromList(poly** geometry , int nPolys , C_Plane* finalPlane)
+bool C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
 {
-   C_Plane tempPlane;
    unsigned int nFront, nBack, nSplits, bestPlane = 0, bestSplits = INT_MAX;
+   C_Plane tempPlane;
    bool found = false;
+   poly_t **geometry = node->geometry;
+   int nPolys = node->nPolys;
 
    float relation, bestRelation, minRelation;
    bestRelation = 0.0f;
@@ -328,7 +334,7 @@ bool C_BspNode::SelectPartitionfromList(poly** geometry , int nPolys , C_Plane* 
 }
 
 
-void C_BspNode::SplitPolygon(C_Plane *plane , poly *polygon , poly **front , poly **back)
+void C_BspNode::SplitPolygon(C_Plane *plane , poly_t *polygon , poly_t **front , poly_t **back)
 {
    vector<C_Vertex> newFront;
    vector<C_Vertex> newBack;
@@ -372,7 +378,7 @@ void C_BspNode::SplitPolygon(C_Plane *plane , poly *polygon , poly **front , pol
       sideA = sideB;
    }
 
-   *front = new poly();
+   *front = new poly_t();
    (*front)->nVertices = newFront.size();
    (*front)->pNorms = new C_Vertex[(*front)->nVertices];
    (*front)->pVertices = new C_Vertex[(*front)->nVertices];
@@ -388,7 +394,7 @@ void C_BspNode::SplitPolygon(C_Plane *plane , poly *polygon , poly **front , pol
       (*front)->pNorms[i].z = polygon->pNorms[0].z;
    }
 
-   *back = new poly();
+   *back = new poly_t();
    (*back)->nVertices = newBack.size();
    (*back)->pNorms = new C_Vertex[(*back)->nVertices];
    (*back)->pVertices = new C_Vertex[(*back)->nVertices];
@@ -408,7 +414,7 @@ void C_BspNode::SplitPolygon(C_Plane *plane , poly *polygon , poly **front , pol
 }
 
 
-void C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree, C_GLShader *shader)
+void C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree)
 {
    float side;
    if(!node) {
@@ -419,24 +425,24 @@ void C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree
       side = node->partitionPlane.distanceFromPoint(cameraPosition);
 
 //		node->partitionPlane.Draw ();
-//		node->bbox.Draw ( 1.0f , 0.0f , 0.0f );
+//		node->bbox->Draw ( 1.0f , 0.0f , 0.0f );
 //		node->DrawPointSet ();
 
       if(side > 0.0f) {
-         C_BspNode::Draw(cameraPosition, node->backNode, tree, shader);
-         C_BspNode::Draw(cameraPosition, node->frontNode, tree, shader);
+         C_BspNode::Draw(cameraPosition, node->backNode, tree);
+         C_BspNode::Draw(cameraPosition, node->frontNode, tree);
       } else {
-         C_BspNode::Draw(cameraPosition, node->frontNode, tree, shader);
-         C_BspNode::Draw(cameraPosition, node->backNode, tree, shader);
+         C_BspNode::Draw(cameraPosition, node->frontNode, tree);
+         C_BspNode::Draw(cameraPosition, node->backNode, tree);
       }
    } else {
-      node->Draw(shader);
+      node->Draw(tree->shader);
       polyCount += node->nPolys;
    }
 }
 
 
-void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, C_GLShader *shader)
+void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree)
 {
    float side;
    if(!node) {
@@ -447,9 +453,9 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
       side = node->partitionPlane.distanceFromPoint(cameraPosition);
 
       if(side > 0.0f) {
-         C_BspNode::Draw_PVS(cameraPosition, node->frontNode, tree, shader);
+         C_BspNode::Draw_PVS(cameraPosition, node->frontNode, tree);
       } else {
-         C_BspNode::Draw_PVS(cameraPosition, node->backNode, tree, shader);
+         C_BspNode::Draw_PVS(cameraPosition, node->backNode, tree);
       }
    } else {
       if(node->drawn) {
@@ -457,7 +463,7 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
       }
 
       node->drawn = true;
-      node->Draw(shader);
+      node->Draw(tree->shader);
 
       for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
          if(node->PVS[i]->drawn) {
@@ -466,8 +472,8 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
 
          node->PVS[i]->drawn = true;
 
-         node->PVS[i]->Draw(shader);
-//			node->PVS[i]->bbox.Draw ( 0.0f , 1.0f , 0.0f );
+         node->PVS[i]->Draw(tree->shader);
+//			node->PVS[i]->bbox->Draw();
 //			node->PVS[i]->DrawPointSet ();
          polyCount += node->PVS[i]->nPolys;
       }
@@ -488,8 +494,12 @@ void C_BspNode::Draw(C_GLShader *shader)
 
 void C_BspNode::CalculateBBox(void)
 {
-   if(geometry == NULL) { return; }
-   if(!nPolys) { return; }
+   if(geometry == NULL || !nPolys)
+      return;
+
+   assert(!bbox);
+   if(bbox) delete bbox;
+   bbox = new C_BBox();
 
    float minX , minY , minZ , maxX , maxY , maxZ;
 
@@ -508,9 +518,9 @@ void C_BspNode::CalculateBBox(void)
       }
    }
 
-   bbox.SetMax(maxX , maxY , maxZ);
-   bbox.SetMin(minX , minY , minZ);
-   bbox.SetVertices();
+   bbox->SetMax(maxX , maxY , maxZ);
+   bbox->SetMin(minX , minY , minZ);
+   bbox->SetVertices();
 }
 
 
@@ -529,6 +539,7 @@ void C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
    for(i = 0 ; i < node->nPolys ; i++) {
       node->nTriangles += node->geometry[i]->nVertices - 2;
    }
+   assert(node->nTriangles == 2 * node->nPolys);
 
    node->triangles = new triangle_vn[node->nTriangles];
 
@@ -574,44 +585,6 @@ void C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
 
          currentTriangle++;
          break;
-
-      case 5:
-         assert(0);
-         /// Triangle 1
-         curTri->vertex0.x = node->geometry[i]->pVertices[0].x; curTri->vertex0.y = node->geometry[i]->pVertices[0].y; curTri->vertex0.z = node->geometry[i]->pVertices[0].z;
-         curTri->vertex1.x = node->geometry[i]->pVertices[1].x; curTri->vertex1.y = node->geometry[i]->pVertices[1].y; curTri->vertex1.z = node->geometry[i]->pVertices[1].z;
-         curTri->vertex2.x = node->geometry[i]->pVertices[2].x; curTri->vertex2.y = node->geometry[i]->pVertices[2].y; curTri->vertex2.z = node->geometry[i]->pVertices[2].z;
-
-         curTri->normal0.x = node->geometry[i]->pNorms[0].x; curTri->normal0.y = node->geometry[i]->pNorms[0].y; curTri->normal0.z = node->geometry[i]->pNorms[0].z;
-         curTri->normal1.x = node->geometry[i]->pNorms[1].x; curTri->normal1.y = node->geometry[i]->pNorms[1].y; curTri->normal1.z = node->geometry[i]->pNorms[1].z;
-         curTri->normal2.x = node->geometry[i]->pNorms[2].x; curTri->normal2.y = node->geometry[i]->pNorms[2].y; curTri->normal2.z = node->geometry[i]->pNorms[2].z;
-
-         currentTriangle++;
-         curTri = &node->triangles[currentTriangle];
-
-         /// Triangle 2
-         curTri->vertex0.x = node->geometry[i]->pVertices[2].x; curTri->vertex0.y = node->geometry[i]->pVertices[2].y; curTri->vertex0.z = node->geometry[i]->pVertices[2].z;
-         curTri->vertex1.x = node->geometry[i]->pVertices[3].x; curTri->vertex1.y = node->geometry[i]->pVertices[3].y; curTri->vertex1.z = node->geometry[i]->pVertices[3].z;
-         curTri->vertex2.x = node->geometry[i]->pVertices[4].x; curTri->vertex2.y = node->geometry[i]->pVertices[4].y; curTri->vertex2.z = node->geometry[i]->pVertices[4].z;
-
-         curTri->normal0.x = node->geometry[i]->pNorms[2].x; curTri->normal0.y = node->geometry[i]->pNorms[2].y; curTri->normal0.z = node->geometry[i]->pNorms[2].z;
-         curTri->normal1.x = node->geometry[i]->pNorms[3].x; curTri->normal1.y = node->geometry[i]->pNorms[3].y; curTri->normal1.z = node->geometry[i]->pNorms[3].z;
-         curTri->normal2.x = node->geometry[i]->pNorms[4].x; curTri->normal2.y = node->geometry[i]->pNorms[4].y; curTri->normal2.z = node->geometry[i]->pNorms[4].z;
-
-         currentTriangle++;
-         curTri = &node->triangles[currentTriangle];
-
-         /// Triangle 3
-         curTri->vertex0.x = node->geometry[i]->pVertices[4].x; curTri->vertex0.y = node->geometry[i]->pVertices[4].y; curTri->vertex0.z = node->geometry[i]->pVertices[4].z;
-         curTri->vertex1.x = node->geometry[i]->pVertices[0].x; curTri->vertex1.y = node->geometry[i]->pVertices[0].y; curTri->vertex1.z = node->geometry[i]->pVertices[0].z;
-         curTri->vertex2.x = node->geometry[i]->pVertices[2].x; curTri->vertex2.y = node->geometry[i]->pVertices[2].y; curTri->vertex2.z = node->geometry[i]->pVertices[2].z;
-
-         curTri->normal0.x = node->geometry[i]->pNorms[4].x; curTri->normal0.y = node->geometry[i]->pNorms[4].y; curTri->normal0.z = node->geometry[i]->pNorms[4].z;
-         curTri->normal1.x = node->geometry[i]->pNorms[0].x; curTri->normal1.y = node->geometry[i]->pNorms[0].y; curTri->normal1.z = node->geometry[i]->pNorms[0].z;
-         curTri->normal2.x = node->geometry[i]->pNorms[2].x; curTri->normal2.y = node->geometry[i]->pNorms[2].y; curTri->normal2.z = node->geometry[i]->pNorms[2].z;
-
-         currentTriangle++;
-         break;
       }
    }
 
@@ -628,7 +601,7 @@ void C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points)
 
    /// Remove points outside the bbox
    while(cPoint < points.size()) {
-      if(node->bbox.IsInside(&points[cPoint]) == false) {
+      if(node->bbox->IsInside(&points[cPoint]) == false) {
          points.erase(points.begin() + cPoint);
          cPoint--;
       }
@@ -692,7 +665,7 @@ void C_BspNode::DistributePointsAlongPartitionPlane(void)
    min.x = min.y = min.z = GREATEST_FLOAT;
    max.x = max.y = max.z = SMALLEST_FLOAT;
 
-   vector<C_Vertex> intersectionPoints = FindBBoxPlaneIntersections(&bbox , &partitionPlane);
+   vector<C_Vertex> intersectionPoints = FindBBoxPlaneIntersections(bbox , &partitionPlane);
 
    float maxU , maxV , minU , minV;
    float tmpU , tmpV;

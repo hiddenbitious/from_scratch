@@ -412,7 +412,7 @@ bool C_GLShader::setUniform4f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2,
 //    if (!_noshader) return true;
 
 	GLint loc = GetUniLoc(varname);
-	if(loc == -1) { return false; } // can't find variable
+	if(loc == -1) { assert(0); return false; } // can't find variable
 
 	glUniform4f(loc, v0, v1, v2, v3);
 
@@ -667,7 +667,7 @@ void C_GLShader::UpdateAttribLocations(void)
 
 C_GLShaderManager::C_GLShaderManager(void)
 {
-	shaderList = NULL;
+//	shaderList = NULL;
 }
 
 C_GLShaderManager::~C_GLShaderManager(void)
@@ -762,11 +762,7 @@ C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const 
 
 	cout << "done!" << endl;
 	cout << "\n********************************************************************************\n\n";
-//	shaderList.push_back(shaderObject);
-	if(!shaderList)
-		delete shaderList;
-	shaderList = shaderObject;
-
+	shaderList.push_back(shaderObject);
 
 	return shaderObject;
 }
