@@ -36,6 +36,7 @@ class C_BspTree {
 		brush* pBrushes;
 		int nBrushes;
 		int nPolys;
+		C_Vertex position;
 
 		/// Scale the map
 		float scaleFactor;
@@ -48,9 +49,6 @@ class C_BspTree {
 
 		USHORT nLeavesToDraw;
 		USHORT nNodesToDraw;
-
-		C_GLShaderManager shaderManager;
-   	C_GLShader* shader;
 
 	public:
 		C_BspTree(USHORT depth);
@@ -74,9 +72,9 @@ class C_BspTree {
 		void CalculateBBoxes(void);
 
 		void Draw(void);
-		int Draw2(C_Vector3* cameraPosition);
-		void Draw3(void);
-		int Draw_PVS(C_Vector3* cameraPosition);
+		int Draw2(C_Vector3* cameraPosition, C_GLShader *shader);
+		void Draw3(C_GLShader *shader);
+		int Draw_PVS(C_Vector3* cameraPosition, C_GLShader *shader);
 
 		/// Max depth allowed
 		USHORT maxDepth;

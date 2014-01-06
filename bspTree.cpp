@@ -50,10 +50,6 @@ C_BspTree::C_BspTree(USHORT depth)
 	nLeavesToDraw = 0;
 	nNodesToDraw = 0;
 	nNodes = 0;
-
-	shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
-	assert(shader->verticesAttribLocation >= 0);
-	assert(shader->normalsAttribLocation >= 0);
 }
 
 
@@ -368,27 +364,22 @@ void C_BspTree::BuildBspTree(void)
 }
 
 
-int C_BspTree::Draw2(C_Vector3* cameraPosition)
+int C_BspTree::Draw2(C_Vector3* cameraPosition, C_GLShader *shader)
 {
 	polyCount = 0;
 	leavesDrawn = 0;
 	nodesDrawn = 0;
 
-	printf("%s: cameraPosition: (%f, %f, %f)\n", __FUNCTION__, cameraPosition->x, cameraPosition->y, cameraPosition->z);
-
-	glFrontFace(GL_CW);
-	shader->Begin();
+//	glFrontFace(GL_CW);
 
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
-	ESMatrix mat;
-	esMatrixLoadIdentity(&mat);
+	ESMatrix mat = globalModelviewMatrix;
+	esTranslate(&mat, position.x , position.y , position.z);
 
 	shader->setUniformMatrix4fv("u_modelviewMatrix", 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-	shader->setUniformMatrix4fv("u_projectionMatrix", 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
-	C_BspNode::Draw(cameraPosition, headNode, this);
-	shader->End();
-	glFrontFace(GL_CCW);
+	C_BspNode::Draw(cameraPosition, headNode, this, shader);
+//	glFrontFace(GL_CCW);
 
 // Sxediase to epipedo diahorismou tis rizas tou dendrou
 	/*	glBegin ( GL_TRIANGLES );
@@ -419,7 +410,7 @@ int C_BspTree::Draw2(C_Vector3* cameraPosition)
 }
 
 
-void C_BspTree::Draw3(void)
+void C_BspTree::Draw3(C_GLShader *shader)
 {
 	glColor3f(1.0f , 0.0f , 0.0f);
 	leaves[nLeavesToDraw]->Draw(shader);
@@ -431,7 +422,7 @@ void C_BspTree::Draw3(void)
 }
 
 
-int C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
+int C_BspTree::Draw_PVS(C_Vector3* cameraPosition, C_GLShader *shader)
 {
 	polyCount = 0;
 	leavesDrawn = 0;
@@ -448,8 +439,15 @@ int C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
 			glVertex3f ( headNode->partitionPlane.points[2].x , headNode->partitionPlane.points[2].y , headNode->partitionPlane.points[2].z );
 		glEnd ();
 	*/
+   /// Pass matrices to shader
+	/// Keep a copy of global movelview matrix
+	ESMatrix mat = globalModelviewMatrix;
+	esTranslate(&mat, position.x , position.y , position.z);
+
+	shader->setUniformMatrix4fv("u_modelviewMatrix", 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+
 	glFrontFace(GL_CW);
-	C_BspNode::Draw_PVS(cameraPosition , headNode , this);
+	C_BspNode::Draw_PVS(cameraPosition, headNode, this, shader);
 	glFrontFace(GL_CCW);
 	/*
 		glDisable ( GL_LIGHTING );

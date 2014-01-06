@@ -408,7 +408,7 @@ void C_BspNode::SplitPolygon(C_Plane *plane , poly *polygon , poly **front , pol
 }
 
 
-void C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree)
+void C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree, C_GLShader *shader)
 {
    float side;
    if(!node) {
@@ -423,20 +423,20 @@ void C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree
 //		node->DrawPointSet ();
 
       if(side > 0.0f) {
-         C_BspNode::Draw(cameraPosition, node->backNode, tree);
-         C_BspNode::Draw(cameraPosition, node->frontNode, tree);
+         C_BspNode::Draw(cameraPosition, node->backNode, tree, shader);
+         C_BspNode::Draw(cameraPosition, node->frontNode, tree, shader);
       } else {
-         C_BspNode::Draw(cameraPosition, node->frontNode, tree);
-         C_BspNode::Draw(cameraPosition, node->backNode, tree);
+         C_BspNode::Draw(cameraPosition, node->frontNode, tree, shader);
+         C_BspNode::Draw(cameraPosition, node->backNode, tree, shader);
       }
    } else {
-      node->Draw(tree->shader);
+      node->Draw(shader);
       polyCount += node->nPolys;
    }
 }
 
 
-void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree)
+void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, C_GLShader *shader)
 {
    float side;
    if(!node) {
@@ -447,9 +447,9 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
       side = node->partitionPlane.distanceFromPoint(cameraPosition);
 
       if(side > 0.0f) {
-         C_BspNode::Draw_PVS(cameraPosition , node->frontNode , tree);
+         C_BspNode::Draw_PVS(cameraPosition, node->frontNode, tree, shader);
       } else {
-         C_BspNode::Draw_PVS(cameraPosition , node->backNode  , tree);
+         C_BspNode::Draw_PVS(cameraPosition, node->backNode, tree, shader);
       }
    } else {
       if(node->drawn) {
@@ -457,7 +457,7 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
       }
 
       node->drawn = true;
-      node->Draw(tree->shader);
+      node->Draw(shader);
 
       for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
          if(node->PVS[i]->drawn) {
@@ -466,7 +466,7 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
 
          node->PVS[i]->drawn = true;
 
-         node->PVS[i]->Draw(tree->shader);
+         node->PVS[i]->Draw(shader);
 //			node->PVS[i]->bbox.Draw ( 0.0f , 1.0f , 0.0f );
 //			node->PVS[i]->DrawPointSet ();
          polyCount += node->PVS[i]->nPolys;
@@ -477,41 +477,9 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
 
 void C_BspNode::Draw(C_GLShader *shader)
 {
-//   glBegin(GL_TRIANGLES);
-//   for(int i = 0; i < nTriangles; i++) {
-//      glNormal3f(triangles[i].normal0.x , triangles[i].normal0.y , triangles[i].normal0.z);
-//      glVertex3f(triangles[i].vertex0.x , triangles[i].vertex0.y , triangles[i].vertex0.z);
-//
-//      glNormal3f(triangles[i].normal1.x , triangles[i].normal1.y , triangles[i].normal1.z);
-//      glVertex3f(triangles[i].vertex1.x , triangles[i].vertex1.y , triangles[i].vertex1.z);
-//
-//      glNormal3f(triangles[i].normal2.x , triangles[i].normal2.y , triangles[i].normal2.z);
-//      glVertex3f(triangles[i].vertex2.x , triangles[i].vertex2.y , triangles[i].vertex2.z);
-//   }
-//   glEnd();
-
-   printf("%s: nodeID: %d, nTriangles: %d\n", __FUNCTION__, nodeID, nTriangles);
-
-   for(int i = 0; i < nTriangles; i++) {
-      printf("Triangle %d:\n", i);
-      printf("\tn0: (%f, %f, %f)\n", triangles[i].normal0.x , triangles[i].normal0.y , triangles[i].normal0.z);
-      printf("\tv0: (%f, %f, %f)\n", triangles[i].vertex0.x , triangles[i].vertex0.y , triangles[i].vertex0.z);
-
-      printf("\tn1: (%f, %f, %f)\n", triangles[i].normal1.x , triangles[i].normal1.y , triangles[i].normal1.z);
-      printf("\tv1: (%f, %f, %f)\n", triangles[i].vertex1.x , triangles[i].vertex1.y , triangles[i].vertex1.z);
-
-      printf("\tn2: (%f, %f, %f)\n", triangles[i].normal2.x , triangles[i].normal2.y , triangles[i].normal2.z);
-      printf("\tv2: (%f, %f, %f)\n", triangles[i].vertex2.x , triangles[i].vertex2.y , triangles[i].vertex2.z);
-
-      printf("\n");
-   }
-
    /// Vertices
-  	glEnableVertexAttribArray(shader->verticesAttribLocation);
 	glVertexAttribPointer(shader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
-
 	/// Normals
-	glEnableVertexAttribArray(shader->normalsAttribLocation);
 	glVertexAttribPointer(shader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)triangles + 3 * sizeof(float));
 
    glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
