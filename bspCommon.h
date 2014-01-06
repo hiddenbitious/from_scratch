@@ -17,6 +17,7 @@
 #ifndef _BSPCOMMON_H_
 #define _BSPCOMMON_H_
 
+#include "glsl/glsl.h"
 #include <vector>
 
 class C_BspNode;

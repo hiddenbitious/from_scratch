@@ -16,9 +16,10 @@
 
 #include "bspHelperFunctions.h"
 
-bool PointInTriangle(C_Vertex* point , poly* triangle)
+bool PointInTriangle(C_Vertex* point , triangle_vn *triangle)
 {
-	C_Plane plane(&triangle->pVertices[0] , &triangle->pVertices[1] , &triangle->pVertices[2]);
+   C_Plane plane(&triangle->vertex0, &triangle->vertex1, &triangle->vertex2);
+//	C_Plane plane(&triangle->pVertices[0] , &triangle->pVertices[1] , &triangle->pVertices[2]);
 
 	// This is cheaper. Calculate it first.
 	float dist = plane.distanceFromPoint(point);
@@ -32,9 +33,10 @@ bool PointInTriangle(C_Vertex* point , poly* triangle)
 }
 
 
-bool RayTriangleIntersection(C_Vertex* p1 , C_Vertex* p2 , poly* triangle)
+bool RayTriangleIntersection(C_Vertex* p1 , C_Vertex* p2 , triangle_vn *triangle)
 {
-	C_Plane plane(&triangle->pVertices[0] , &triangle->pVertices[1] , &triangle->pVertices[2]);
+   C_Plane plane(&triangle->vertex0, &triangle->vertex1, &triangle->vertex2);
+//	C_Plane plane(&triangle->pVertices[0] , &triangle->pVertices[1] , &triangle->pVertices[2]);
 
 	// First check ray with plane
 	C_Vertex interPoint;

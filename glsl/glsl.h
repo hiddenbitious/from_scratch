@@ -1,15 +1,15 @@
 /****************************************
 *     ***************************       *
-*         Diplomatiki Ergasia:			*
+*         Diplomatiki Ergasia:         *
 *                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
+*       Meleti kai Ylopoiish        *
+*       Algorithmon Grafikon        *
 *                                       *
 *     ***************************       *
 *                                       *
-*			  Syggrafeas:               *
+*          Syggrafeas:               *
 *                                       *
-*		  Apostolou Panagiotis			*
+*       Apostolou Panagiotis        *
 *                                       *
 *     ***************************       *
 ****************************************/
@@ -21,127 +21,146 @@
 #define MAX_SHADERS 2
 
 //#ifdef JNI_COMPATIBLE
-//#	include <jni.h>
-//#	include <android/log.h>
+//#   include <jni.h>
+//#   include <android/log.h>
 //
-//#	include <GLES2/gl2.h>
-//#	include <GLES2/gl2ext.h>
+//#   include <GLES2/gl2.h>
+//#   include <GLES2/gl2ext.h>
 //#else
-//#	include <GL/glew.h>
-//#	include <iostream>
+//#   include <GL/glew.h>
+//#   include <iostream>
 //#endif
 
 #include <GL/glew.h>
 #include <iostream>
 #include <string.h>
 
+#define VERTEX_ATTRIBUTE_VARIABLE_NAME_VERTICES    "a_vertices"
+#define VERTEX_ATTRIBUTE_VARIABLE_NAME_NORMALS     "a_normals"
+#define VERTEX_ATTRIBUTE_VARIABLE_NAME_TEXCOORDS   "a_texCoords"
+#define VERTEX_ATTRIBUTE_VARIABLE_NAME_COLORS      "a_colors"
+
+#define UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX     "u_modelviewMatrix"
+#define UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX    "u_projectionMatrix"
+
 using namespace std;
 class C_GLShader;
-typedef enum{NO_SHADER, VERTEX_SHADER, FRAGMENT_SHADER} shader_type_t;
+typedef enum {NO_SHADER, VERTEX_SHADER, FRAGMENT_SHADER} shader_type_t;
 
-class C_GLShaderObject {
-		friend class C_GLShader;
+class C_GLShaderObject
+{
+friend class C_GLShader;
 
-	public:
-		C_GLShaderObject();
-		virtual ~C_GLShaderObject();
+public:
+   C_GLShaderObject();
+   virtual ~C_GLShaderObject();
 
-		bool LoadShaderProgram(const char *);
+   bool LoadShaderProgram(const char *);
 
-		//Compile shader
-		bool compile(bool printSource);
-		char *compilerLog;
+   //Compile shader
+   bool compile(bool printSource);
+   char *compilerLog;
 
-	protected:
-		// shader object
-		GLuint shaderObject;
-		shader_type_t type;
-		GLubyte* shaderSource;
-		bool isCompiled;
+protected:
+   // shader object
+   GLuint shaderObject;
+   shader_type_t type;
+   GLubyte* shaderSource;
+   bool isCompiled;
 };
 
-class C_GLVertexShader : public C_GLShaderObject {
-	public:
-		C_GLVertexShader(void);
-		~C_GLVertexShader(void);
+class C_GLVertexShader : public C_GLShaderObject
+{
+public:
+   C_GLVertexShader(void);
+   ~C_GLVertexShader(void);
 };
 
-class C_GLFragmentShader : public C_GLShaderObject {
-	public:
-		C_GLFragmentShader(void);
-		~C_GLFragmentShader(void);
+class C_GLFragmentShader : public C_GLShaderObject
+{
+public:
+   C_GLFragmentShader(void);
+   ~C_GLFragmentShader(void);
 };
 
-class C_GLShader {
-	public:
-		C_GLShader(void);
-		~C_GLShader(void);
+class C_GLShader
+{
+friend class C_GLShaderManager;
 
-		// Add a vertex or fragment shader
-		void AddShader(C_GLShaderObject* shader);
+public:
+   C_GLShader(void);
+   ~C_GLShader(void);
 
-		char *linkerLog;
+   void Begin(void);
+   void End(void);
 
-		// Link shaders
-		bool Link(void);
-		void Begin(void);
-		void End(void);
-		inline bool GetisLinked(void) { return isLinked; }
+   // Uniform Variables
+   bool setUniform1f(char* varname, GLfloat v0);  //!< set float uniform to program
+   bool setUniform2f(char* varname, GLfloat v0, GLfloat v1); //!< set vec2 uniform to program
+   bool setUniform3f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2); //!< set vec3 uniform to program
+   bool setUniform4f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3); //!< set vec4 uniform to program
 
-		// Uniform Variables
-		bool setUniform1f(char* varname, GLfloat v0);  //!< set float uniform to program
-		bool setUniform2f(char* varname, GLfloat v0, GLfloat v1); //!< set vec2 uniform to program
-		bool setUniform3f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2); //!< set vec3 uniform to program
-		bool setUniform4f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3); //!< set vec4 uniform to program
+   bool setUniform1i(char* varname, GLint v0);
+   bool setUniform2i(char* varname, GLint v0, GLint v1);
+   bool setUniform3i(char* varname, GLint v0, GLint v1, GLint v2);
+   bool setUniform4i(char* varname, GLint v0, GLint v1, GLint v2, GLint v3);
 
-		bool setUniform1i(char* varname, GLint v0);
-		bool setUniform2i(char* varname, GLint v0, GLint v1);
-		bool setUniform3i(char* varname, GLint v0, GLint v1, GLint v2);
-		bool setUniform4i(char* varname, GLint v0, GLint v1, GLint v2, GLint v3);
+   bool setUniform1fv(char* varname, GLsizei count, GLfloat *value);
+   bool setUniform2fv(char* varname, GLsizei count, GLfloat *value);
+   bool setUniform3fv(char* varname, GLsizei count, GLfloat *value);
+   bool setUniform4fv(char* varname, GLsizei count, GLfloat *value);
+   bool setUniform1iv(char* varname, GLsizei count, GLint *value);
+   bool setUniform2iv(char* varname, GLsizei count, GLint *value);
+   bool setUniform3iv(char* varname, GLsizei count, GLint *value);
+   bool setUniform4iv(char* varname, GLsizei count, GLint *value);
 
-		bool setUniform1fv(char* varname, GLsizei count, GLfloat *value);
-		bool setUniform2fv(char* varname, GLsizei count, GLfloat *value);
-		bool setUniform3fv(char* varname, GLsizei count, GLfloat *value);
-		bool setUniform4fv(char* varname, GLsizei count, GLfloat *value);
-		bool setUniform1iv(char* varname, GLsizei count, GLint *value);
-		bool setUniform2iv(char* varname, GLsizei count, GLint *value);
-		bool setUniform3iv(char* varname, GLsizei count, GLint *value);
-		bool setUniform4iv(char* varname, GLsizei count, GLint *value);
+   bool setUniformMatrix2fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
+   bool setUniformMatrix3fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
+   bool setUniformMatrix4fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
 
-		bool setUniformMatrix2fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
-		bool setUniformMatrix3fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
-		bool setUniformMatrix4fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
+   GLenum bindAttribLocation(const char *varname, const GLint position);
+   GLint getAttribLocation(const char *varname);
 
-		GLenum bindAttribLocation(const char *varname, const GLint position);
-		GLint getAttribLocation(const char *varname);
+   /// Receive Uniform variables:
+   void GetUniformfv(char* name, GLfloat* values);
+   void GetUniformiv(char* name, GLint* values);
 
-		/// Receive Uniform variables:
-		void GetUniformfv(char* name, GLfloat* values);
-		void GetUniformiv(char* name, GLint* values);
+   void printAttribInfo(GLint attrib);
 
-		void printAttribInfo(GLint attrib);
+   GLint verticesAttribLocation, normalsAttribLocation, texCoordsAttribLocation, colorsAttribLocation;
 
-	private:
-		// Holds all the shaders
-		C_GLShaderObject* shaderList[MAX_SHADERS];
-		int nShaders;
-		GLuint programObject;
-		bool isLinked;
-		bool inUse;
+protected:
+   char *linkerLog;
 
-		GLint GetUniLoc(const GLcharARB *name);
+   // Add a vertex or fragment shader
+   void AddShader(C_GLShaderObject* shader);
+   // Link shaders
+   bool Link(void);
+   inline bool GetisLinked(void) { return isLinked; }
+   void UpdateAttribLocations(void);
+
+private:
+   // Holds all the shaders
+   C_GLShaderObject* shaderList[MAX_SHADERS];
+   int nShaders;
+   GLuint programObject;
+   bool isLinked;
+   bool inUse;
+
+   GLint GetUniLoc(const GLcharARB *name);
 };
 
-class C_GLShaderManager {
-	public :
-		C_GLShaderManager();
-		~C_GLShaderManager();
+class C_GLShaderManager
+{
+public :
+   C_GLShaderManager();
+   ~C_GLShaderManager();
 
-		// Load a vertex and a fragment shader and returns a pointer to a C_GLShader object that holds both
-		C_GLShader* LoadShaderProgram(const char *, const char *);
+   // Load a vertex and a fragment shader and returns a pointer to a C_GLShader object that holds both
+   C_GLShader* LoadShaderProgram(const char *, const char *);
 
-	private:
-		C_GLShader* shaderList;
+private:
+   C_GLShader* shaderList;
 };
 
 //Initializes extensions using glew

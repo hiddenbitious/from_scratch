@@ -3,10 +3,6 @@
 #include "tables.h"
 #include "../math.h"
 
-//#define FIXED_PIPELINE
-
-C_GLShaderManager C_CubeGrid::shaderManager;
-
 struct grid_vertex {
 	C_Vertex vertex;
 	C_Vertex normal;
@@ -93,15 +89,11 @@ void C_CubeGrid::Constructor(float x, float y, float z)
 	#ifndef FIXED_PIPELINE
 	#ifndef JNI_COMPATIBLE
 	shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
+	assert(shader->verticesAttribLocation >= 0);
+	assert(shader->normalsAttribLocation >= 0);
 	#else
 	shader = shaderManager.LoadShaderProgram(vertexShaderSource, fragmentShaderSource);
 	#endif
-	/// Get attribute locations
-	verticesAttribLocation = shader->getAttribLocation("a_vertices");
-	assert(verticesAttribLocation >= 0);
-
-	normalsAttribLocation = shader->getAttribLocation("a_normals");
-	assert(normalsAttribLocation >= 0);
 	#endif
 
 	bbox.SetMin(position.x , position.y , position.z);
@@ -295,12 +287,12 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 	shader->setUniformMatrix4fv("u_projectionMatrix", 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
 	/// Vertices
-	glEnableVertexAttribArray(verticesAttribLocation);
-	glVertexAttribPointer(verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), geometry);
+	glEnableVertexAttribArray(shader->verticesAttribLocation);
+	glVertexAttribPointer(shader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), geometry);
 
 	/// Normals
-	glEnableVertexAttribArray(normalsAttribLocation);
-	glVertexAttribPointer(normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)geometry + 3 * sizeof(float));
+	glEnableVertexAttribArray(shader->normalsAttribLocation);
+	glVertexAttribPointer(shader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)geometry + 3 * sizeof(float));
 
 	glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
 

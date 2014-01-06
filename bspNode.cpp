@@ -408,7 +408,7 @@ void C_BspNode::SplitPolygon(C_Plane *plane , poly *polygon , poly **front , pol
 }
 
 
-void C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree)
+void C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree)
 {
    float side;
    if(!node) {
@@ -423,14 +423,14 @@ void C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tr
 //		node->DrawPointSet ();
 
       if(side > 0.0f) {
-         C_BspNode::Draw(cameraPosition , node->backNode  , tree);
-         C_BspNode::Draw(cameraPosition , node->frontNode , tree);
+         C_BspNode::Draw(cameraPosition, node->backNode, tree);
+         C_BspNode::Draw(cameraPosition, node->frontNode, tree);
       } else {
-         C_BspNode::Draw(cameraPosition , node->frontNode , tree);
-         C_BspNode::Draw(cameraPosition , node->backNode  , tree);
+         C_BspNode::Draw(cameraPosition, node->frontNode, tree);
+         C_BspNode::Draw(cameraPosition, node->backNode, tree);
       }
    } else {
-      node->Draw();
+      node->Draw(tree->shader);
       polyCount += node->nPolys;
    }
 }
@@ -457,7 +457,7 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
       }
 
       node->drawn = true;
-      node->Draw();
+      node->Draw(tree->shader);
 
       for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
          if(node->PVS[i]->drawn) {
@@ -466,7 +466,7 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
 
          node->PVS[i]->drawn = true;
 
-         node->PVS[i]->Draw();
+         node->PVS[i]->Draw(tree->shader);
 //			node->PVS[i]->bbox.Draw ( 0.0f , 1.0f , 0.0f );
 //			node->PVS[i]->DrawPointSet ();
          polyCount += node->PVS[i]->nPolys;
@@ -475,21 +475,46 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
 }
 
 
-void C_BspNode::Draw(void)
+void C_BspNode::Draw(C_GLShader *shader)
 {
-   glBegin(GL_TRIANGLES);
-   for(int i = 0 ; i < nTriangles ; i++) {
-      glNormal3f(triangles[i].pNorms[0].x , triangles[i].pNorms[0].y , triangles[i].pNorms[0].z);
-      glVertex3f(triangles[i].pVertices[0].x , triangles[i].pVertices[0].y , triangles[i].pVertices[0].z);
+//   glBegin(GL_TRIANGLES);
+//   for(int i = 0; i < nTriangles; i++) {
+//      glNormal3f(triangles[i].normal0.x , triangles[i].normal0.y , triangles[i].normal0.z);
+//      glVertex3f(triangles[i].vertex0.x , triangles[i].vertex0.y , triangles[i].vertex0.z);
+//
+//      glNormal3f(triangles[i].normal1.x , triangles[i].normal1.y , triangles[i].normal1.z);
+//      glVertex3f(triangles[i].vertex1.x , triangles[i].vertex1.y , triangles[i].vertex1.z);
+//
+//      glNormal3f(triangles[i].normal2.x , triangles[i].normal2.y , triangles[i].normal2.z);
+//      glVertex3f(triangles[i].vertex2.x , triangles[i].vertex2.y , triangles[i].vertex2.z);
+//   }
+//   glEnd();
 
-      glNormal3f(triangles[i].pNorms[1].x , triangles[i].pNorms[1].y , triangles[i].pNorms[1].z);
-      glVertex3f(triangles[i].pVertices[1].x , triangles[i].pVertices[1].y , triangles[i].pVertices[1].z);
+   printf("%s: nodeID: %d, nTriangles: %d\n", __FUNCTION__, nodeID, nTriangles);
 
-      glNormal3f(triangles[i].pNorms[2].x , triangles[i].pNorms[2].y , triangles[i].pNorms[2].z);
-      glVertex3f(triangles[i].pVertices[2].x , triangles[i].pVertices[2].y , triangles[i].pVertices[2].z);
+   for(int i = 0; i < nTriangles; i++) {
+      printf("Triangle %d:\n", i);
+      printf("\tn0: (%f, %f, %f)\n", triangles[i].normal0.x , triangles[i].normal0.y , triangles[i].normal0.z);
+      printf("\tv0: (%f, %f, %f)\n", triangles[i].vertex0.x , triangles[i].vertex0.y , triangles[i].vertex0.z);
+
+      printf("\tn1: (%f, %f, %f)\n", triangles[i].normal1.x , triangles[i].normal1.y , triangles[i].normal1.z);
+      printf("\tv1: (%f, %f, %f)\n", triangles[i].vertex1.x , triangles[i].vertex1.y , triangles[i].vertex1.z);
+
+      printf("\tn2: (%f, %f, %f)\n", triangles[i].normal2.x , triangles[i].normal2.y , triangles[i].normal2.z);
+      printf("\tv2: (%f, %f, %f)\n", triangles[i].vertex2.x , triangles[i].vertex2.y , triangles[i].vertex2.z);
+
+      printf("\n");
    }
-   glEnd();
 
+   /// Vertices
+  	glEnableVertexAttribArray(shader->verticesAttribLocation);
+	glVertexAttribPointer(shader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
+
+	/// Normals
+	glEnableVertexAttribArray(shader->normalsAttribLocation);
+	glVertexAttribPointer(shader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)triangles + 3 * sizeof(float));
+
+   glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
 }
 
 
@@ -537,27 +562,15 @@ void C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
       node->nTriangles += node->geometry[i]->nVertices - 2;
    }
 
-   node->triangles = new poly[node->nTriangles];
-   node->triangles_new = new triangle_vn[node->nTriangles];
+   node->triangles = new triangle_vn[node->nTriangles];
 
    int currentTriangle = 0;
    for(i = 0 ; i < node->nPolys ; i++) {
-      triangle_vn *curTri = &node->triangles_new[currentTriangle];
+      triangle_vn *curTri = &node->triangles[currentTriangle];
 
       switch(node->geometry[i]->nVertices) {
       case 3:
-         node->triangles[currentTriangle].nVertices = 3;
-         node->triangles[currentTriangle].pNorms = new C_Vertex[3];
-         node->triangles[currentTriangle].pVertices = new C_Vertex[3];
-
-         node->triangles[currentTriangle].pNorms[0] = node->geometry[i]->pNorms[0];
-         node->triangles[currentTriangle].pNorms[1] = node->geometry[i]->pNorms[1];
-         node->triangles[currentTriangle].pNorms[2] = node->geometry[i]->pNorms[2];
-
-         node->triangles[currentTriangle].pVertices[0] = node->geometry[i]->pVertices[0];
-         node->triangles[currentTriangle].pVertices[1] = node->geometry[i]->pVertices[1];
-         node->triangles[currentTriangle].pVertices[2] = node->geometry[i]->pVertices[2];
-
+         assert(0);
          curTri->vertex0.x = node->geometry[i]->pVertices[0].x; curTri->vertex0.y = node->geometry[i]->pVertices[0].y; curTri->vertex0.z = node->geometry[i]->pVertices[0].z;
          curTri->vertex1.x = node->geometry[i]->pVertices[1].x; curTri->vertex1.y = node->geometry[i]->pVertices[1].y; curTri->vertex1.z = node->geometry[i]->pVertices[1].z;
          curTri->vertex2.x = node->geometry[i]->pVertices[2].x; curTri->vertex2.y = node->geometry[i]->pVertices[2].y; curTri->vertex2.z = node->geometry[i]->pVertices[2].z;
@@ -570,19 +583,7 @@ void C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
          break;
 
       case 4:
-         // Triangle 1
-         node->triangles[currentTriangle].nVertices = 3;
-         node->triangles[currentTriangle].pNorms = new C_Vertex[3];
-         node->triangles[currentTriangle].pVertices = new C_Vertex[3];
-
-         node->triangles[currentTriangle].pNorms[0] = node->geometry[i]->pNorms[0];
-         node->triangles[currentTriangle].pNorms[1] = node->geometry[i]->pNorms[1];
-         node->triangles[currentTriangle].pNorms[2] = node->geometry[i]->pNorms[2];
-
-         node->triangles[currentTriangle].pVertices[0] = node->geometry[i]->pVertices[0];
-         node->triangles[currentTriangle].pVertices[1] = node->geometry[i]->pVertices[1];
-         node->triangles[currentTriangle].pVertices[2] = node->geometry[i]->pVertices[2];
-
+         /// Triangle 1
          curTri->vertex0.x = node->geometry[i]->pVertices[0].x; curTri->vertex0.y = node->geometry[i]->pVertices[0].y; curTri->vertex0.z = node->geometry[i]->pVertices[0].z;
          curTri->vertex1.x = node->geometry[i]->pVertices[1].x; curTri->vertex1.y = node->geometry[i]->pVertices[1].y; curTri->vertex1.z = node->geometry[i]->pVertices[1].z;
          curTri->vertex2.x = node->geometry[i]->pVertices[2].x; curTri->vertex2.y = node->geometry[i]->pVertices[2].y; curTri->vertex2.z = node->geometry[i]->pVertices[2].z;
@@ -592,46 +593,23 @@ void C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
          curTri->normal2.x = node->geometry[i]->pNorms[2].x; curTri->normal2.y = node->geometry[i]->pNorms[2].y; curTri->normal2.z = node->geometry[i]->pNorms[2].z;
 
          currentTriangle++;
-         curTri = &node->triangles_new[currentTriangle];
+         curTri = &node->triangles[currentTriangle];
 
-         // Triangle 2
-         node->triangles[currentTriangle].nVertices = 3;
-         node->triangles[currentTriangle].pNorms = new C_Vertex[3];
-         node->triangles[currentTriangle].pVertices = new C_Vertex[3];
+         /// Triangle 2
+         curTri->vertex0.x = node->geometry[i]->pVertices[2].x; curTri->vertex0.y = node->geometry[i]->pVertices[2].y; curTri->vertex0.z = node->geometry[i]->pVertices[2].z;
+         curTri->vertex1.x = node->geometry[i]->pVertices[3].x; curTri->vertex1.y = node->geometry[i]->pVertices[3].y; curTri->vertex1.z = node->geometry[i]->pVertices[3].z;
+         curTri->vertex2.x = node->geometry[i]->pVertices[0].x; curTri->vertex2.y = node->geometry[i]->pVertices[0].y; curTri->vertex2.z = node->geometry[i]->pVertices[0].z;
 
-         node->triangles[currentTriangle].pNorms[0] = node->geometry[i]->pNorms[2];
-         node->triangles[currentTriangle].pNorms[1] = node->geometry[i]->pNorms[3];
-         node->triangles[currentTriangle].pNorms[2] = node->geometry[i]->pNorms[0];
-
-         node->triangles[currentTriangle].pVertices[0] = node->geometry[i]->pVertices[2];
-         node->triangles[currentTriangle].pVertices[1] = node->geometry[i]->pVertices[3];
-         node->triangles[currentTriangle].pVertices[2] = node->geometry[i]->pVertices[0];
-
-         curTri->vertex0.x = node->geometry[i]->pVertices[0].x; curTri->vertex0.y = node->geometry[i]->pVertices[0].y; curTri->vertex0.z = node->geometry[i]->pVertices[0].z;
-         curTri->vertex1.x = node->geometry[i]->pVertices[1].x; curTri->vertex1.y = node->geometry[i]->pVertices[1].y; curTri->vertex1.z = node->geometry[i]->pVertices[1].z;
-         curTri->vertex2.x = node->geometry[i]->pVertices[2].x; curTri->vertex2.y = node->geometry[i]->pVertices[2].y; curTri->vertex2.z = node->geometry[i]->pVertices[2].z;
-
-         curTri->normal0.x = node->geometry[i]->pNorms[0].x; curTri->normal0.y = node->geometry[i]->pNorms[0].y; curTri->normal0.z = node->geometry[i]->pNorms[0].z;
-         curTri->normal1.x = node->geometry[i]->pNorms[1].x; curTri->normal1.y = node->geometry[i]->pNorms[1].y; curTri->normal1.z = node->geometry[i]->pNorms[1].z;
-         curTri->normal2.x = node->geometry[i]->pNorms[2].x; curTri->normal2.y = node->geometry[i]->pNorms[2].y; curTri->normal2.z = node->geometry[i]->pNorms[2].z;
+         curTri->normal0.x = node->geometry[i]->pNorms[2].x; curTri->normal0.y = node->geometry[i]->pNorms[2].y; curTri->normal0.z = node->geometry[i]->pNorms[2].z;
+         curTri->normal1.x = node->geometry[i]->pNorms[3].x; curTri->normal1.y = node->geometry[i]->pNorms[3].y; curTri->normal1.z = node->geometry[i]->pNorms[3].z;
+         curTri->normal2.x = node->geometry[i]->pNorms[0].x; curTri->normal2.y = node->geometry[i]->pNorms[0].y; curTri->normal2.z = node->geometry[i]->pNorms[0].z;
 
          currentTriangle++;
          break;
 
       case 5:
-         // Triangle 1
-         node->triangles[currentTriangle].nVertices = 3;
-         node->triangles[currentTriangle].pNorms = new C_Vertex[3];
-         node->triangles[currentTriangle].pVertices = new C_Vertex[3];
-
-         node->triangles[currentTriangle].pNorms[0] = node->geometry[i]->pNorms[0];
-         node->triangles[currentTriangle].pNorms[1] = node->geometry[i]->pNorms[1];
-         node->triangles[currentTriangle].pNorms[2] = node->geometry[i]->pNorms[2];
-
-         node->triangles[currentTriangle].pVertices[0] = node->geometry[i]->pVertices[0];
-         node->triangles[currentTriangle].pVertices[1] = node->geometry[i]->pVertices[1];
-         node->triangles[currentTriangle].pVertices[2] = node->geometry[i]->pVertices[2];
-
+         assert(0);
+         /// Triangle 1
          curTri->vertex0.x = node->geometry[i]->pVertices[0].x; curTri->vertex0.y = node->geometry[i]->pVertices[0].y; curTri->vertex0.z = node->geometry[i]->pVertices[0].z;
          curTri->vertex1.x = node->geometry[i]->pVertices[1].x; curTri->vertex1.y = node->geometry[i]->pVertices[1].y; curTri->vertex1.z = node->geometry[i]->pVertices[1].z;
          curTri->vertex2.x = node->geometry[i]->pVertices[2].x; curTri->vertex2.y = node->geometry[i]->pVertices[2].y; curTri->vertex2.z = node->geometry[i]->pVertices[2].z;
@@ -641,118 +619,30 @@ void C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
          curTri->normal2.x = node->geometry[i]->pNorms[2].x; curTri->normal2.y = node->geometry[i]->pNorms[2].y; curTri->normal2.z = node->geometry[i]->pNorms[2].z;
 
          currentTriangle++;
-         curTri = &node->triangles_new[currentTriangle];
+         curTri = &node->triangles[currentTriangle];
 
-         // Triangle 2
-         node->triangles[currentTriangle].nVertices = 3;
-         node->triangles[currentTriangle].pNorms = new C_Vertex[3];
-         node->triangles[currentTriangle].pVertices = new C_Vertex[3];
+         /// Triangle 2
+         curTri->vertex0.x = node->geometry[i]->pVertices[2].x; curTri->vertex0.y = node->geometry[i]->pVertices[2].y; curTri->vertex0.z = node->geometry[i]->pVertices[2].z;
+         curTri->vertex1.x = node->geometry[i]->pVertices[3].x; curTri->vertex1.y = node->geometry[i]->pVertices[3].y; curTri->vertex1.z = node->geometry[i]->pVertices[3].z;
+         curTri->vertex2.x = node->geometry[i]->pVertices[4].x; curTri->vertex2.y = node->geometry[i]->pVertices[4].y; curTri->vertex2.z = node->geometry[i]->pVertices[4].z;
 
-         node->triangles[currentTriangle].pNorms[0] = node->geometry[i]->pNorms[2];
-         node->triangles[currentTriangle].pNorms[1] = node->geometry[i]->pNorms[3];
-         node->triangles[currentTriangle].pNorms[2] = node->geometry[i]->pNorms[4];
+         curTri->normal0.x = node->geometry[i]->pNorms[2].x; curTri->normal0.y = node->geometry[i]->pNorms[2].y; curTri->normal0.z = node->geometry[i]->pNorms[2].z;
+         curTri->normal1.x = node->geometry[i]->pNorms[3].x; curTri->normal1.y = node->geometry[i]->pNorms[3].y; curTri->normal1.z = node->geometry[i]->pNorms[3].z;
+         curTri->normal2.x = node->geometry[i]->pNorms[4].x; curTri->normal2.y = node->geometry[i]->pNorms[4].y; curTri->normal2.z = node->geometry[i]->pNorms[4].z;
 
-         node->triangles[currentTriangle].pVertices[0] = node->geometry[i]->pVertices[2];
-         node->triangles[currentTriangle].pVertices[1] = node->geometry[i]->pVertices[3];
-         node->triangles[currentTriangle].pVertices[2] = node->geometry[i]->pVertices[4];
+         currentTriangle++;
+         curTri = &node->triangles[currentTriangle];
 
-         curTri->vertex0.x = node->geometry[i]->pVertices[0].x; curTri->vertex0.y = node->geometry[i]->pVertices[0].y; curTri->vertex0.z = node->geometry[i]->pVertices[0].z;
-         curTri->vertex1.x = node->geometry[i]->pVertices[1].x; curTri->vertex1.y = node->geometry[i]->pVertices[1].y; curTri->vertex1.z = node->geometry[i]->pVertices[1].z;
+         /// Triangle 3
+         curTri->vertex0.x = node->geometry[i]->pVertices[4].x; curTri->vertex0.y = node->geometry[i]->pVertices[4].y; curTri->vertex0.z = node->geometry[i]->pVertices[4].z;
+         curTri->vertex1.x = node->geometry[i]->pVertices[0].x; curTri->vertex1.y = node->geometry[i]->pVertices[0].y; curTri->vertex1.z = node->geometry[i]->pVertices[0].z;
          curTri->vertex2.x = node->geometry[i]->pVertices[2].x; curTri->vertex2.y = node->geometry[i]->pVertices[2].y; curTri->vertex2.z = node->geometry[i]->pVertices[2].z;
 
-         curTri->normal0.x = node->geometry[i]->pNorms[0].x; curTri->normal0.y = node->geometry[i]->pNorms[0].y; curTri->normal0.z = node->geometry[i]->pNorms[0].z;
-         curTri->normal1.x = node->geometry[i]->pNorms[1].x; curTri->normal1.y = node->geometry[i]->pNorms[1].y; curTri->normal1.z = node->geometry[i]->pNorms[1].z;
+         curTri->normal0.x = node->geometry[i]->pNorms[4].x; curTri->normal0.y = node->geometry[i]->pNorms[4].y; curTri->normal0.z = node->geometry[i]->pNorms[4].z;
+         curTri->normal1.x = node->geometry[i]->pNorms[0].x; curTri->normal1.y = node->geometry[i]->pNorms[0].y; curTri->normal1.z = node->geometry[i]->pNorms[0].z;
          curTri->normal2.x = node->geometry[i]->pNorms[2].x; curTri->normal2.y = node->geometry[i]->pNorms[2].y; curTri->normal2.z = node->geometry[i]->pNorms[2].z;
 
          currentTriangle++;
-         curTri = &node->triangles_new[currentTriangle];
-
-         // Triangle 3
-         node->triangles[currentTriangle].nVertices = 3;
-         node->triangles[currentTriangle].pNorms = new C_Vertex[3];
-         node->triangles[currentTriangle].pVertices = new C_Vertex[3];
-
-         node->triangles[currentTriangle].pNorms[0] = node->geometry[i]->pNorms[4];
-         node->triangles[currentTriangle].pNorms[1] = node->geometry[i]->pNorms[0];
-         node->triangles[currentTriangle].pNorms[2] = node->geometry[i]->pNorms[2];
-
-         node->triangles[currentTriangle].pVertices[0] = node->geometry[i]->pVertices[4];
-         node->triangles[currentTriangle].pVertices[1] = node->geometry[i]->pVertices[0];
-         node->triangles[currentTriangle].pVertices[2] = node->geometry[i]->pVertices[2];
-
-         curTri->vertex0.x = node->geometry[i]->pVertices[0].x; curTri->vertex0.y = node->geometry[i]->pVertices[0].y; curTri->vertex0.z = node->geometry[i]->pVertices[0].z;
-         curTri->vertex1.x = node->geometry[i]->pVertices[1].x; curTri->vertex1.y = node->geometry[i]->pVertices[1].y; curTri->vertex1.z = node->geometry[i]->pVertices[1].z;
-         curTri->vertex2.x = node->geometry[i]->pVertices[2].x; curTri->vertex2.y = node->geometry[i]->pVertices[2].y; curTri->vertex2.z = node->geometry[i]->pVertices[2].z;
-
-         curTri->normal0.x = node->geometry[i]->pNorms[0].x; curTri->normal0.y = node->geometry[i]->pNorms[0].y; curTri->normal0.z = node->geometry[i]->pNorms[0].z;
-         curTri->normal1.x = node->geometry[i]->pNorms[1].x; curTri->normal1.y = node->geometry[i]->pNorms[1].y; curTri->normal1.z = node->geometry[i]->pNorms[1].z;
-         curTri->normal2.x = node->geometry[i]->pNorms[2].x; curTri->normal2.y = node->geometry[i]->pNorms[2].y; curTri->normal2.z = node->geometry[i]->pNorms[2].z;
-
-         currentTriangle++;
-         break;
-
-      case 6: case 7:
-      assert(0);
-         // Triangle 1
-         node->triangles[currentTriangle].nVertices = 3;
-         node->triangles[currentTriangle].pNorms = new C_Vertex[3];
-         node->triangles[currentTriangle].pVertices = new C_Vertex[3];
-
-         node->triangles[currentTriangle].pNorms[0] = node->geometry[i]->pNorms[0];
-         node->triangles[currentTriangle].pNorms[1] = node->geometry[i]->pNorms[1];
-         node->triangles[currentTriangle].pNorms[2] = node->geometry[i]->pNorms[2];
-
-         node->triangles[currentTriangle].pVertices[0] = node->geometry[i]->pVertices[0];
-         node->triangles[currentTriangle].pVertices[1] = node->geometry[i]->pVertices[1];
-         node->triangles[currentTriangle].pVertices[2] = node->geometry[i]->pVertices[2];
-
-         currentTriangle++;
-
-         // Triangle 2
-         node->triangles[currentTriangle].nVertices = 3;
-         node->triangles[currentTriangle].pNorms = new C_Vertex[3];
-         node->triangles[currentTriangle].pVertices = new C_Vertex[3];
-
-         node->triangles[currentTriangle].pNorms[0] = node->geometry[i]->pNorms[2];
-         node->triangles[currentTriangle].pNorms[1] = node->geometry[i]->pNorms[3];
-         node->triangles[currentTriangle].pNorms[2] = node->geometry[i]->pNorms[4];
-
-         node->triangles[currentTriangle].pVertices[0] = node->geometry[i]->pVertices[2];
-         node->triangles[currentTriangle].pVertices[1] = node->geometry[i]->pVertices[3];
-         node->triangles[currentTriangle].pVertices[2] = node->geometry[i]->pVertices[4];
-
-         currentTriangle++;
-
-         // Triangle 3
-         node->triangles[currentTriangle].nVertices = 3;
-         node->triangles[currentTriangle].pNorms = new C_Vertex[3];
-         node->triangles[currentTriangle].pVertices = new C_Vertex[3];
-
-         node->triangles[currentTriangle].pNorms[0] = node->geometry[i]->pNorms[4];
-         node->triangles[currentTriangle].pNorms[1] = node->geometry[i]->pNorms[5];
-         node->triangles[currentTriangle].pNorms[2] = node->geometry[i]->pNorms[0];
-
-         node->triangles[currentTriangle].pVertices[0] = node->geometry[i]->pVertices[4];
-         node->triangles[currentTriangle].pVertices[1] = node->geometry[i]->pVertices[5];
-         node->triangles[currentTriangle].pVertices[2] = node->geometry[i]->pVertices[0];
-
-         currentTriangle++;
-
-         // Triangle 4
-         node->triangles[currentTriangle].nVertices = 3;
-         node->triangles[currentTriangle].pNorms = new C_Vertex[3];
-         node->triangles[currentTriangle].pVertices = new C_Vertex[3];
-
-         node->triangles[currentTriangle].pNorms[0] = node->geometry[i]->pNorms[0];
-         node->triangles[currentTriangle].pNorms[1] = node->geometry[i]->pNorms[2];
-         node->triangles[currentTriangle].pNorms[2] = node->geometry[i]->pNorms[4];
-
-         node->triangles[currentTriangle].pVertices[0] = node->geometry[i]->pVertices[0];
-         node->triangles[currentTriangle].pVertices[1] = node->geometry[i]->pVertices[2];
-         node->triangles[currentTriangle].pVertices[2] = node->geometry[i]->pVertices[4];
-
-         currentTriangle++;
-
          break;
       }
    }
@@ -768,7 +658,7 @@ void C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points)
 {
    unsigned int cPoint = 0;
 
-   // Remove points outside the bbox
+   /// Remove points outside the bbox
    while(cPoint < points.size()) {
       if(node->bbox.IsInside(&points[cPoint]) == false) {
          points.erase(points.begin() + cPoint);
@@ -778,8 +668,8 @@ void C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points)
       cPoint++;
    }
 
-   // Remove points coinciding with the triangles of the given node
-   // NOTE: VERY BRUTE FORCE WAY. MUST FIND SOMETHING FASTER.
+   /// Remove points coinciding with the triangles of the given node
+   /// NOTE: VERY BRUTE FORCE WAY. MUST FIND SOMETHING FASTER.
    for(int cTri = 0 ; cTri < node->nTriangles ; cTri++) {
       cPoint = 0;
       while(cPoint < points.size()) {

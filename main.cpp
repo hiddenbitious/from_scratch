@@ -28,7 +28,7 @@ using namespace std;
 
 // BSP
 // Orise ena dendro me megisto bathos 15
-static C_BspTree bspTest(15);
+static C_BspTree *bspTest;
 int mapPolys;
 
 /// Global variables
@@ -104,15 +104,13 @@ static void Initializations(void)
 	camera.zFar = 800.0f;
 	camera.zNear = 1.0f;
 
-	/// Load shaders
-//	basicShader_texture = shaderManager.LoadShaderProgram("basic_withSingleTexture.vert" , "basic_withSingleTexture.frag");
-
 	// Diabase tin geometria gia to bsp
-	bspTest.ReadGeometryFile("properMap2.BSP");
+	bspTest = new C_BspTree(15);
+	bspTest->ReadGeometryFile("properMap2.BSP");
 
 	// Kataskeuase bsp kai pvs
-	bspTest.BuildBspTree();
-	bspTest.BuildPVS();
+	bspTest->BuildBspTree();
+	bspTest->BuildPVS();
 
 	/// metaballs initialization
 	grid.Constructor(0.0f , 0.0f , -80.0f);
@@ -153,15 +151,14 @@ static void Draw(void)
 	/// Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   glLoadIdentity();
 	esMatrixLoadIdentity(&globalModelviewMatrix);
 	camera.Look();
 	metaballPolys = 0;
 
 	/// Make light source rotate around the camera
 	float lightPos[] = { cameraPosition.x + 10.0f * (float)sin(angle),
-						 cameraPosition.y,
-						 cameraPosition.z + 10.0f * (float)cos(angle), 1.0f};
+                        cameraPosition.y,
+						      cameraPosition.z + 10.0f * (float)cos(angle), 1.0f};
 
 	/// Visuallize light by placing a low poly sphere at it's position
 //	glPushMatrix();
@@ -179,25 +176,25 @@ static void Draw(void)
 //		glMaterialfv(GL_FRONT , GL_AMBIENT , grey);
 //	}
 
-	switch(bspRenderingType) {
-			// Shediase ti fainetai kanonika.
-		case 0:
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			mapPolys = bspTest.Draw_PVS(&cameraPosition);
-			break;
-
-			// Shediase olo to harti se wireframe
-		case 1:
+//	switch(bspRenderingType) {
+//			// Shediase ti fainetai kanonika.
+//		case 0:
+//			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//			mapPolys = bspTest->Draw_PVS(&cameraPosition);
+//			break;
+//
+//			// Shediase olo to harti se wireframe
+//		case 1:
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			mapPolys = bspTest.Draw2(&cameraPosition);
-			break;
-
-			// Shediase to PVS se wireframe
-		case 2:
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			mapPolys = bspTest.Draw_PVS(&cameraPosition);
-			break;
-	}
+			mapPolys = bspTest->Draw2(&cameraPosition);
+//			break;
+//
+//			// Shediase to PVS se wireframe
+//		case 2:
+//			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//			mapPolys = bspTest->Draw_PVS(&cameraPosition);
+//			break;
+//	}
 
 	/// Draw metaballs
 	metaball[0].position.y = 20.0f + 5 * cos(angle2);
@@ -214,9 +211,9 @@ static void Draw(void)
 //		metaballPolys = grid.Draw(camera.frustum);
 ////		grid.DrawGridCube();
 //	} else {
-		grid.Update(metaball , 3 , NULL);
-		grid.Draw(NULL);
-//	}
+//		grid.Update(metaball , 3 , NULL);
+//		grid.Draw(NULL);
+////	}
 //	basicShader->End();
 
 #ifndef JNI_COMPATIBLE
@@ -228,7 +225,7 @@ static void Draw(void)
 					 "FPS: %d" , (int)fps);
 	camera.PrintText(0, lineHeight * line++,
 					 1.0f, 1.0f, 0.0f, 0.6f,
-					 "Metaball polys: %d" , metaballPolys);
+					 "bsp polys: %d" , mapPolys);
 
 	/// Update timer
 	timer.Update ();
@@ -238,6 +235,8 @@ static void Draw(void)
 
 	glutSwapBuffers();
 #endif
+
+   exit(0);
 }
 
 

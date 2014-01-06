@@ -48,9 +48,7 @@ class C_BspNode {
 
 		/// Same poly tesselated into tirangles
 		int nTriangles;
-		poly* triangles;
-		triangle_vn *triangles_new;
-
+		triangle_vn *triangles;
 
 		/// Children nodes
 		C_BspNode* frontNode;
@@ -100,7 +98,7 @@ class C_BspNode {
 
 		static void Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
 		static void Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
-		void Draw(void);
+		void Draw(C_GLShader *shader);
 
 		/// Brakes down CONVEX polygon of 4 or 5 vertices into triangles.
 		/// Also it frees any memory reserved for the previous polygons

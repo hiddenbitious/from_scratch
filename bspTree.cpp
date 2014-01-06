@@ -50,6 +50,10 @@ C_BspTree::C_BspTree(USHORT depth)
 	nLeavesToDraw = 0;
 	nNodesToDraw = 0;
 	nNodes = 0;
+
+	shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
+	assert(shader->verticesAttribLocation >= 0);
+	assert(shader->normalsAttribLocation >= 0);
 }
 
 
@@ -370,8 +374,20 @@ int C_BspTree::Draw2(C_Vector3* cameraPosition)
 	leavesDrawn = 0;
 	nodesDrawn = 0;
 
+	printf("%s: cameraPosition: (%f, %f, %f)\n", __FUNCTION__, cameraPosition->x, cameraPosition->y, cameraPosition->z);
+
 	glFrontFace(GL_CW);
-	C_BspNode::Draw(cameraPosition , headNode , this);
+	shader->Begin();
+
+   /// Pass matrices to shader
+	/// Keep a copy of global movelview matrix
+	ESMatrix mat;
+	esMatrixLoadIdentity(&mat);
+
+	shader->setUniformMatrix4fv("u_modelviewMatrix", 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+	shader->setUniformMatrix4fv("u_projectionMatrix", 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+	C_BspNode::Draw(cameraPosition, headNode, this);
+	shader->End();
 	glFrontFace(GL_CCW);
 
 // Sxediase to epipedo diahorismou tis rizas tou dendrou
@@ -406,11 +422,11 @@ int C_BspTree::Draw2(C_Vector3* cameraPosition)
 void C_BspTree::Draw3(void)
 {
 	glColor3f(1.0f , 0.0f , 0.0f);
-	leaves[nLeavesToDraw]->Draw();
+	leaves[nLeavesToDraw]->Draw(shader);
 	glColor3f(1.0f , 1.0f , 1.0f);
 
 	for(unsigned int j = 0 ; j < leaves[nLeavesToDraw]->connectedLeaves.size() ; j++) {
-		leaves[nLeavesToDraw]->connectedLeaves[j]->Draw();
+		leaves[nLeavesToDraw]->connectedLeaves[j]->Draw(shader);
 	}
 }
 

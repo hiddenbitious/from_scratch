@@ -51,9 +51,8 @@ public:
 	void DrawGridCube(void);
 
 private:
-	static C_GLShaderManager shaderManager;
+	C_GLShaderManager shaderManager;
 	C_GLShader* shader;
-	GLint verticesAttribLocation, normalsAttribLocation;
 };
 
 #endif

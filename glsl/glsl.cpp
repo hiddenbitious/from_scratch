@@ -202,6 +202,11 @@ C_GLShader::C_GLShader(void)
 	nShaders = 0;
 	linkerLog = NULL;
 
+	verticesAttribLocation = -1;
+	normalsAttribLocation = -1;
+	texCoordsAttribLocation = -1;
+	colorsAttribLocation = -1;
+
 	if(glslAvailable) {
 		programObject = glCreateProgram();
 	}
@@ -650,6 +655,16 @@ void C_GLShader::GetUniformiv(char* name, GLint* values)
 	glGetUniformiv(programObject, loc, values);
 }
 
+void C_GLShader::UpdateAttribLocations(void)
+{
+   assert(isLinked);
+
+   verticesAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_VERTICES);
+   normalsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_NORMALS);
+   texCoordsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_TEXCOORDS);
+   colorsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_COLORS);
+}
+
 C_GLShaderManager::C_GLShaderManager(void)
 {
 	shaderList = NULL;
@@ -742,6 +757,9 @@ C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const 
 		delete tFragmentShader;
 		return shaderObject;
 	}
+
+	shaderObject->UpdateAttribLocations();
+
 	cout << "done!" << endl;
 	cout << "\n********************************************************************************\n\n";
 //	shaderList.push_back(shaderObject);

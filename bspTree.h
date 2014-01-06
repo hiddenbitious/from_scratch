@@ -49,6 +49,9 @@ class C_BspTree {
 		USHORT nLeavesToDraw;
 		USHORT nNodesToDraw;
 
+		C_GLShaderManager shaderManager;
+   	C_GLShader* shader;
+
 	public:
 		C_BspTree(USHORT depth);
 		~C_BspTree();
