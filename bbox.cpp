@@ -20,6 +20,9 @@ C_GLShader *C_BBox::shader = NULL;
 
 C_BBox::C_BBox()
 {
+   C_BBox::shader = shaderManager.LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
+   assert(shader->verticesAttribLocation >= 0);
+   assert(shader->normalsAttribLocation == -1);
 }
 
 C_BBox::~C_BBox()
@@ -133,16 +136,14 @@ void C_BBox::GetMin(float* x , float* y , float* z)
 
 void C_BBox::Draw(void)
 {
-   if(!C_BBox::shader) {
-      C_BBox::shader = shaderManager.LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
-      assert(shader->verticesAttribLocation >= 0);
-      assert(shader->normalsAttribLocation == -1);
-   }
+   Draw(1.0f, 1.0f, 1.0f);
+}
 
+void C_BBox::Draw(float r , float g , float b)
+{
 	glPolygonMode(GL_FRONT_AND_BACK , GL_LINE);
 
    C_Vertex verts[24];
-   C_Vertex position;
 	//Bottom
 	verts[0].x = min.x, verts[0].y = min.y, verts[0].z = max.z;
 	verts[1].x = min.x, verts[1].y = min.y, verts[1].z = min.z;
@@ -180,67 +181,17 @@ void C_BBox::Draw(void)
 	verts[23].x = max.x, verts[23].y = min.y, verts[23].z = min.z;
 
    shader->Begin();
-   shader->setUniform4f("u_v4_color", 1.0f, 1.0f, 1.0f, 1.0f);
+   shader->setUniform4f("u_v4_color", r, g, b, 1.0f);
 
-//  	ESMatrix mat = globalModelviewMatrix;
-//	esTranslate(&mat, position.x , position.y , position.z);
-//	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+   glEnableVertexAttribArray(shader->verticesAttribLocation);
 
+	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
  	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
    glEnableVertexAttribArray(shader->verticesAttribLocation);
-   glVertexAttribPointer(shader->verticesAttribLocation, 4, GL_FLOAT, GL_FALSE, 0, verts);
-   glDrawArrays(GL_TRIANGLES, 0, 24);
+   glVertexAttribPointer(shader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, verts);
+   glDrawArrays(GL_QUADS, 0, 24);
    shader->End();
-
-	glPolygonMode(GL_FRONT_AND_BACK , GL_FILL);
-}
-
-void C_BBox::Draw(float r , float g , float b)
-{
-	glPolygonMode(GL_FRONT_AND_BACK , GL_LINE);
-	glDisable(GL_TEXTURE_2D);
-	glColor3f(r , g , b);
-
-	glBegin(GL_QUADS);
-
-	//Bottom
-	glVertex3f(min.x , min.y , max.z);
-	glVertex3f(min.x , min.y , min.z);
-	glVertex3f(max.x , min.y , min.z);
-	glVertex3f(max.x , min.y , max.z);
-
-	//Top
-	glVertex3f(min.x , max.y , max.z);
-	glVertex3f(min.x , max.y , min.z);
-	glVertex3f(max.x , max.y , min.z);
-	glVertex3f(max.x , max.y , max.z);
-
-	//Left
-	glVertex3f(min.x , min.y , min.z);
-	glVertex3f(min.x , min.y , max.z);
-	glVertex3f(min.x , max.y , max.z);
-	glVertex3f(min.x , max.y , min.z);
-
-	//Right
-	glVertex3f(max.x , min.y , min.z);
-	glVertex3f(max.x , min.y , max.z);
-	glVertex3f(max.x , max.y , max.z);
-	glVertex3f(max.x , max.y , min.z);
-
-	//Front
-	glVertex3f(min.x , min.y , max.z);
-	glVertex3f(min.x , max.y , max.z);
-	glVertex3f(max.x , max.y , max.z);
-	glVertex3f(max.x , min.y , max.z);
-
-	//Back
-	glVertex3f(min.x , min.y , min.z);
-	glVertex3f(min.x , max.y , min.z);
-	glVertex3f(max.x , max.y , min.z);
-	glVertex3f(max.x , min.y , min.z);
-
-	glEnd();
 
 	glPolygonMode(GL_FRONT_AND_BACK , GL_FILL);
 }

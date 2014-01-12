@@ -63,7 +63,7 @@ static float timeElapsed = 0.0f;
 static float fps;
 
 /// Metaballs
-static C_CubeGrid grid;
+static C_CubeGrid *grid;
 static C_Metaball metaball[3];
 
 static void CountFPS (void);
@@ -75,9 +75,9 @@ static void Initializations(void)
 	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
 
 	/// Backface culling
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
+//	glEnable(GL_CULL_FACE);
+//	glFrontFace(GL_CCW);
+//	glCullFace(GL_BACK);
 
 	glEnable(GL_DEPTH_TEST);
 	glShadeModel(GL_SMOOTH);
@@ -111,7 +111,8 @@ static void Initializations(void)
 	bspTest->BuildPVS();
 
 	/// metaballs initialization
-	grid.Constructor(0.0f , 0.0f , -80.0f);
+	grid = new C_CubeGrid();
+	grid->Constructor(0.0f , 0.0f , -80.0f);
 
 	metaball[0].Constructor();
 	metaball[0].position.x = 10.0f;
@@ -183,8 +184,8 @@ static void Draw(void)
 
 	metaball[2].position.z = 15.0f + 10.0f * cos(angle);
 
-   grid.Update(metaball , 3 , NULL);
-   grid.Draw(NULL);
+   grid->Update(metaball , 3 , NULL);
+   grid->Draw(NULL);
 
 	switch(bspRenderingType) {
       // Shediase ti fainetai kanonika.

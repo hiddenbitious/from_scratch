@@ -96,28 +96,28 @@ public:
    void End(void);
 
    // Uniform Variables
-   bool setUniform1f(char* varname, GLfloat v0);  //!< set float uniform to program
-   bool setUniform2f(char* varname, GLfloat v0, GLfloat v1); //!< set vec2 uniform to program
-   bool setUniform3f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2); //!< set vec3 uniform to program
-   bool setUniform4f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3); //!< set vec4 uniform to program
+   bool setUniform1f(const char* varname, GLfloat v0);  //!< set float uniform to program
+   bool setUniform2f(const char* varname, GLfloat v0, GLfloat v1); //!< set vec2 uniform to program
+   bool setUniform3f(const char* varname, GLfloat v0, GLfloat v1, GLfloat v2); //!< set vec3 uniform to program
+   bool setUniform4f(const char* varname, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3); //!< set vec4 uniform to program
 
-   bool setUniform1i(char* varname, GLint v0);
-   bool setUniform2i(char* varname, GLint v0, GLint v1);
-   bool setUniform3i(char* varname, GLint v0, GLint v1, GLint v2);
-   bool setUniform4i(char* varname, GLint v0, GLint v1, GLint v2, GLint v3);
+   bool setUniform1i(const char* varname, GLint v0);
+   bool setUniform2i(const char* varname, GLint v0, GLint v1);
+   bool setUniform3i(const char* varname, GLint v0, GLint v1, GLint v2);
+   bool setUniform4i(const char* varname, GLint v0, GLint v1, GLint v2, GLint v3);
 
-   bool setUniform1fv(char* varname, GLsizei count, GLfloat *value);
-   bool setUniform2fv(char* varname, GLsizei count, GLfloat *value);
-   bool setUniform3fv(char* varname, GLsizei count, GLfloat *value);
-   bool setUniform4fv(char* varname, GLsizei count, GLfloat *value);
-   bool setUniform1iv(char* varname, GLsizei count, GLint *value);
-   bool setUniform2iv(char* varname, GLsizei count, GLint *value);
-   bool setUniform3iv(char* varname, GLsizei count, GLint *value);
-   bool setUniform4iv(char* varname, GLsizei count, GLint *value);
+   bool setUniform1fv(const char* varname, GLsizei count, GLfloat *value);
+   bool setUniform2fv(const char* varname, GLsizei count, GLfloat *value);
+   bool setUniform3fv(const char* varname, GLsizei count, GLfloat *value);
+   bool setUniform4fv(const char* varname, GLsizei count, GLfloat *value);
+   bool setUniform1iv(const char* varname, GLsizei count, GLint *value);
+   bool setUniform2iv(const char* varname, GLsizei count, GLint *value);
+   bool setUniform3iv(const char* varname, GLsizei count, GLint *value);
+   bool setUniform4iv(const char* varname, GLsizei count, GLint *value);
 
-   bool setUniformMatrix2fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
-   bool setUniformMatrix3fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
-   bool setUniformMatrix4fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
+   bool setUniformMatrix2fv(const char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
+   bool setUniformMatrix3fv(const char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
+   bool setUniformMatrix4fv(const char* varname, GLsizei count, GLboolean transpose, GLfloat *value);
 
    GLenum bindAttribLocation(const char *varname, const GLint position);
    GLint getAttribLocation(const char *varname);

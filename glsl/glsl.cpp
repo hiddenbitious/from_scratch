@@ -177,6 +177,7 @@ C_GLVertexShader::C_GLVertexShader(void)
 
 C_GLVertexShader::~C_GLVertexShader(void)
 {
+   glDeleteShader(shaderObject);
 }
 
 C_GLFragmentShader::C_GLFragmentShader(void)
@@ -190,6 +191,7 @@ C_GLFragmentShader::C_GLFragmentShader(void)
 
 C_GLFragmentShader::~C_GLFragmentShader(void)
 {
+   glDeleteShader(shaderObject);
 }
 //-------------------------------------------------------------
 
@@ -220,6 +222,7 @@ C_GLShader::~C_GLShader(void)
 			delete shaderList[i];
 		}
 		nShaders = 0;
+		glDeleteProgram(programObject);
 	}
 }
 //-------------------------------------------------------------
@@ -289,7 +292,6 @@ bool C_GLShader::Link(void)
 
 void C_GLShader::Begin(void)
 {
-	if(!glslAvailable)	{ return; }
 	if(!programObject)	{ return; }
 	if(!isLinked) { return; }
 	if(inUse) { return; }
@@ -301,7 +303,6 @@ void C_GLShader::Begin(void)
 
 void C_GLShader::End(void)
 {
-	if(!glslAvailable)	{ return; }
 	if(!programObject)	{ return; }
 	if(!inUse) { return; }
 
@@ -367,7 +368,7 @@ void C_GLShader::printAttribInfo(GLint attrib)
 	LOGI("\tname: %s\n", name);
 }
 
-bool C_GLShader::setUniform1f(char* varname, GLfloat v0)
+bool C_GLShader::setUniform1f(const char* varname, GLfloat v0)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -380,7 +381,7 @@ bool C_GLShader::setUniform1f(char* varname, GLfloat v0)
 	return true;
 }
 
-bool C_GLShader::setUniform2f(char* varname, GLfloat v0, GLfloat v1)
+bool C_GLShader::setUniform2f(const char* varname, GLfloat v0, GLfloat v1)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //   if (!_noshader) return true;
@@ -393,7 +394,7 @@ bool C_GLShader::setUniform2f(char* varname, GLfloat v0, GLfloat v1)
 	return true;
 }
 
-bool C_GLShader::setUniform3f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2)
+bool C_GLShader::setUniform3f(const char* varname, GLfloat v0, GLfloat v1, GLfloat v2)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -406,7 +407,7 @@ bool C_GLShader::setUniform3f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2)
 	return true;
 }
 
-bool C_GLShader::setUniform4f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+bool C_GLShader::setUniform4f(const char* varname, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -419,7 +420,7 @@ bool C_GLShader::setUniform4f(char* varname, GLfloat v0, GLfloat v1, GLfloat v2,
 	return true;
 }
 
-bool C_GLShader::setUniform1i(char* varname, GLint v0)
+bool C_GLShader::setUniform1i(const char* varname, GLint v0)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -432,7 +433,7 @@ bool C_GLShader::setUniform1i(char* varname, GLint v0)
 	return true;
 }
 
-bool C_GLShader::setUniform2i(char* varname, GLint v0, GLint v1)
+bool C_GLShader::setUniform2i(const char* varname, GLint v0, GLint v1)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -446,7 +447,7 @@ bool C_GLShader::setUniform2i(char* varname, GLint v0, GLint v1)
 	return true;
 }
 
-bool C_GLShader::setUniform3i(char* varname, GLint v0, GLint v1, GLint v2)
+bool C_GLShader::setUniform3i(const char* varname, GLint v0, GLint v1, GLint v2)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -459,7 +460,7 @@ bool C_GLShader::setUniform3i(char* varname, GLint v0, GLint v1, GLint v2)
 	return true;
 }
 
-bool C_GLShader::setUniform4i(char* varname, GLint v0, GLint v1, GLint v2, GLint v3)
+bool C_GLShader::setUniform4i(const char* varname, GLint v0, GLint v1, GLint v2, GLint v3)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -472,7 +473,7 @@ bool C_GLShader::setUniform4i(char* varname, GLint v0, GLint v1, GLint v2, GLint
 	return true;
 }
 
-bool C_GLShader::setUniform1fv(char* varname, GLsizei count, GLfloat *value)
+bool C_GLShader::setUniform1fv(const char* varname, GLsizei count, GLfloat *value)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -485,7 +486,7 @@ bool C_GLShader::setUniform1fv(char* varname, GLsizei count, GLfloat *value)
 	return true;
 }
 
-bool C_GLShader::setUniform2fv(char* varname, GLsizei count, GLfloat *value)
+bool C_GLShader::setUniform2fv(const char* varname, GLsizei count, GLfloat *value)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -498,7 +499,7 @@ bool C_GLShader::setUniform2fv(char* varname, GLsizei count, GLfloat *value)
 	return true;
 }
 
-bool C_GLShader::setUniform3fv(char* varname, GLsizei count, GLfloat *value)
+bool C_GLShader::setUniform3fv(const char* varname, GLsizei count, GLfloat *value)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -511,7 +512,7 @@ bool C_GLShader::setUniform3fv(char* varname, GLsizei count, GLfloat *value)
 	return true;
 }
 
-bool C_GLShader::setUniform4fv(char* varname, GLsizei count, GLfloat *value)
+bool C_GLShader::setUniform4fv(const char* varname, GLsizei count, GLfloat *value)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -524,7 +525,7 @@ bool C_GLShader::setUniform4fv(char* varname, GLsizei count, GLfloat *value)
 	return true;
 }
 
-bool C_GLShader::setUniform1iv(char* varname, GLsizei count, GLint *value)
+bool C_GLShader::setUniform1iv(const char* varname, GLsizei count, GLint *value)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -537,7 +538,7 @@ bool C_GLShader::setUniform1iv(char* varname, GLsizei count, GLint *value)
 	return true;
 }
 
-bool C_GLShader::setUniform2iv(char* varname, GLsizei count, GLint *value)
+bool C_GLShader::setUniform2iv(const char* varname, GLsizei count, GLint *value)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -550,7 +551,7 @@ bool C_GLShader::setUniform2iv(char* varname, GLsizei count, GLint *value)
 	return true;
 }
 
-bool C_GLShader::setUniform3iv(char* varname, GLsizei count, GLint *value)
+bool C_GLShader::setUniform3iv(const char* varname, GLsizei count, GLint *value)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -563,7 +564,7 @@ bool C_GLShader::setUniform3iv(char* varname, GLsizei count, GLint *value)
 	return true;
 }
 
-bool C_GLShader::setUniform4iv(char* varname, GLsizei count, GLint *value)
+bool C_GLShader::setUniform4iv(const char* varname, GLsizei count, GLint *value)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -576,7 +577,7 @@ bool C_GLShader::setUniform4iv(char* varname, GLsizei count, GLint *value)
 	return true;
 }
 
-bool C_GLShader::setUniformMatrix2fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value)
+bool C_GLShader::setUniformMatrix2fv(const char* varname, GLsizei count, GLboolean transpose, GLfloat *value)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -589,7 +590,7 @@ bool C_GLShader::setUniformMatrix2fv(char* varname, GLsizei count, GLboolean tra
 	return true;
 }
 
-bool C_GLShader::setUniformMatrix3fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value)
+bool C_GLShader::setUniformMatrix3fv(const char* varname, GLsizei count, GLboolean transpose, GLfloat *value)
 {
 	if(!glslAvailable) { return false; }  // GLSL not available
 //    if (!_noshader) return true;
@@ -602,13 +603,13 @@ bool C_GLShader::setUniformMatrix3fv(char* varname, GLsizei count, GLboolean tra
 	return true;
 }
 
-bool C_GLShader::setUniformMatrix4fv(char* varname, GLsizei count, GLboolean transpose, GLfloat *value)
+bool C_GLShader::setUniformMatrix4fv(const char* varname, GLsizei count, GLboolean transpose, GLfloat *value)
 {
-	if(!glslAvailable) { return false; }  // GLSL not available
+	if(!glslAvailable) { assert(0); return false; }  // GLSL not available
 //    if (!_noshader) return true;
 
 	GLint loc = GetUniLoc(varname);
-	if(loc == -1) { return false; } // can't find variable
+	if(loc == -1) { assert(0); return false; } // can't find variable
 
 	glUniformMatrix4fv(loc, count, transpose, value);
 

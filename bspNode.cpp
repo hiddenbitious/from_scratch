@@ -471,10 +471,13 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
          }
 
          node->PVS[i]->drawn = true;
-
          node->PVS[i]->Draw(tree->shader);
-//			node->PVS[i]->bbox->Draw();
+
+         tree->shader->End();
+			node->PVS[i]->bbox->Draw();
 //			node->PVS[i]->DrawPointSet ();
+         tree->shader->Begin();
+
          polyCount += node->PVS[i]->nPolys;
       }
    }

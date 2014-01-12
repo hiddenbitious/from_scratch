@@ -23,6 +23,8 @@
 class C_BVolumes {
 	public:
 		virtual void Draw(void) = 0;
+//		virtual C_BVolumes() = 0;
+		virtual ~C_BVolumes() {};
 };
 
 #endif
