@@ -30,7 +30,7 @@ int mapPolys;
 
 /// Global variables
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
-C_GLShaderManager shaderManager;
+C_GLShaderManager *shaderManager;
 
 /// Camera and frustum
 static C_Camera camera;
@@ -96,6 +96,8 @@ static void Initializations(void)
 
 	glEnable(GL_LIGHT0);
 
+	shaderManager = C_GLShaderManager::getSingleton();
+
 	// Enose tin camera me to frustum kai dose times gia tin proboli
 	camera.frustum = &frustum;
 	camera.fov = 50.0f;
@@ -155,9 +157,9 @@ static void Draw(void)
 	metaballPolys = 0;
 
 	/// Make light source rotate around the camera
-	float lightPos[] = { cameraPosition.x + 10.0f * (float)sin(angle),
-                        cameraPosition.y,
-						      cameraPosition.z + 10.0f * (float)cos(angle), 1.0f};
+//	float lightPos[] = { cameraPosition.x + 10.0f * (float)sin(angle),
+//                        cameraPosition.y,
+//						      cameraPosition.z + 10.0f * (float)cos(angle), 1.0f};
 
 	/// Visuallize light by placing a low poly sphere at it's position
 //	glPushMatrix();
@@ -217,6 +219,9 @@ static void Draw(void)
 	camera.PrintText(0, lineHeight * line++,
 					 1.0f, 1.0f, 0.0f, 0.6f,
 					 "bsp polys: %d" , mapPolys);
+   camera.PrintText(0, lineHeight * line++,
+					 1.0f, 1.0f, 0.0f, 0.6f,
+					 "bsp rendering method: %d", bspRenderingType);
 
 	/// Update timer
 	timer.Update ();

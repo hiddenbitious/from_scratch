@@ -25,6 +25,7 @@ C_BspTree::C_BspTree(USHORT depth)
 	pRawPolys = NULL;
 
 	maxDepth = depth;
+	lessPolysInNodeFound = INT_MAX;
 
 	nSplits = 0;
 	nConvexRooms = 0;
@@ -35,7 +36,7 @@ C_BspTree::C_BspTree(USHORT depth)
 	nNodesToDraw = 0;
 	nNodes = 0;
 
-   shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
+   shader = shaderManager->LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
    assert(shader->verticesAttribLocation >= 0);
    assert(shader->normalsAttribLocation >= 0);
 }

@@ -126,6 +126,6 @@ class C_Vector3;
 class C_GLShaderManager;
 
 extern ESMatrix globalModelviewMatrix, globalProjectionMatrix;
-extern C_GLShaderManager shaderManager;
+extern C_GLShaderManager *shaderManager;
 
 #endif

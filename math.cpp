@@ -19,7 +19,7 @@
 
 float math::Magnitude(float x , float y , float z)
 {
-	return (sqrt(x * x + y * y + z * z));
+	return (sqrtf(x * x + y * y + z * z));
 }
 
 void math::Normalize(float* x , float* y , float *z)

@@ -88,11 +88,11 @@ void C_CubeGrid::Constructor(float x, float y, float z)
 	/// Initialize shader
 	#ifndef FIXED_PIPELINE
 	#ifndef JNI_COMPATIBLE
-	shader = shaderManager.LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
+	shader = shaderManager->LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
 	assert(shader->verticesAttribLocation >= 0);
 	assert(shader->normalsAttribLocation >= 0);
 	#else
-	shader = shaderManager.LoadShaderProgram(vertexShaderSource, fragmentShaderSource);
+	shader = shaderManager->LoadShaderProgram(vertexShaderSource, fragmentShaderSource);
 	#endif
 	#endif
 

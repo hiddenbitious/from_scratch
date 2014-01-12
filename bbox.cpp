@@ -20,7 +20,7 @@ C_GLShader *C_BBox::shader = NULL;
 
 C_BBox::C_BBox()
 {
-   C_BBox::shader = shaderManager.LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
+   C_BBox::shader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
    assert(shader->verticesAttribLocation >= 0);
    assert(shader->normalsAttribLocation == -1);
 }
@@ -141,7 +141,10 @@ void C_BBox::Draw(void)
 
 void C_BBox::Draw(float r , float g , float b)
 {
-	glPolygonMode(GL_FRONT_AND_BACK , GL_LINE);
+   int polygonMode;
+   glGetIntegerv(GL_POLYGON_MODE, &polygonMode);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
    C_Vertex verts[24];
 	//Bottom
@@ -193,7 +196,7 @@ void C_BBox::Draw(float r , float g , float b)
    glDrawArrays(GL_QUADS, 0, 24);
    shader->End();
 
-	glPolygonMode(GL_FRONT_AND_BACK , GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
 }
 
 void C_BBox::Translate(const float x, const float y, const float z)

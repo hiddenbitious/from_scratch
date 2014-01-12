@@ -23,11 +23,15 @@
 
 bool extensions_init = false;
 bool glslAvailable = false;
+bool C_GLShaderManager::instanceFlag = false;
+C_GLShaderManager *C_GLShaderManager::classInstance = NULL;
+vector<C_GLShader *> C_GLShaderManager::shaderList;
 
 C_GLShaderObject::C_GLShaderObject(void)
 {
 	type = NO_SHADER;
 	shaderObject = 0;
+	sourceBytes = 0;
 	isCompiled = false;
 	shaderSource = NULL;
 	compilerLog = NULL;
@@ -72,10 +76,10 @@ bool C_GLShaderObject::LoadShaderProgram(const char* filename)
 		return false;
 	}
 
-	unsigned long len = getFileLength(file);
+	sourceBytes = getFileLength(file);
 
 	// "Empty File"
-	if(!len) {
+	if(!sourceBytes) {
 		return false;
 	}
 
@@ -85,22 +89,22 @@ bool C_GLShaderObject::LoadShaderProgram(const char* filename)
 	}
 
 	// can't reserve memory
-	shaderSource = (GLubyte*) new char[len + 1];
+	shaderSource = (GLubyte*) new char[sourceBytes + 1];
 	if(!shaderSource) {
 		return false;
 	}
 
-	// len isn't always strlen cause some characters are stripped in ascii read...
-	// it is important to 0-terminate the real length later, len is just max possible value...
-	shaderSource[len] = '\0';
+	// sourceBytes isn't always strlen cause some characters are stripped in ascii read...
+	// it is important to 0-terminate the real length later, sourceBytes is just max possible value...
+	shaderSource[sourceBytes] = '\0';
 
 	unsigned int i = 0;
 	while(file.good()) {
 		shaderSource[i++] = file.get();
 
 		// coding guidelines...
-		if(i > len) {
-			i = len;
+		if(i > sourceBytes) {
+			i = sourceBytes;
 		}
 	}
 
@@ -141,6 +145,10 @@ bool C_GLShaderObject::compile(bool printSource)
 		return false;
 	}
 
+	if(isCompiled) {
+	   return true;
+	}
+
 	#ifndef JNI_COMPATIBLE
 	if(printSource) {
 		cout << endl << endl << shaderSource << endl << endl;
@@ -161,7 +169,7 @@ bool C_GLShaderObject::compile(bool printSource)
 
 	glGetShaderInfoLog(shaderObject, logSize, NULL, compilerLog);
 
-	isCompiled = true;
+	isCompiled = (bool)!!success;
 
 	return (bool)!!success;
 }
@@ -675,28 +683,81 @@ C_GLShaderManager::~C_GLShaderManager(void)
 {
 }
 
+C_GLShaderManager *C_GLShaderManager::getSingleton(void)
+{
+   if(!instanceFlag) {
+      classInstance = new C_GLShaderManager();
+      instanceFlag = true;
+   }
+
+   return classInstance;
+}
+
+/// Finds if a shader has already been loaded comparing it's source
+C_GLShaderObject *C_GLShaderManager::shaderObjectExists(const C_GLShaderObject *shaderObject, shader_type_t type)
+{
+   C_GLShaderObject *currentShader;
+
+   for(int i = 0; i < shaderList.size(); i++) {
+      for(int j = 0; j < shaderList[i]->nShaders; j++) {
+         currentShader = shaderList[i]->shaderList[j];
+         if(type != currentShader->type)
+            continue;
+
+         if(!memcmp(shaderObject->shaderSource, currentShader->shaderSource, currentShader->sourceBytes) &&
+            shaderObject->sourceBytes == currentShader->sourceBytes)
+            return currentShader;
+      }
+   }
+
+   return NULL;
+}
+
+C_GLShader *C_GLShaderManager::shaderExists(const C_GLShaderObject *shaderObject1, const C_GLShaderObject *shaderObject2)
+{
+   for(int i = 0; i < shaderList.size(); i++) {
+      if(shaderList[i]->nShaders == 1) {
+         if(shaderList[i]->shaderList[0] == shaderObject1)
+            return shaderList[i];
+      } else if (shaderList[i]->nShaders == 2) {
+         if((shaderList[i]->shaderList[0] == shaderObject1 && shaderList[i]->shaderList[1] == shaderObject2) ||
+            (shaderList[i]->shaderList[0] == shaderObject2 && shaderList[i]->shaderList[1] == shaderObject1))
+            return shaderList[i];
+      }
+   }
+
+   return NULL;
+}
+
 #ifndef JNI_COMPATIBLE
 C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const char *fragmentFile)
 {
+   bool fragmentExists = false, vertexExists = false;
+   C_GLShaderObject *tmpShader;
 	C_GLShader* shaderObject;
 	C_GLVertexShader* tVertexShader;
 	C_GLFragmentShader* tFragmentShader;
 
-	cout << "\n********************************************************************************\n\n";
 	cout << "Loading shader . . ." << endl;
-
 
 	// Load vertex shader
 	tVertexShader = new C_GLVertexShader();
-	shaderObject = new C_GLShader();
 //	cout << "----------------------------------------------------------" << endl;
 	cout << "Loading vertex shader from file:   \"" << vertexFile << "\" ... ";
 	if(!tVertexShader->LoadShaderProgram(vertexFile)) {
 		cout << "\nCan't load vertex shader file: \"" << vertexFile << "\"." << endl;
 		delete tVertexShader;
-		return shaderObject;
+		return NULL;
 	}
-	cout << "done!" << endl;
+
+	if((tmpShader = shaderObjectExists(tVertexShader, VERTEX_SHADER))) {
+      vertexExists = true;
+	   delete tVertexShader;
+	   tVertexShader = (C_GLVertexShader *)tmpShader;
+	   cout << "Shader already loaded." << endl;
+	} else {
+   	cout << "done!" << endl;
+	}
 
 	// Load fragment shader
 	tFragmentShader = new C_GLFragmentShader();
@@ -706,20 +767,28 @@ C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const 
 		cout << "\nCan't load fragment shader file: " << fragmentFile << "." << endl;
 		delete tVertexShader;
 		delete tFragmentShader;
-		return shaderObject;
+		return NULL;
 	}
-	cout << "done!" << endl;
+
+	if((tmpShader = shaderObjectExists(tFragmentShader, FRAGMENT_SHADER))) {
+      fragmentExists = true;
+	   delete tFragmentShader;
+	   tFragmentShader = (C_GLFragmentShader *)tmpShader;
+	   cout << "Shader already loaded." << endl;
+	} else {
+   	cout << "done!" << endl;
+	}
 
 	// Compile vertex shader
 //	cout << "----------------------------------------------------------" << endl;
 	cout << "Compiling vertex shader...";
-	if(!tVertexShader->compile(true)) {
+	if(!tVertexShader->compile(false)) {
 		cout << "Error compiling vertex shader in file: " << vertexFile << "\n\n";
 		cout << "Compiler log: " << endl;
 		cout << tVertexShader->compilerLog << endl;
 		delete tVertexShader;
 		delete tFragmentShader;
-		return shaderObject;
+		return NULL;
 	}
 	cout << "...done!" << endl;
 	if(strlen(tVertexShader->compilerLog)) {
@@ -730,13 +799,13 @@ C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const 
 	// Compile fragment shader
 //	cout << "----------------------------------------------------------" << endl;
 	cout << "Compiling fragment shader...";
-	if(!tFragmentShader->compile(true)) {
+	if(!tFragmentShader->compile(false)) {
 		cout << "Error compiling fragment shader in file: " << fragmentFile << "\n\n";
 		cout << "Compiler log: " << endl;
 		cout << tFragmentShader->compilerLog << endl;
 		delete tVertexShader;
 		delete tFragmentShader;
-		return shaderObject;
+		return NULL;
 	}
 	cout << "...done!" << endl;
 	if(strlen(tFragmentShader->compilerLog)) {
@@ -745,8 +814,15 @@ C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const 
 	}
 
 	// Add shaders to shader object
-	shaderObject->AddShader(tVertexShader);
-	shaderObject->AddShader(tFragmentShader);
+	if(fragmentExists && vertexExists) {
+      shaderObject = shaderExists(tVertexShader, tFragmentShader);
+      assert(shaderObject);
+      return shaderObject;
+	} else {
+	   shaderObject = new C_GLShader();
+      shaderObject->AddShader(tVertexShader);
+      shaderObject->AddShader(tFragmentShader);
+   }
 
 	// Link shader object
 //	cout << "----------------------------------------------------------" << endl;
@@ -762,7 +838,6 @@ C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const 
 	shaderObject->UpdateAttribLocations();
 
 	cout << "done!" << endl;
-	cout << "\n********************************************************************************\n\n";
 	shaderList.push_back(shaderObject);
 
 	return shaderObject;
