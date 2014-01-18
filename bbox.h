@@ -30,8 +30,6 @@ private:
    float MaxOfEight(float n1 , float n2 , float n3 , float n4 , float n5 , float n6 , float n7 , float n8);
    float MinOfEight(float n1 , float n2 , float n3 , float n4 , float n5 , float n6 , float n7 , float n8);
 
-   static C_GLShader *shader;
-
 public:
    C_BBox();
    ~C_BBox();

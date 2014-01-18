@@ -16,13 +16,8 @@
 
 #include "bbox.h"
 
-C_GLShader *C_BBox::shader = NULL;
-
 C_BBox::C_BBox()
 {
-   C_BBox::shader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
-   assert(shader->verticesAttribLocation >= 0);
-   assert(shader->normalsAttribLocation == -1);
 }
 
 C_BBox::~C_BBox()
@@ -141,8 +136,8 @@ void C_BBox::Draw(void)
 
 void C_BBox::Draw(float r , float g , float b)
 {
-   int polygonMode;
-   glGetIntegerv(GL_POLYGON_MODE, &polygonMode);
+   int polygonMode[2];
+   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -183,20 +178,20 @@ void C_BBox::Draw(float r , float g , float b)
 	verts[22].x = max.x, verts[22].y = max.y, verts[22].z = min.z;
 	verts[23].x = max.x, verts[23].y = min.y, verts[23].z = min.z;
 
-   shader->Begin();
-   shader->setUniform4f("u_v4_color", r, g, b, 1.0f);
+   shaderManager->pushShader(basicShader);
+   basicShader->setUniform4f("u_v4_color", r, g, b, 1.0f);
 
-   glEnableVertexAttribArray(shader->verticesAttribLocation);
+   glEnableVertexAttribArray(basicShader->verticesAttribLocation);
 
-	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
- 	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+	basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
+ 	basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
-   glEnableVertexAttribArray(shader->verticesAttribLocation);
-   glVertexAttribPointer(shader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, verts);
+   glEnableVertexAttribArray(basicShader->verticesAttribLocation);
+   glVertexAttribPointer(basicShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, verts);
    glDrawArrays(GL_QUADS, 0, 24);
-   shader->End();
+   shaderManager->popShader();
 
-	glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
+	glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
 }
 
 void C_BBox::Translate(const float x, const float y, const float z)

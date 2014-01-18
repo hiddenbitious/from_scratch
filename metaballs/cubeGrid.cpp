@@ -278,7 +278,7 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 #else
 	/// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
-	shader->Begin();
+	shaderManager->pushShader(shader);
 	ESMatrix mat = globalModelviewMatrix;
 	esTranslate(&mat, position.x , position.y , position.z);
 
@@ -294,7 +294,7 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 
 	glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
 	glFlush();
-	shader->End();
+	shaderManager->popShader();
 #endif
 
 	return nTriangles;

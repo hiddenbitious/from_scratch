@@ -161,6 +161,8 @@ public :
 
    // Load a vertex and a fragment shader and returns a pointer to a C_GLShader object that holds both
    C_GLShader* LoadShaderProgram(const char *, const char *);
+   void pushShader(C_GLShader *shader);
+   void popShader(void);
 
 private:
    C_GLShaderManager();
@@ -168,9 +170,13 @@ private:
    static bool instanceFlag;
    static C_GLShaderManager *classInstance;
 
-   static vector<C_GLShader *> shaderList;
-   static C_GLShaderObject *shaderObjectExists(const C_GLShaderObject *shaderObject, shader_type_t type);
-   static C_GLShader *shaderExists(const C_GLShaderObject *shaderObject1, const C_GLShaderObject *shaderObject2);
+   /// All loaded shaders
+   vector<C_GLShader *> shaderList;
+   /// Stack of active shaders
+   vector<C_GLShader *> activeShader;
+
+   C_GLShaderObject *shaderObjectExists(const C_GLShaderObject *shaderObject, shader_type_t type);
+   C_GLShader *shaderExists(const C_GLShaderObject *shaderObject1, const C_GLShaderObject *shaderObject2);
 };
 
 //Initializes extensions using glew

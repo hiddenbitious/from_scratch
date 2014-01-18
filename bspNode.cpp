@@ -436,7 +436,7 @@ void C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree
          C_BspNode::Draw(cameraPosition, node->backNode, tree);
       }
    } else {
-      node->Draw(tree->shader);
+      node->Draw(bspShader);
       polyCount += node->nPolys;
    }
 }
@@ -463,7 +463,7 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
       }
 
       node->drawn = true;
-      node->Draw(tree->shader);
+      node->Draw(bspShader);
 
       for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
          if(node->PVS[i]->drawn) {
@@ -471,12 +471,10 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
          }
 
          node->PVS[i]->drawn = true;
-         node->PVS[i]->Draw(tree->shader);
+         node->PVS[i]->Draw(bspShader);
 
-         tree->shader->End();
 			node->PVS[i]->bbox->Draw();
-//			node->PVS[i]->DrawPointSet ();
-         tree->shader->Begin();
+//			node->PVS[i]->DrawPointSet();
 
          polyCount += node->PVS[i]->nPolys;
       }
@@ -631,14 +629,15 @@ void C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points)
 void C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points)
 {
    // CLEAN UP POINTS
-   CleanUpPointSet(node , points);
+   CleanUpPointSet(node, points);
 
-   if(node->isLeaf == true) {
+   if(node->isLeaf) {
       node->pointSet = points;
    } else {
       float dist;
-      vector<C_Vertex> frontPoints , backPoints;
+      vector<C_Vertex> frontPoints, backPoints;
 
+      /// Fill in node's pointset
       node->DistributePointsAlongPartitionPlane();
       frontPoints = node->pointSet;
       backPoints = node->pointSet;
@@ -665,24 +664,24 @@ void C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& point
 void C_BspNode::DistributePointsAlongPartitionPlane(void)
 {
    C_Vertex min , max , tmp;
-   min.x = min.y = min.z = GREATEST_FLOAT;
-   max.x = max.y = max.z = SMALLEST_FLOAT;
-
-   vector<C_Vertex> intersectionPoints = FindBBoxPlaneIntersections(bbox , &partitionPlane);
-
-   float maxU , maxV , minU , minV;
-   float tmpU , tmpV;
+   float maxU, maxV, minU, minV;
+   float tmpU, tmpV;
    maxU = maxV = SMALLEST_FLOAT;
    minU = minV = GREATEST_FLOAT;
+   min.x = min.y = min.z = GREATEST_FLOAT;
+   max.x = max.y = max.z = SMALLEST_FLOAT;
 //	dist = SMALLEST_FLOAT;
 
-   for(USHORT i = 0 ; i < intersectionPoints.size() ; i++) {
-      CalculateUV(&partitionPlane , &intersectionPoints[i] , &tmpU , &tmpV);
+   /// Find where the node's partition plane intersects with the node's bounding box
+   vector<C_Vertex> intersectionPoints = FindBBoxPlaneIntersections(bbox, &partitionPlane);
 
-      if(tmpU > maxU) { maxU = tmpU; }
-      if(tmpV > maxV) { maxV = tmpV; }
-      if(tmpU < minU) { minU = tmpU; }
-      if(tmpV < minV) { minV = tmpV; }
+   for(USHORT i = 0 ; i < intersectionPoints.size() ; i++) {
+      CalculateUV(&partitionPlane, &intersectionPoints[i], &tmpU, &tmpV);
+
+      if(tmpU > maxU) maxU = tmpU;
+      if(tmpV > maxV) maxV = tmpV;
+      if(tmpU < minU) minU = tmpU;
+      if(tmpV < minV) minV = tmpV;
    }
 
    float stepU = abs(maxU - minU) / NPOINTS_U;
@@ -695,8 +694,8 @@ void C_BspNode::DistributePointsAlongPartitionPlane(void)
    C_Vector3 v0 = C - A;
    C_Vector3 v1 = B - A;
 
-   for(float uu = minU ; uu < maxU ; uu += stepU) {
-      for(float vv = minV ; vv < maxV ; vv += stepV) {
+   for(float uu = minU; uu < maxU; uu += stepU) {
+      for(float vv = minV; vv < maxV; vv += stepV) {
          P = A + v0 * uu + v1 * vv;
          tmp.x = P.x; tmp.y = P.y; tmp.z = P.z;
          pointSet.push_back(tmp);
@@ -708,15 +707,32 @@ void C_BspNode::DistributePointsAlongPartitionPlane(void)
 void C_BspNode::DrawPointSet(void)
 {
    int n = pointSet.size();
+   int polygonMode[2];
 
-   glDisable(GL_LIGHTING);
+   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
 
-   glColor3f(0.0f , 1.0f , 0.0f);
-   glBegin(GL_POINTS);
-   for(int i = 0; i < n ; i++) {
-      glVertex3f(pointSet[i].x , pointSet[i].y , pointSet[i].z);
-   }
-   glEnd();
 
-   glEnable(GL_LIGHTING);
+//   glDisable(GL_LIGHTING);
+//
+//   glColor3f(0.0f , 1.0f , 0.0f);
+//   glBegin(GL_POINTS);
+//   for(int i = 0; i < n ; i++) {
+//      glVertex3f(pointSet[i].x , pointSet[i].y , pointSet[i].z);
+//   }
+//   glEnd();
+//
+//   glEnable(GL_LIGHTING);
+
+   shaderManager->pushShader(basicShader);
+   basicShader->setUniform4f("u_v4_color", 0.0f, 1.0f, 0.0f, 1.0f);
+
+	basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
+ 	basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+
+   glEnableVertexAttribArray(basicShader->verticesAttribLocation);
+   glVertexAttribPointer(basicShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, &pointSet[0]);
+   glDrawArrays(GL_POINTS, 0, n);
+   shaderManager->popShader();
+
+	glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
 }

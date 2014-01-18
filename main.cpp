@@ -32,6 +32,9 @@ int mapPolys;
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
 C_GLShaderManager *shaderManager;
 
+C_GLShader *bspShader;
+C_GLShader *basicShader;
+
 /// Camera and frustum
 static C_Camera camera;
 static C_Frustum frustum;
@@ -133,6 +136,15 @@ static void Initializations(void)
 	metaball[2].position.y = 15.0f;
 	metaball[2].position.z = 15.0f;
 	metaball[2].radius = 3.0f;
+
+	/// Shaders
+	bspShader = shaderManager->LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
+   assert(bspShader->verticesAttribLocation >= 0);
+   assert(bspShader->normalsAttribLocation >= 0);
+
+   basicShader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
+   assert(basicShader->verticesAttribLocation >= 0);
+   assert(basicShader->normalsAttribLocation == -1);
 
 	/// timer initialization
 	timer.Initialize ();

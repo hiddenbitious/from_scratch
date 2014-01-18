@@ -51,9 +51,9 @@ bool RayTriangleIntersection(C_Vertex* p1 , C_Vertex* p2 , triangle_vn *triangle
 }
 
 
-void CalculateUV(C_Plane* plane , C_Vertex* point , float* u , float* v)
+void CalculateUV(C_Plane *plane, C_Vertex *point, float *u, float *v)
 {
-	float dot00 , dot01 , dot02 , dot11 , dot12;
+	float dot00, dot01, dot02, dot11, dot12;
 	C_Vector3 A(&plane->points[0]);
 	C_Vector3 B(&plane->points[1]);
 	C_Vector3 C(&plane->points[2]);
@@ -77,13 +77,27 @@ void CalculateUV(C_Plane* plane , C_Vertex* point , float* u , float* v)
 
 // The intersection polygon can vary from 3 to 6 vertices
 // I will consider the bbox as 12 lines with which i will test the plane for intersection
-vector<C_Vertex> FindBBoxPlaneIntersections(C_BBox* bbox , C_Plane* plane)
+vector<C_Vertex> FindBBoxPlaneIntersections(C_BBox *bbox, C_Plane *plane)
 {
 	vector<C_Vertex> points;
-	C_Vertex tmpPoint;
-	C_Vertex bboxVertices[8];
+	C_Vertex tmpPoint, bboxVertices[8];
 
 	bbox->GetVertices(bboxVertices);
+
+/*
+	int i;
+// BOTTOM
+   for(i = 0; i < 4; i++) {
+	if(FindIntersectionPoint_withCheck(&bboxVertices[(i)%4] , &bboxVertices[(i+1)%4] , plane , &tmpPoint))
+		if(bbox->IsInside(&tmpPoint)) { points.push_back(tmpPoint); }
+   }
+
+// TOP
+   for(i = 0; i < 4; i++) {
+      if(FindIntersectionPoint_withCheck(&bboxVertices[((i + 4)%4) + 4] , &bboxVertices[((i+5)%4) + 4] , plane , &tmpPoint))
+         if(bbox->IsInside(&tmpPoint)) { points.push_back(tmpPoint); }
+   }
+*/
 
 // BOTTOM
 	if(FindIntersectionPoint_withCheck(&bboxVertices[0] , &bboxVertices[1] , plane , &tmpPoint))
@@ -139,7 +153,7 @@ C_Vertex FindIntersectionPoint(C_Vertex *ptA , C_Vertex *ptB , C_Plane *plane)
 }
 
 
-bool FindIntersectionPoint_withCheck(C_Vertex *ptA , C_Vertex *ptB , C_Plane *plane , C_Vertex* intersectionPoint)
+bool FindIntersectionPoint_withCheck(C_Vertex *ptA, C_Vertex *ptB, C_Plane *plane, C_Vertex *intersectionPoint)
 {
 	C_Vertex v, planeNormal;
 
@@ -150,9 +164,11 @@ bool FindIntersectionPoint_withCheck(C_Vertex *ptA , C_Vertex *ptB , C_Plane *pl
 	float denominator = C_Vector3::DotProduct(&planeNormal, &v);
 
 	// If denominator is 0 then line and plane are parallel so they don't intersect
-	if(!denominator) {
-		return false;
-	}
+	if(FLOAT_EQ(denominator, 0.0f))
+	   return false;
+//	if(!denominator) {
+//		return false;
+//	}
 
 	float sect = -plane->distanceFromPoint(ptA) / denominator;
 	intersectionPoint->x = ptA->x + v.x * sect;

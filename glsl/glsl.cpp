@@ -25,7 +25,7 @@ bool extensions_init = false;
 bool glslAvailable = false;
 bool C_GLShaderManager::instanceFlag = false;
 C_GLShaderManager *C_GLShaderManager::classInstance = NULL;
-vector<C_GLShader *> C_GLShaderManager::shaderList;
+//vector<C_GLShader *> C_GLShaderManager::shaderList;
 
 C_GLShaderObject::C_GLShaderObject(void)
 {
@@ -727,6 +727,27 @@ C_GLShader *C_GLShaderManager::shaderExists(const C_GLShaderObject *shaderObject
    }
 
    return NULL;
+}
+
+void C_GLShaderManager::pushShader(C_GLShader *shader)
+{
+   /// Deactivate current shader
+   if(activeShader.size())
+      activeShader[activeShader.size() - 1]->End();
+   /// Place new shader on top of stack
+   activeShader.push_back(shader);
+   shader->Begin();
+}
+
+void C_GLShaderManager::popShader(void)
+{
+   if(!activeShader.size())
+      return;
+
+   activeShader[activeShader.size() - 1]->End();
+   activeShader.pop_back();
+   if(activeShader.size())
+      activeShader[activeShader.size() - 1]->Begin();
 }
 
 #ifndef JNI_COMPATIBLE

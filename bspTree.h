@@ -100,8 +100,6 @@ class C_BspTree {
 
 		inline USHORT GetnLeavesToDraw() { return nLeavesToDraw; }
 		inline USHORT GetnNodesToDraw() { return nNodesToDraw; }
-
-		C_GLShader *shader;
 };
 
 #endif
