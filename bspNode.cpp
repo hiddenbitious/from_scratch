@@ -474,7 +474,7 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
          node->PVS[i]->Draw(bspShader);
 
 			node->PVS[i]->bbox->Draw();
-//			node->PVS[i]->DrawPointSet();
+			node->PVS[i]->DrawPointSet();
 
          polyCount += node->PVS[i]->nPolys;
       }
@@ -684,8 +684,10 @@ void C_BspNode::DistributePointsAlongPartitionPlane(void)
       if(tmpV < minV) minV = tmpV;
    }
 
-   float stepU = abs(maxU - minU) / NPOINTS_U;
-   float stepV = abs(maxV - minV) / NPOINTS_V;
+   assert(!FLOAT_EQ(maxU, minU));
+   assert(!FLOAT_EQ(maxV, minV));
+   float stepU = (maxU - minU) / NPOINTS_U;
+   float stepV = (maxV - minV) / NPOINTS_V;
 
    C_Vector3 P;
    C_Vector3 A(&partitionPlane.points[0]);

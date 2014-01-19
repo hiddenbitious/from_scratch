@@ -187,7 +187,7 @@ void C_BspTree::BuildPVS(void)
 	cout << "Building PVS..." << endl;
 
 	cout << "\tDistributing sample points...";
-//	C_BspNode::DistributeSamplePoints(headNode , headNode->pointSet);
+	C_BspNode::DistributeSamplePoints(headNode , headNode->pointSet);
 	cout << "Done!" << endl;
 
 	cout << "\tFinding conected leaves...";
