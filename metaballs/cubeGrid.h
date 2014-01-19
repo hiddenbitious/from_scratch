@@ -49,7 +49,6 @@ public:
 	/// Drawing functions
 	int Draw(C_Frustum *frustum);
 	void DrawGridCube(void);
-	C_GLShader *shader;
 };
 
 #endif

@@ -88,9 +88,9 @@ void C_CubeGrid::Constructor(float x, float y, float z)
 	/// Initialize shader
 	#ifndef FIXED_PIPELINE
 	#ifndef JNI_COMPATIBLE
-	shader = shaderManager->LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
-	assert(shader->verticesAttribLocation >= 0);
-	assert(shader->normalsAttribLocation >= 0);
+//	shader = shaderManager->LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
+//	assert(shader->verticesAttribLocation >= 0);
+//	assert(shader->normalsAttribLocation >= 0);
 	#else
 	shader = shaderManager->LoadShaderProgram(vertexShaderSource, fragmentShaderSource);
 	#endif
@@ -256,46 +256,25 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 		}
 	}
 
-#ifdef FIXED_PIPELINE
-	glPushMatrix();
-	glTranslatef(position.x , position.y , position.z);
-	glColor3f(1.0f , 1.0f , 1.0f);
-
-	glBegin(GL_TRIANGLES);
-	for(unsigned int i = 0 ; i < nTriangles ; i++) {
-		glNormal3f(geometry[i].normal0.x , geometry[i].normal0.y , geometry[i].normal0.z);
-		glVertex3f(geometry[i].vertex0.x , geometry[i].vertex0.y , geometry[i].vertex0.z);
-
-		glNormal3f(geometry[i].normal1.x , geometry[i].normal1.y , geometry[i].normal1.z);
-		glVertex3f(geometry[i].vertex1.x , geometry[i].vertex1.y , geometry[i].vertex1.z);
-
-		glNormal3f(geometry[i].normal2.x , geometry[i].normal2.y , geometry[i].normal2.z);
-		glVertex3f(geometry[i].vertex2.x , geometry[i].vertex2.y , geometry[i].vertex2.z);
-	}
-	glEnd();
-
-	glPopMatrix();
-#else
 	/// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
-	shaderManager->pushShader(shader);
+	shaderManager->pushShader(bspShader);
 	ESMatrix mat = globalModelviewMatrix;
 	esTranslate(&mat, position.x , position.y , position.z);
 
-	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-	shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 	/// Vertices
-	glEnableVertexAttribArray(shader->verticesAttribLocation);
-	glVertexAttribPointer(shader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), geometry);
+	glEnableVertexAttribArray(bspShader->verticesAttribLocation);
+	glVertexAttribPointer(bspShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), geometry);
 
 	/// Normals
-	glEnableVertexAttribArray(shader->normalsAttribLocation);
-	glVertexAttribPointer(shader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)geometry + 3 * sizeof(float));
+	glEnableVertexAttribArray(bspShader->normalsAttribLocation);
+	glVertexAttribPointer(bspShader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)geometry + 3 * sizeof(float));
 
 	glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
 	glFlush();
 	shaderManager->popShader();
-#endif
 
 	return nTriangles;
 }

@@ -1,19 +1,3 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #include "bspNode.h"
 #include "bspTree.h"
 #include "bspHelperFunctions.h"
@@ -25,9 +9,8 @@
 #define MINIMUMRELATION			0.5f
 #define MINIMUMRELATIONSCALE	2.0f
 
-#define NPOINTS_U 10
-#define NPOINTS_V 10
-
+#define NPOINTS_U 50
+#define NPOINTS_V 50
 
 C_BspNode::C_BspNode(void)
 {
@@ -46,7 +29,6 @@ C_BspNode::C_BspNode(void)
    bbox = NULL;
 }
 
-
 C_BspNode::C_BspNode(poly_t** geometry , int nPolys)
 {
    this->geometry = geometry;
@@ -64,7 +46,6 @@ C_BspNode::C_BspNode(poly_t** geometry , int nPolys)
    visibleFrom = NULL;
 }
 
-
 C_BspNode::~C_BspNode()
 {
    delete frontNode;
@@ -80,8 +61,8 @@ C_BspNode::~C_BspNode()
    delete bbox;
 }
 
-
-int C_BspNode::ClassifyVertex(C_Plane *plane , C_Vertex *vertex)
+int
+C_BspNode::ClassifyVertex(C_Plane *plane , C_Vertex *vertex)
 {
    float dist = plane->distanceFromPoint(vertex);
 
@@ -94,8 +75,8 @@ int C_BspNode::ClassifyVertex(C_Plane *plane , C_Vertex *vertex)
    }
 }
 
-
-int C_BspNode::ClassifyPolygon(C_Plane *plane, poly_t *polygon)
+int
+C_BspNode::ClassifyPolygon(C_Plane *plane, poly_t *polygon)
 {
    int front = 0, back = 0;
 
@@ -120,8 +101,8 @@ int C_BspNode::ClassifyPolygon(C_Plane *plane, poly_t *polygon)
    }
 }
 
-
-bool C_BspNode::IsConvex(C_BspNode *node)
+bool
+C_BspNode::IsConvex(C_BspNode *node)
 {
    poly_t** polys = node->geometry;
    int nPolys = node->nPolys;
@@ -141,8 +122,8 @@ bool C_BspNode::IsConvex(C_BspNode *node)
    return true;
 }
 
-
-void C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
+void
+C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
 {
    static int ID = 0;
    bool isConvex;
@@ -263,8 +244,8 @@ void C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
    }
 }
 
-
-bool C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
+bool
+C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
 {
    unsigned int nFront, nBack, nSplits, bestPlane = 0, bestSplits = INT_MAX;
    C_Plane tempPlane;
@@ -333,8 +314,8 @@ bool C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
    return found;
 }
 
-
-void C_BspNode::SplitPolygon(C_Plane *plane , poly_t *polygon , poly_t **front , poly_t **back)
+void
+C_BspNode::SplitPolygon(C_Plane *plane , poly_t *polygon , poly_t **front , poly_t **back)
 {
    vector<C_Vertex> newFront;
    vector<C_Vertex> newBack;
@@ -413,8 +394,8 @@ void C_BspNode::SplitPolygon(C_Plane *plane , poly_t *polygon , poly_t **front ,
    return;
 }
 
-
-void C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree)
+void
+C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree)
 {
    float side;
    if(!node) {
@@ -441,8 +422,8 @@ void C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree
    }
 }
 
-
-void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree)
+void
+C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree)
 {
    float side;
    if(!node) {
@@ -458,9 +439,9 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
          C_BspNode::Draw_PVS(cameraPosition, node->backNode, tree);
       }
    } else {
-      if(node->drawn) {
-         return;
-      }
+//      if(node->drawn) {
+//         return;
+//      }
 
       node->drawn = true;
       node->Draw(bspShader);
@@ -481,8 +462,8 @@ void C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree
    }
 }
 
-
-void C_BspNode::Draw(C_GLShader *shader)
+void
+C_BspNode::Draw(C_GLShader *shader)
 {
    /// Vertices
 	glVertexAttribPointer(shader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
@@ -492,8 +473,8 @@ void C_BspNode::Draw(C_GLShader *shader)
    glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
 }
 
-
-void C_BspNode::CalculateBBox(void)
+void
+C_BspNode::CalculateBBox(void)
 {
    if(geometry == NULL || !nPolys)
       return;
@@ -524,8 +505,8 @@ void C_BspNode::CalculateBBox(void)
    bbox->SetVertices();
 }
 
-
-void C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
+void
+C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
 {
    if(!node->isLeaf) {
       TessellatePolygonsInLeaves(node->backNode);
@@ -595,8 +576,8 @@ void C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
    node->geometry = NULL;
 }
 
-
-void C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points)
+void
+C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points)
 {
    unsigned int cPoint = 0;
 
@@ -625,8 +606,8 @@ void C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points)
    }
 }
 
-
-void C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points)
+void
+C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points)
 {
    // CLEAN UP POINTS
    CleanUpPointSet(node, points);
@@ -645,9 +626,9 @@ void C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& point
       for(unsigned int i = 0 ; i < points.size() ; i++) {
          dist = node->partitionPlane.distanceFromPoint(&points[i]);
 
-         if(dist > 0.0f) {
+         if(FLOAT_GREATER(dist, 0.0f)) {
             frontPoints.push_back(points[i]);
-         } else if(dist < 0.0f) {
+         } else if(FLOAT_GREATER(0.0f, dist)) {
             backPoints.push_back(points[i]);
          } else {
             frontPoints.push_back(points[i]);
@@ -660,8 +641,8 @@ void C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& point
    }
 }
 
-
-void C_BspNode::DistributePointsAlongPartitionPlane(void)
+void
+C_BspNode::DistributePointsAlongPartitionPlane(void)
 {
    C_Vertex min , max , tmp;
    float maxU, maxV, minU, minV;
@@ -670,7 +651,6 @@ void C_BspNode::DistributePointsAlongPartitionPlane(void)
    minU = minV = GREATEST_FLOAT;
    min.x = min.y = min.z = GREATEST_FLOAT;
    max.x = max.y = max.z = SMALLEST_FLOAT;
-//	dist = SMALLEST_FLOAT;
 
    /// Find where the node's partition plane intersects with the node's bounding box
    vector<C_Vertex> intersectionPoints = FindBBoxPlaneIntersections(bbox, &partitionPlane);
@@ -686,8 +666,8 @@ void C_BspNode::DistributePointsAlongPartitionPlane(void)
 
    assert(!FLOAT_EQ(maxU, minU));
    assert(!FLOAT_EQ(maxV, minV));
-   float stepU = (maxU - minU) / NPOINTS_U;
-   float stepV = (maxV - minV) / NPOINTS_V;
+   float stepU = (maxU - minU) / (float)NPOINTS_U;
+   float stepV = (maxV - minV) / (float)NPOINTS_V;
 
    C_Vector3 P;
    C_Vector3 A(&partitionPlane.points[0]);
@@ -705,36 +685,18 @@ void C_BspNode::DistributePointsAlongPartitionPlane(void)
    }
 }
 
-
 void C_BspNode::DrawPointSet(void)
 {
    int n = pointSet.size();
-   int polygonMode[2];
 
-   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+   shaderManager->pushShader(pointShader);
+   pointShader->setUniform4f("u_v4_color", 0.0f, 1.0f, 0.0f, 1.0f);
 
+	pointShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
+ 	pointShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
-//   glDisable(GL_LIGHTING);
-//
-//   glColor3f(0.0f , 1.0f , 0.0f);
-//   glBegin(GL_POINTS);
-//   for(int i = 0; i < n ; i++) {
-//      glVertex3f(pointSet[i].x , pointSet[i].y , pointSet[i].z);
-//   }
-//   glEnd();
-//
-//   glEnable(GL_LIGHTING);
-
-   shaderManager->pushShader(basicShader);
-   basicShader->setUniform4f("u_v4_color", 0.0f, 1.0f, 0.0f, 1.0f);
-
-	basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
- 	basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
-
-   glEnableVertexAttribArray(basicShader->verticesAttribLocation);
-   glVertexAttribPointer(basicShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, &pointSet[0]);
+   glEnableVertexAttribArray(pointShader->verticesAttribLocation);
+   glVertexAttribPointer(pointShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, &pointSet[0]);
    glDrawArrays(GL_POINTS, 0, n);
    shaderManager->popShader();
-
-	glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
 }

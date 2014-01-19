@@ -19,15 +19,13 @@
 bool PointInTriangle(C_Vertex* point , triangle_vn *triangle)
 {
    C_Plane plane(&triangle->vertex0, &triangle->vertex1, &triangle->vertex2);
-//	C_Plane plane(&triangle->pVertices[0] , &triangle->pVertices[1] , &triangle->pVertices[2]);
 
-	// This is cheaper. Calculate it first.
-	float dist = plane.distanceFromPoint(point);
-	if(FLOAT_EQ(dist, 0.0f) == false) {
+	/// This is cheaper. Calculate it first.
+	if(!FLOAT_EQ(plane.distanceFromPoint(point), 0.0f)) {
 		return false;
 	}
 
-	float u , v;
+	float u, v;
 	CalculateUV(&plane , point , &u , &v);
 	return ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.0f));
 }

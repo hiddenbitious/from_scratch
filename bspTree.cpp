@@ -6,7 +6,7 @@
 #include <fstream>
 #include <GL/gl.h>
 #include <iostream>
-#include <string.h>	// for memset (!)
+#include <string.h>
 
 int polyCount;
 int leavesDrawn;
@@ -32,7 +32,7 @@ C_BspTree::C_BspTree(USHORT depth)
 
 	depthReached = -1;
 	nLeaves = 0;
-	nLeavesToDraw = 0;
+	leafToDraw = 0;
 	nNodesToDraw = 0;
 	nNodes = 0;
 }
@@ -54,26 +54,32 @@ C_BspTree::~C_BspTree(void)
 }
 
 
-void C_BspTree::IncreaseLeavesDrawn()
+void
+C_BspTree::IncreaseLeavesDrawn()
 {
-	if(nLeavesToDraw < nLeaves) { nLeavesToDraw++; } cout << "Leaves drawn: " << nLeavesToDraw << endl;
-}
-void C_BspTree::DecreaseLeavesDrawn()
-{
-	if(nLeavesToDraw > 0) { nLeavesToDraw--; } cout << "Leaves drawn: " << nLeavesToDraw << endl;
+	if(leafToDraw < nLeaves) { leafToDraw++; } cout << "Leaf drawn: " << leafToDraw << endl;
 }
 
-void C_BspTree::IncreaseNodesDrawn()
+void
+C_BspTree::DecreaseLeavesDrawn()
+{
+	if(leafToDraw > 0) { leafToDraw--; } cout << "Leaves drawn: " << leafToDraw << endl;
+}
+
+void
+C_BspTree::IncreaseNodesDrawn()
 {
 	if(nNodesToDraw < nNodes) { nNodesToDraw++; } cout << "Nodes drawn: " << nNodesToDraw << endl;
 }
-void C_BspTree::DecreaseNodesDrawn()
+
+void
+C_BspTree::DecreaseNodesDrawn()
 {
 	if(nNodesToDraw > 0) { nNodesToDraw--; } cout << "Node drawn: " << nNodesToDraw << endl;
 }
 
-
-bool C_BspTree::ReadGeometryFile(const char* fileName)
+bool
+C_BspTree::ReadGeometryFile(const char* fileName)
 {
 	printf("%s\n", __FUNCTION__);
 
@@ -135,8 +141,8 @@ bool C_BspTree::ReadGeometryFile(const char* fileName)
 	return true;
 }
 
-
-void C_BspTree::Draw(void)
+void
+C_BspTree::Draw(void)
 {
 	for(int np = 0 ; np < nPolys ; np++) {
 		glBegin(GL_POLYGON);
@@ -151,8 +157,8 @@ void C_BspTree::Draw(void)
 	}
 }
 
-
-void C_BspTree::CalcNorms(void)
+void
+C_BspTree::CalcNorms(void)
 {
 	printf("%s\n", __FUNCTION__);
 	C_Vector3 norm;
@@ -173,14 +179,15 @@ void C_BspTree::CalcNorms(void)
 	}
 }
 
-
-void C_BspTree::BuildPVS(void)
+void
+C_BspTree::BuildPVS(void)
 {
 	printf("%s\n", __FUNCTION__);
 
 	// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound;
 	pvsFileFound = this->ReadPVSFile("pvs_.txt");
+//	pvsFileFound = false;
 
 //	ULONG start = timeGetTime ();
 
@@ -198,18 +205,17 @@ void C_BspTree::BuildPVS(void)
 		cout << "Done!" << endl;
 	}
 
-	cout << "\tTracing Visibility...";
-	if(pvsFileFound) {
-		cout << "Found in file. Skipping calculations." << endl;
-	} else {
-		C_BspTree::TraceVisibility();
-		cout << "Done!" << endl << endl;
-	}
+//	cout << "\tTracing Visibility...";
+//	if(pvsFileFound) {
+//		cout << "Found in file. Skipping calculations." << endl;
+//	} else {
+//		C_BspTree::TraceVisibility();
+//		cout << "Done!" << endl << endl;
+//	}
 
 	cout << "Done!" << endl << endl;
 
 //	ULONG time = timeGetTime () - start;
-
 //	cout << "Time elapsed: " << (float)(time/1000.0f) << " seconds.\n\n" << endl;
 
 	// An den eihe brethei arheio apothikeuse gia tin epomeni ektelesi
@@ -218,7 +224,8 @@ void C_BspTree::BuildPVS(void)
 	}
 }
 
-void C_BspTree::TraceVisibility(void)
+void
+C_BspTree::TraceVisibility(void)
 {
 	float step = 20.0f / (float)leaves.size() ;
 	float progress = step;
@@ -268,8 +275,8 @@ void C_BspTree::TraceVisibility(void)
 	cout << "   ";
 }
 
-
-bool C_BspTree::CheckVisibility(C_BspNode *node1 , C_BspNode *node2)
+bool
+C_BspTree::CheckVisibility(C_BspNode *node1 , C_BspNode *node2)
 {
 	for(unsigned int p1 = 0 ; p1 < node1->pointSet.size() ; p1++) {
 		for(unsigned int p2 = 0 ; p2 < node2->pointSet.size() ; p2++) {
@@ -281,8 +288,8 @@ bool C_BspTree::CheckVisibility(C_BspNode *node1 , C_BspNode *node2)
 	return false;
 }
 
-
-bool C_BspTree::RayIntersectsSomethingInTree(C_BspNode *node , C_Vertex *start , C_Vertex *end)
+bool
+C_BspTree::RayIntersectsSomethingInTree(C_BspNode *node , C_Vertex *start , C_Vertex *end)
 {
 	if(node->isLeaf) {
 		for(int cp = 0 ; cp < node->nTriangles ; cp++) {
@@ -320,8 +327,8 @@ bool C_BspTree::RayIntersectsSomethingInTree(C_BspNode *node , C_Vertex *start ,
 	return false;
 }
 
-
-void C_BspTree::BuildBspTree(void)
+void
+C_BspTree::BuildBspTree(void)
 {
 	cout << "***********************************************" << endl;
 	cout << "Building bsp tree...";
@@ -349,14 +356,12 @@ void C_BspTree::BuildBspTree(void)
 	cout << "***********************************************\n\n" << endl;
 }
 
-
-int C_BspTree::Draw2(C_Vector3* cameraPosition)
+int
+C_BspTree::Draw2(C_Vector3* cameraPosition)
 {
 	polyCount = 0;
 	leavesDrawn = 0;
 	nodesDrawn = 0;
-
-//	glFrontFace(GL_CW);
 
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
@@ -372,50 +377,32 @@ int C_BspTree::Draw2(C_Vector3* cameraPosition)
 	C_BspNode::Draw(cameraPosition, headNode, this);
 	glFlush();
 	shaderManager->popShader();
-//	glFrontFace(GL_CCW);
 
-// Sxediase to epipedo diahorismou tis rizas tou dendrou
-	/*	glBegin ( GL_TRIANGLES );
-			glVertex3f ( headNode->partitionPlane.points[0].x , headNode->partitionPlane.points[0].y , headNode->partitionPlane.points[0].z );
-			glVertex3f ( headNode->partitionPlane.points[1].x , headNode->partitionPlane.points[1].y , headNode->partitionPlane.points[1].z );
-			glVertex3f ( headNode->partitionPlane.points[2].x , headNode->partitionPlane.points[2].y , headNode->partitionPlane.points[2].z );
-		glEnd ();
-	*/
-
-	/*
-		glDisable ( GL_LIGHTING );
-		glColor3f ( .5 , 0.5 , 0.0 );
-		for ( int i = 0 ; i < debug.size () ; i += 3 )
-		{
-			glBegin ( GL_TRIANGLES );
-				glVertex3f ( debug[i  ].x , debug[i  ].y , debug[i  ].z );
-				glVertex3f ( debug[i+1].x , debug[i+1].y , debug[i+1].z );
-				glVertex3f ( debug[i+2].x , debug[i+2].y , debug[i+2].z );
-			glEnd ();
-		}
-		glColor3f ( 1.0 , 1.0 , 1.0 );
-		glEnable ( GL_LIGHTING );
-	*/
-
-
-//	glDisable ( GL_COLOR_MATERIAL );
 	return polyCount;
 }
 
-
-void C_BspTree::Draw3(void)
+void
+C_BspTree::Draw3(void)
 {
-	glColor3f(1.0f , 0.0f , 0.0f);
-	leaves[nLeavesToDraw]->Draw(bspShader);
-	glColor3f(1.0f , 1.0f , 1.0f);
+	shaderManager->pushShader(bspShader);
+   glEnableVertexAttribArray(bspShader->verticesAttribLocation);
+	glEnableVertexAttribArray(bspShader->normalsAttribLocation);
 
-	for(unsigned int j = 0 ; j < leaves[nLeavesToDraw]->connectedLeaves.size() ; j++) {
-		leaves[nLeavesToDraw]->connectedLeaves[j]->Draw(bspShader);
-	}
+	ESMatrix mat = globalModelviewMatrix;
+	esTranslate(&mat, position.x , position.y , position.z);
+
+	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+	C_BspNode::Draw(NULL, leaves[leafToDraw], this);
+	glFlush();
+	shaderManager->popShader();
+//	for(unsigned int j = 0 ; j < leaves[leafToDraw]->connectedLeaves.size() ; j++) {
+//		leaves[leafToDraw]->connectedLeaves[j]->Draw(bspShader);
+//	}
 }
 
-
-int C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
+int
+C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
 {
 	polyCount = 0;
 	leavesDrawn = 0;
@@ -424,14 +411,7 @@ int C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
 	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
 		leaves[i]->drawn = false;
 	}
-	/*
-	// Sxediase to epipedo diahorismou tis rizas tou dendrou
-		glBegin ( GL_TRIANGLES );
-			glVertex3f ( headNode->partitionPlane.points[0].x , headNode->partitionPlane.points[0].y , headNode->partitionPlane.points[0].z );
-			glVertex3f ( headNode->partitionPlane.points[1].x , headNode->partitionPlane.points[1].y , headNode->partitionPlane.points[1].z );
-			glVertex3f ( headNode->partitionPlane.points[2].x , headNode->partitionPlane.points[2].y , headNode->partitionPlane.points[2].z );
-		glEnd ();
-	*/
+
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
 	shaderManager->pushShader(bspShader);
@@ -448,83 +428,50 @@ int C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
 	glFrontFace(GL_CCW);
 	shaderManager->popShader();
 
-	/*
-		glDisable ( GL_LIGHTING );
-		glColor3f ( 1.0f , 0.0f , 0.0f );
-		leaves[nLeavesToDraw]->Draw ();
-		leaves[nLeavesToDraw]->DrawPointSet ();
-		glColor3f ( 1.0f , 1.0f , 1.0f );
-		for ( int i = 0 ; i < leaves[nLeavesToDraw]->PVS.size () ; i++ )
-		{
-			if ( leaves[nLeavesToDraw]->PVS[i]->drawn == true )
-				continue;
-
-			leaves[nLeavesToDraw]->PVS[i]->drawn = true;
-			leaves[nLeavesToDraw]->PVS[i]->Draw();
-			leaves[nLeavesToDraw]->PVS[i]->DrawPointSet ();
-		}
-		glEnable ( GL_LIGHTING );
-	*/
-
-	/*
-		glDisable ( GL_LIGHTING );
-		glColor3f ( .5 , 0.5 , 0.0 );
-		for ( int i = 0 ; i < debug.size () ; i += 3 )
-		{
-			glBegin ( GL_TRIANGLES );
-				glVertex3f ( debug[i  ].x , debug[i  ].y , debug[i  ].z );
-				glVertex3f ( debug[i+1].x , debug[i+1].y , debug[i+1].z );
-				glVertex3f ( debug[i+2].x , debug[i+2].y , debug[i+2].z );
-			glEnd ();
-		}
-		glColor3f ( 1.0 , 1.0 , 1.0 );
-		glEnable ( GL_LIGHTING );
-	*/
-
 	return polyCount;
 }
 
-
-void C_BspTree::TessellatePolygons(void)
+void
+C_BspTree::TessellatePolygons(void)
 {
 	C_BspNode::TessellatePolygonsInLeaves(headNode);
 }
 
-
-void C_BspTree::FindConnectedLeaves(void)
+void
+C_BspTree::FindConnectedLeaves(void)
 {
-	for(int i = 0 ; i < nLeaves ; i++) {
-		leaves[i]->visibleFrom = new bool[nNodes];
-		leaves[i]->checkedVisibilityWith = new bool[nNodes];
+   assert(nLeaves == leaves.size());
 
-		memset(leaves[i]->visibleFrom , false , nNodes * sizeof(bool));
-		memset(leaves[i]->checkedVisibilityWith , false , nNodes * sizeof(bool));
+	for(int i = 0 ; i < nLeaves ; i++) {
+		leaves[i]->visibleFrom = new bool[nLeaves];
+		leaves[i]->checkedVisibilityWith = new bool[nLeaves];
+
+		memset(leaves[i]->visibleFrom, false, nLeaves * sizeof(bool));
+		memset(leaves[i]->checkedVisibilityWith, false, nLeaves * sizeof(bool));
 	}
 
-	for(int i = 0 ; i < nLeaves ; i++) {
-		for(int j = 0 ; j < nLeaves ; j++) {
-			if(i == j) {
+	for(int i = 0; i < nLeaves; i++) {
+		for(int j = 0; j < nLeaves; j++) {
+			if(i == j || leaves[j]->visibleFrom[i] || leaves[i]->visibleFrom[j])
 				continue;
-			}
 
-			for(unsigned int p1 = 0 ; p1 < leaves[i]->pointSet.size(); p1++) {
-				for(unsigned int p2 = 0 ; p2 < leaves[j]->pointSet.size(); p2++) {
-					if((leaves[i]->pointSet[p1].x == leaves[j]->pointSet[p2].x) &&
-							(leaves[i]->pointSet[p1].y == leaves[j]->pointSet[p2].y) &&
-							(leaves[i]->pointSet[p1].z == leaves[j]->pointSet[p2].z)) {
-						if(leaves[j]->visibleFrom[leaves[i]->nodeID] == false) {
-							leaves[i]->connectedLeaves.push_back(leaves[j]);
-							leaves[i]->PVS.push_back(leaves[j]);
-							leaves[j]->visibleFrom[leaves[i]->nodeID] = true;
-						}
-
-						if(leaves[i]->visibleFrom[leaves[j]->nodeID] == false) {
+			for(unsigned int p1 = 0; p1 < leaves[i]->pointSet.size(); p1++) {
+				for(unsigned int p2 = 0; p2 < leaves[j]->pointSet.size(); p2++) {
+					if(FLOAT_EQ(leaves[i]->pointSet[p1].x, leaves[j]->pointSet[p2].x) &&
+                  FLOAT_EQ(leaves[i]->pointSet[p1].y, leaves[j]->pointSet[p2].y) &&
+						FLOAT_EQ(leaves[i]->pointSet[p1].z, leaves[j]->pointSet[p2].z)) {
+						if(leaves[j]->visibleFrom[i] == false) {
 							leaves[j]->connectedLeaves.push_back(leaves[i]);
 							leaves[j]->PVS.push_back(leaves[i]);
-							leaves[i]->visibleFrom[leaves[j]->nodeID] = true;
+							leaves[j]->visibleFrom[i] = true;
 						}
 
-						// Termatise kai to for tou p1
+						if(leaves[i]->visibleFrom[j] == false) {
+							leaves[i]->connectedLeaves.push_back(leaves[j]);
+							leaves[i]->PVS.push_back(leaves[j]);
+							leaves[i]->visibleFrom[j] = true;
+						}
+
 						p1 = leaves[i]->pointSet.size();
 						break;
 					}
@@ -534,18 +481,18 @@ void C_BspTree::FindConnectedLeaves(void)
 	}
 }
 
-
-void C_BspTree::WritePVSFile(const char *fileName)
+void
+C_BspTree::WritePVSFile(const char *fileName)
 {
 	fstream filestr;
 	filestr.open("pvs.txt" , fstream::out);
 
 	filestr << nLeaves << endl;
 
-	for(int i = 0 ; i < nLeaves ; i++) {
+	for(int i = 0; i < nLeaves; i++) {
 		filestr << leaves[i]->nodeID << " * " << leaves[i]->PVS.size();
 
-		for(unsigned int j = 0 ; j < leaves[i]->PVS.size() ; j++) {
+		for(unsigned int j = 0; j < leaves[i]->PVS.size(); j++) {
 			filestr << " " << leaves[i]->PVS[j]->nodeID;
 		}
 
@@ -555,7 +502,8 @@ void C_BspTree::WritePVSFile(const char *fileName)
 	filestr.close();
 }
 
-bool C_BspTree::ReadPVSFile(const char *fileName)
+bool
+C_BspTree::ReadPVSFile(const char *fileName)
 {
 	fstream filestr;
 	filestr.open(fileName , fstream::in);
@@ -566,7 +514,7 @@ bool C_BspTree::ReadPVSFile(const char *fileName)
 
 	filestr >> nLeaves;
 
-	for(int i = 0 ; i < nLeaves ; i++) {
+	for(int i = 0; i < nLeaves; i++) {
 		ULONG nodeId;
 		int size;
 
@@ -574,7 +522,7 @@ bool C_BspTree::ReadPVSFile(const char *fileName)
 		filestr.ignore(3);
 		filestr >> size;
 
-		for(int j  = 0 ; j < size ; j++) {
+		for(int j = 0; j < size; j++) {
 			filestr >> nodeId;
 
 			int k = 0;

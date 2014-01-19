@@ -47,7 +47,7 @@ class C_BspTree {
 		vector<poly_t*> tessellatedPolys;
 		poly_t** pRawPolys;
 
-		USHORT nLeavesToDraw;
+		USHORT leafToDraw;
 		USHORT nNodesToDraw;
 
 	public:
@@ -92,13 +92,13 @@ class C_BspTree {
 
 		void FindConnectedLeaves(void);
 
-		void IncreaseLeavesDrawn(); // { if ( nLeavesToDraw < nLeaves ) nLeavesToDraw++; cout << nLeavesToDraw << endl;}
-		void DecreaseLeavesDrawn(); // { if ( nLeavesToDraw > 0 ) nLeavesToDraw--; cout << nLeavesToDraw << endl;}
+		void IncreaseLeavesDrawn(); // { if ( leafToDraw < nLeaves ) leafToDraw++; cout << leafToDraw << endl;}
+		void DecreaseLeavesDrawn(); // { if ( leafToDraw > 0 ) leafToDraw--; cout << leafToDraw << endl;}
 
-		void IncreaseNodesDrawn(); // { if ( nLeavesToDraw < nLeaves ) nLeavesToDraw++; cout << nLeavesToDraw << endl;}
-		void DecreaseNodesDrawn(); // { if ( nLeavesToDraw > 0 ) nLeavesToDraw--; cout << nLeavesToDraw << endl;}
+		void IncreaseNodesDrawn(); // { if ( leafToDraw < nLeaves ) leafToDraw++; cout << leafToDraw << endl;}
+		void DecreaseNodesDrawn(); // { if ( leafToDraw > 0 ) leafToDraw--; cout << leafToDraw << endl;}
 
-		inline USHORT GetnLeavesToDraw() { return nLeavesToDraw; }
+		inline USHORT GetnLeavesToDraw() { return leafToDraw; }
 		inline USHORT GetnNodesToDraw() { return nNodesToDraw; }
 };
 

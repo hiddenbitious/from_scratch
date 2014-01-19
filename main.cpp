@@ -30,10 +30,11 @@ int mapPolys;
 
 /// Global variables
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
-C_GLShaderManager *shaderManager;
+C_GLShaderManager *shaderManager = NULL;
 
-C_GLShader *bspShader;
-C_GLShader *basicShader;
+C_GLShader *bspShader = NULL;
+C_GLShader *basicShader = NULL;
+C_GLShader *pointShader = NULL;
 
 /// Camera and frustum
 static C_Camera camera;
@@ -55,8 +56,6 @@ static int metaballPolys = 0;
 static bool frustumCulling = true;
 static int bspRenderingType = 0;
 
-//static float white[] = { 1.0f , 1.0f , 1.0f , 1.0f };
-//static float grey[] = { 0.3f , 0.3f , 0.3f , 0.3f };
 static C_Vector3 center(0.0f , 0.0f , 0.0f);
 
 /// Timer vars
@@ -71,8 +70,8 @@ static C_Metaball metaball[3];
 
 static void CountFPS (void);
 
-
-static void Initializations(void)
+static void
+Initializations(void)
 {
 	/// Set clear color
 	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
@@ -83,28 +82,16 @@ static void Initializations(void)
 //	glCullFace(GL_BACK);
 
 	glEnable(GL_DEPTH_TEST);
-	glShadeModel(GL_SMOOTH);
+	glPointSize(10.0f);
+//	glShadeModel(GL_SMOOTH);
 
 	/// XXX: Disable normalizing ???
 	glDisable(GL_NORMALIZE);
-	glEnable(GL_LIGHTING);
-
-	/// Lighting parameters
-	float ambient[] = { 1.0f , 1.0f , 1.0f , 1.0f };
-	float diffuse[] = { 1.0f , 1.0f , 1.0f , 1.0f };
-	float specular[] = { 1.0f , 1.0f , 1.0f , 1.0f };
-	glLightfv(GL_LIGHT0 , GL_AMBIENT , ambient);
-	glLightfv(GL_LIGHT0 , GL_DIFFUSE , diffuse);
-	glLightfv(GL_LIGHT0 , GL_SPECULAR , specular);
-
-	glEnable(GL_LIGHT0);
-
-	shaderManager = C_GLShaderManager::getSingleton();
 
 	// Enose tin camera me to frustum kai dose times gia tin proboli
 	camera.frustum = &frustum;
 	camera.fov = 50.0f;
-	camera.zFar = 800.0f;
+	camera.zFar = 1000.0f;
 	camera.zNear = 1.0f;
 
 	// Diabase tin geometria gia to bsp
@@ -138,6 +125,8 @@ static void Initializations(void)
 	metaball[2].radius = 3.0f;
 
 	/// Shaders
+	shaderManager = C_GLShaderManager::getSingleton();
+
 	bspShader = shaderManager->LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
    assert(bspShader->verticesAttribLocation >= 0);
    assert(bspShader->normalsAttribLocation >= 0);
@@ -146,11 +135,16 @@ static void Initializations(void)
    assert(basicShader->verticesAttribLocation >= 0);
    assert(basicShader->normalsAttribLocation == -1);
 
+   pointShader = shaderManager->LoadShaderProgram("shaders/points_shader.vert", "shaders/points_shader.frag");
+   assert(pointShader->verticesAttribLocation >= 0);
+   assert(pointShader->normalsAttribLocation == -1);
+
 	/// timer initialization
 	timer.Initialize ();
 }
 
-static void Draw(void)
+static void
+Draw(void)
 {
 	C_Vector3 cameraPosition = camera.GetPosition();
 
@@ -167,27 +161,6 @@ static void Draw(void)
 	esMatrixLoadIdentity(&globalModelviewMatrix);
 	camera.Look();
 	metaballPolys = 0;
-
-	/// Make light source rotate around the camera
-//	float lightPos[] = { cameraPosition.x + 10.0f * (float)sin(angle),
-//                        cameraPosition.y,
-//						      cameraPosition.z + 10.0f * (float)cos(angle), 1.0f};
-
-	/// Visuallize light by placing a low poly sphere at it's position
-//	glPushMatrix();
-//	glTranslatef(lightPos[0], lightPos[1], lightPos[2]);
-//	glutSolidSphere(1.5, 5, 5);
-//	glPopMatrix();
-
-	/// Place light source
-//	glLightfv(GL_LIGHT0 , GL_POSITION , lightPos);
-
-//	glColor3fv(white);
-	/// In case shaders are not available
-//	if(!basicShader->GetisLinked() || !CheckGLSL()) {
-//		glMaterialfv(GL_FRONT , GL_DIFFUSE , white);
-//		glMaterialfv(GL_FRONT , GL_AMBIENT , grey);
-//	}
 
 	/// Draw metaballs
 	metaball[0].position.y = 20.0f + 5 * cos(angle2);
@@ -219,6 +192,13 @@ static void Draw(void)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			mapPolys = bspTest->Draw_PVS(&cameraPosition);
 			break;
+
+      case 3:
+  			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+         mapPolys = bspTest->Draw2(&cameraPosition);
+         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			bspTest->Draw3();
+			break;
 	}
 
 #ifndef JNI_COMPATIBLE
@@ -247,21 +227,22 @@ static void Draw(void)
 
 
 #ifndef JNI_COMPATIBLE
-// Sinartisi heirismou parathirou
-static void reshape(GLint w , GLint h)
+static void
+reshape(GLint w , GLint h)
 {
 	windowWidth = w;
 	windowHeight = h;
 	camera.setProjection(w , h);
 }
 
-static void idle(void)
+static void
+idle(void)
 {
 	glutPostRedisplay();
 }
 
-/// mouse handling
-static void mouse_look(int x , int y)
+static void
+mouse_look(int x , int y)
 {
 	static int oldX = 0;
 	static int oldY = 0;
@@ -281,8 +262,8 @@ static void mouse_look(int x , int y)
 	glutPostRedisplay();
 }
 
-/// keyboard handling
-static void hande_simple_keys(unsigned char key , int x , int y)
+static void
+hande_simple_keys(unsigned char key , int x , int y)
 {
 	switch(key) {
 		case 27 : case 13 :	//ESC
@@ -302,7 +283,15 @@ static void hande_simple_keys(unsigned char key , int x , int y)
 			break;
 
 		case 'x' : case 'X' :
-			bspRenderingType = (bspRenderingType + 1) % 3;
+			bspRenderingType = (bspRenderingType + 1) % 4;
+			break;
+
+		case 'q' : case 'Q' :
+			bspTest->IncreaseLeavesDrawn();
+			break;
+
+		case 'w' : case 'W' :
+			bspTest->DecreaseLeavesDrawn();
 			break;
 
 		default:
@@ -311,9 +300,9 @@ static void hande_simple_keys(unsigned char key , int x , int y)
 	}
 }
 
-
 /// arrow keys handling
-static void handle_arrows(int key , int x , int y)
+static void
+handle_arrows(int key , int x , int y)
 {
 	switch(key) {
 		case GLUT_KEY_UP:
@@ -337,8 +326,8 @@ static void handle_arrows(int key , int x , int y)
 }
 #endif
 
-// Main program entry point
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
 #ifndef JNI_COMPATIBLE
 	glutInit(&argc , argv);
@@ -372,7 +361,8 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void CountFPS (void)
+void
+CountFPS (void)
 {
 	static ULONG count = 0.0f;
 	float delta = timer.GetTime () - start;
