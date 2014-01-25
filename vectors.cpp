@@ -296,18 +296,6 @@ C_Vector3 C_Vector3::CrossProduct2(const C_Vertex* v1 , const C_Vertex* v2 , con
 }
 
 
-float C_Vector3::DotProduct(const C_Vector3* vec1 , const C_Vector3* vec2)
-{
-	return (vec1->x * vec2->x + vec1->y * vec2->y + vec1->z * vec2->z);
-}
-
-
-float C_Vector3::DotProduct(const C_Vertex* v1 , const C_Vertex* v2)
-{
-	return (v1->x * v2->x + v1->y * v2->y + v1->z * v2->z);
-}
-
-
 void C_Vector3::Normalize(void)
 {
 	float lenght = C_Vector3::Magnitude(x , y , z);

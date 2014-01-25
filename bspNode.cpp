@@ -439,12 +439,13 @@ C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tre
          C_BspNode::Draw_PVS(cameraPosition, node->backNode, tree);
       }
    } else {
-//      if(node->drawn) {
-//         return;
-//      }
+      if(node->drawn) {
+         return;
+      }
 
       node->drawn = true;
       node->Draw(bspShader);
+      node->DrawPointSet();
 
       for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
          if(node->PVS[i]->drawn) {
@@ -455,7 +456,7 @@ C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tre
          node->PVS[i]->Draw(bspShader);
 
 			node->PVS[i]->bbox->Draw();
-			node->PVS[i]->DrawPointSet();
+//			node->PVS[i]->DrawPointSet();
 
          polyCount += node->PVS[i]->nPolys;
       }

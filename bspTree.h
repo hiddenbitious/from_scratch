@@ -30,7 +30,7 @@ using namespace std;
 class C_BspTree {
 		friend class C_BspNode;
 
-	private:
+	public:
 		C_BspNode* headNode;
 
 		brush_t* pBrushes;

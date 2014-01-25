@@ -132,5 +132,5 @@ extern C_GLShaderManager *shaderManager;
 extern C_GLShader *bspShader;
 extern C_GLShader *basicShader;
 extern C_GLShader *pointShader;
-
+extern bool drawConnectedToo;
 #endif

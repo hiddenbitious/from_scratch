@@ -1,19 +1,3 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #include "bspHelperFunctions.h"
 
 bool PointInTriangle(C_Vertex* point , triangle_vn *triangle)
@@ -31,18 +15,17 @@ bool PointInTriangle(C_Vertex* point , triangle_vn *triangle)
 }
 
 
-bool RayTriangleIntersection(C_Vertex* p1 , C_Vertex* p2 , triangle_vn *triangle)
+bool RayTriangleIntersection(C_Vertex* p1, C_Vertex* p2, triangle_vn *triangle)
 {
    C_Plane plane(&triangle->vertex0, &triangle->vertex1, &triangle->vertex2);
-//	C_Plane plane(&triangle->pVertices[0] , &triangle->pVertices[1] , &triangle->pVertices[2]);
 
-	// First check ray with plane
+	/// First check ray with plane in case it is parallel to it
 	C_Vertex interPoint;
-	if(FindIntersectionPoint_withCheck(p1 , p2 , &plane , &interPoint) == false) {
+	if(FindIntersectionPoint_withCheck(p1, p2, &plane, &interPoint) == false) {
 		return false;
 	}
 
-	// If ray hits plane check if the iPoint is in Triangle
+	/// If ray hits plane check if the iPoint is in Triangle
 	float u , v;
 	CalculateUV(&plane , &interPoint , &u , &v);
 	return ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.0f));
@@ -161,12 +144,9 @@ bool FindIntersectionPoint_withCheck(C_Vertex *ptA, C_Vertex *ptB, C_Plane *plan
 	planeNormal = plane->getPlaneNormal();
 	float denominator = C_Vector3::DotProduct(&planeNormal, &v);
 
-	// If denominator is 0 then line and plane are parallel so they don't intersect
+	/// If denominator is 0 then line and plane are parallel so they don't intersect
 	if(FLOAT_EQ(denominator, 0.0f))
 	   return false;
-//	if(!denominator) {
-//		return false;
-//	}
 
 	float sect = -plane->distanceFromPoint(ptA) / denominator;
 	intersectionPoint->x = ptA->x + v.x * sect;

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <time.h>
+#include <stdio.h>
 
 #ifndef JNI_COMPATIBLE
 #	include <GL/glew.h>
@@ -16,6 +17,7 @@
 
 #include "camera.h"
 #include "bspTree.h"
+#include "bspNode.h"
 #include "vectors.h"
 #include "timer.h"
 #include "glsl/glsl.h"
@@ -27,6 +29,7 @@ using namespace std;
 // BSP
 static C_BspTree *bspTest;
 int mapPolys;
+bool drawConnectedToo = false;
 
 /// Global variables
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
@@ -175,20 +178,20 @@ Draw(void)
    grid->Draw(NULL);
 
 	switch(bspRenderingType) {
-      // Shediase ti fainetai kanonika.
 		case 0:
+		   /// Draw tree using PVS
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			mapPolys = bspTest->Draw_PVS(&cameraPosition);
 			break;
 
-      // Shediase olo to harti se wireframe
       case 1:
+         /// Draw the whole tree without PVS
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			mapPolys = bspTest->Draw2(&cameraPosition);
 			break;
 
-		// Shediase to PVS se wireframe
 		case 2:
+		   /// Draw PVS in wireframe mode
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			mapPolys = bspTest->Draw_PVS(&cameraPosition);
 			break;
@@ -284,15 +287,41 @@ hande_simple_keys(unsigned char key , int x , int y)
 
 		case 'x' : case 'X' :
 			bspRenderingType = (bspRenderingType + 1) % 4;
+			printf("bspRenderingType: %d\n", bspRenderingType);
 			break;
 
-		case 'q' : case 'Q' :
+		case 'q' : case 'Q' :{
 			bspTest->IncreaseLeavesDrawn();
-			break;
 
-		case 'w' : case 'W' :
-			bspTest->DecreaseLeavesDrawn();
+			printf("Drawing leaf: %d (%d)\n", bspTest->leafToDraw, bspTest->leaves[bspTest->leafToDraw]->nodeID);
+			int nleaves = bspTest->leaves[bspTest->leafToDraw]->connectedLeaves.size();
+			printf("Connected leaves: %d\n", nleaves);
+			for(int i = 0; i < nleaves; i++) {
+   			printf("%d, ", bspTest->leaves[bspTest->leafToDraw]->connectedLeaves[i]->nodeID);
+         }
+         printf("\n\n");
+
 			break;
+			}
+
+		case 'w' : case 'W' :{
+			bspTest->DecreaseLeavesDrawn();
+
+			printf("Drawing leaf: %d (%d)\n", bspTest->leafToDraw, bspTest->leaves[bspTest->leafToDraw]->nodeID);
+			int nleaves = bspTest->leaves[bspTest->leafToDraw]->connectedLeaves.size();
+			printf("Connected leaves: %d\n", nleaves);
+			for(int i = 0; i < nleaves; i++) {
+   			printf("%d, ", bspTest->leaves[bspTest->leafToDraw]->connectedLeaves[i]->nodeID);
+         }
+         printf("\n\n");
+
+			break;
+			}
+
+      case 'e': {
+         drawConnectedToo = !drawConnectedToo;
+         break;
+      }
 
 		default:
 			cout << int (key) << '\n';

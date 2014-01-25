@@ -7,6 +7,9 @@
 #include <GL/gl.h>
 #include <iostream>
 #include <string.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <sys/time.h>
 
 int polyCount;
 int leavesDrawn;
@@ -57,7 +60,7 @@ C_BspTree::~C_BspTree(void)
 void
 C_BspTree::IncreaseLeavesDrawn()
 {
-	if(leafToDraw < nLeaves) { leafToDraw++; } cout << "Leaf drawn: " << leafToDraw << endl;
+	if(leafToDraw < nLeaves - 1) { leafToDraw++; } cout << "Leaf drawn: " << leafToDraw << endl;
 }
 
 void
@@ -185,19 +188,17 @@ C_BspTree::BuildPVS(void)
 	printf("%s\n", __FUNCTION__);
 
 	// An iparhei arheio me tin pliroforia diabase apo ekei
-	bool pvsFileFound;
-	pvsFileFound = this->ReadPVSFile("pvs_.txt");
-//	pvsFileFound = false;
+	bool pvsFileFound = false;
+//	pvsFileFound = this->ReadPVSFile("pvs.txt");
 
 //	ULONG start = timeGetTime ();
 
 	cout << "Building PVS..." << endl;
-
-	cout << "\tDistributing sample points...";
+	cout << "\tDistributing sample points..." << flush;
 	C_BspNode::DistributeSamplePoints(headNode , headNode->pointSet);
 	cout << "Done!" << endl;
 
-	cout << "\tFinding conected leaves...";
+	cout << "\tFinding conected leaves..." << flush;
 	if(pvsFileFound) {
 		cout << "Found in file. Skipping calculations." << endl;
 	} else {
@@ -205,13 +206,13 @@ C_BspTree::BuildPVS(void)
 		cout << "Done!" << endl;
 	}
 
-//	cout << "\tTracing Visibility...";
-//	if(pvsFileFound) {
-//		cout << "Found in file. Skipping calculations." << endl;
-//	} else {
-//		C_BspTree::TraceVisibility();
-//		cout << "Done!" << endl << endl;
-//	}
+	cout << "\tTracing Visibility..." << flush;
+	if(pvsFileFound) {
+		cout << "Found in file. Skipping calculations." << endl;
+	} else {
+		C_BspTree::TraceVisibility();
+		cout << "Done!" << endl << endl;
+	}
 
 	cout << "Done!" << endl << endl;
 
@@ -222,65 +223,192 @@ C_BspTree::BuildPVS(void)
 	if(!pvsFileFound) {
 		WritePVSFile("pvs.txt");
 	}
+
+//   exit(0);
+}
+
+#define MAX_THREADS  2
+
+typedef struct {
+   int tid;
+   C_BspTree *tree;
+} threadData_t;
+
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+static float step;
+static float progress;
+
+void *TraceVisibility_Thread(void *data_)
+{
+   threadData_t *data = (threadData_t *)data_;
+   int tid = data->tid;
+   C_BspTree *tree = data->tree;
+   vector<C_BspNode*> &leaves = tree->leaves;
+   bool res;
+
+   int load = leaves.size();
+   int start = load / MAX_THREADS * tid;
+   int end = load / MAX_THREADS * (tid + 1);
+
+//   if(!tid) {
+//      pthread_mutex_lock(&mutex);
+//      step = 20.0f / (float)load;
+//      progress = 0.0f;
+//      pthread_mutex_unlock(&mutex);
+//
+//      cout << "\n\t\t0%|---------50---------|100%\n\t   ";
+//   }
+
+	for(unsigned int l1 = 0; l1 < leaves.size(); l1++) {
+		for(unsigned int l2 = start; l2 < end; l2++) {
+   		pthread_mutex_lock(&mutex);
+		   if(l1 == l2 || leaves[l1]->visibleFrom[l2] || leaves[l2]->visibleFrom[l1] ||
+		      leaves[l1]->checkedVisibilityWith[l2] || leaves[l2]->checkedVisibilityWith[l1]) {
+		      pthread_mutex_unlock(&mutex);
+		      continue;
+         } else {
+            pthread_mutex_unlock(&mutex);
+         }
+
+         res = tree->CheckVisibility(leaves[l1], leaves[l2]);
+
+         pthread_mutex_lock(&mutex);
+         if(res) {
+            leaves[l1]->PVS.push_back(leaves[l2]);
+            leaves[l1]->visibleFrom[l2] = true;
+
+            leaves[l2]->PVS.push_back(leaves[l1]);
+            leaves[l2]->visibleFrom[l1] = true;
+         }
+
+         leaves[l1]->checkedVisibilityWith[l2] = true;
+         leaves[l2]->checkedVisibilityWith[l1] = true;
+         pthread_mutex_unlock(&mutex);
+		}
+
+//		pthread_mutex_lock(&mutex);
+//  		progress += step;
+//  		pthread_mutex_unlock(&mutex);
+
+//  		if(!tid) {
+//         cout << "\r\t\t   ";
+//         for(int k = 0 ; k < (int)progress ; k++)
+//            cout << "*" << flush;
+//      }
+	}
+
+	pthread_mutex_lock(&mutex);
+	printf("\t\t[Thread %d finished]\n", tid);
+	pthread_mutex_unlock(&mutex);
+
+	pthread_exit(NULL);
+	return NULL;
 }
 
 void
 C_BspTree::TraceVisibility(void)
 {
-	float step = 20.0f / (float)leaves.size() ;
-	float progress = step;
+   pthread_t threads[MAX_THREADS];
+   threadData_t threadData[MAX_THREADS];
+   int cb, ret;
 
-	cout << "\n\t0%|---------50---------|100%\n\t   ";
+   printf("\n");
 
-	for(unsigned int l1 = 0 ; l1 < leaves.size() ; l1++) {
-		for(unsigned int l2 = 0 ; l2 < leaves[l1]->PVS.size() ; l2++) {
-			if(leaves[l1]->nodeID == leaves[l1]->PVS[l2]->nodeID) {
-				continue;
-			}
+   timeval start, end;
+   double elapsedTime;
+   gettimeofday(&start, NULL);
 
-			for(unsigned int l3 = 0 ; l3 < leaves[l1]->PVS[l2]->PVS.size() ; l3++) {
-				if(leaves[l1]->PVS[l2]->PVS[l3]->nodeID == leaves[l1]->PVS[l2]->nodeID) {
-					continue;
-				}
-
-				if(leaves[l1]->PVS[l2]->PVS[l3]->visibleFrom[leaves[l1]->nodeID] ||
-						leaves[l1]->visibleFrom[leaves[l1]->PVS[l2]->PVS[l3]->nodeID]) {
-					continue;
-				}
-
-				if(leaves[l1]->checkedVisibilityWith[leaves[l1]->PVS[l2]->PVS[l3]->nodeID] ||
-						leaves[l1]->PVS[l2]->PVS[l3]->checkedVisibilityWith[leaves[l1]->nodeID]) {
-					continue;
-				}
-
-				if(C_BspTree::CheckVisibility(leaves[l1] , leaves[l1]->PVS[l2]->PVS[l3])) {
-					leaves[l1]->PVS.push_back(leaves[l1]->PVS[l2]->PVS[l3]);
-					leaves[l1]->PVS[l2]->PVS[l3]->visibleFrom[leaves[l1]->nodeID] = true;
-
-					leaves[l1]->PVS[l2]->PVS[l3]->PVS.push_back(leaves[l1]);
-					leaves[l1]->visibleFrom[leaves[l1]->PVS[l2]->PVS[l3]->nodeID] = true;
-				}
-
-				leaves[l1]->checkedVisibilityWith[leaves[l1]->PVS[l2]->PVS[l3]->nodeID] = true;
-				leaves[l1]->PVS[l2]->PVS[l3]->checkedVisibilityWith[leaves[l1]->nodeID] = true;
-			}
-		}
-
-		progress += step;
-		cout << "\r\t   ";
-		for(int k = 0 ; k < (int)progress ; k++) {
-			cout << "*";
-		}
+	for(cb = 0; cb < MAX_THREADS; cb++) {
+		threadData[cb].tid = cb;
+		threadData[cb].tree = this;
+		printf("\t\t[Creating thread %d]\n", cb);
+		ret = pthread_create(&threads[cb], NULL, TraceVisibility_Thread, (void *) &threadData[cb]);
+		if(ret) {
+		   printf("Could not create new thread.\n");
+		   abort();
+      }
 	}
-	cout << "   ";
+
+	for(cb = 0; cb < MAX_THREADS; cb++) {
+		pthread_join(threads[cb], NULL);
+	}
+
+   gettimeofday(&end, NULL);
+   elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
+   elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
+
+   printf("\n\ntime building PVS: %f\n", elapsedTime);
+
+	pthread_mutex_destroy(&mutex);
+
+//	cout << "\n\t0%|---------50---------|100%\n\t   ";
+//
+//	for(unsigned int l1 = 0; l1 < leaves.size(); l1++) {
+//		for(unsigned int l2 = 0; l2 < leaves.size(); l2++) {
+//
+//		   if(l1 == l2 || leaves[l1]->visibleFrom[l2] || leaves[l2]->visibleFrom[l1] ||
+//		      leaves[l1]->checkedVisibilityWith[l2] || leaves[l2]->checkedVisibilityWith[l1]) {
+//		      continue;
+//         }
+//
+//         if(C_BspTree::CheckVisibility(leaves[l1], leaves[l2])) {
+//            leaves[l1]->PVS.push_back(leaves[l2]);
+//            leaves[l1]->visibleFrom[l2] = true;
+//
+//            leaves[l2]->PVS.push_back(leaves[l1]);
+//            leaves[l2]->visibleFrom[l1] = true;
+//         }
+//
+//         leaves[l1]->checkedVisibilityWith[l2] = true;
+//         leaves[l2]->checkedVisibilityWith[l1] = true;
+//
+////			if(leaves[l1]->nodeID == leaves[l1]->PVS[l2]->nodeID) {
+////				continue;
+////			}
+////
+////			for(unsigned int l3 = 0; l3 < leaves[l1]->PVS[l2]->PVS.size(); l3++) {
+////				if(leaves[l1]->PVS[l2]->PVS[l3]->nodeID == leaves[l1]->PVS[l2]->nodeID) {
+////					continue;
+////				}
+////
+////				if(leaves[l1]->PVS[l2]->PVS[l3]->visibleFrom[leaves[l1]->nodeID] ||
+////					leaves[l1]->visibleFrom[leaves[l1]->PVS[l2]->PVS[l3]->nodeID]) {
+////					continue;
+////				}
+////
+////				if(leaves[l1]->checkedVisibilityWith[leaves[l1]->PVS[l2]->PVS[l3]->nodeID] ||
+////               leaves[l1]->PVS[l2]->PVS[l3]->checkedVisibilityWith[leaves[l1]->nodeID]) {
+////					continue;
+////				}
+////
+////				if(C_BspTree::CheckVisibility(leaves[l1], leaves[l1]->PVS[l2]->PVS[l3])) {
+////					leaves[l1]->PVS.push_back(leaves[l1]->PVS[l2]->PVS[l3]);
+////					leaves[l1]->PVS[l2]->PVS[l3]->visibleFrom[leaves[l1]->nodeID] = true;
+////
+////					leaves[l1]->PVS[l2]->PVS[l3]->PVS.push_back(leaves[l1]);
+////					leaves[l1]->visibleFrom[leaves[l1]->PVS[l2]->PVS[l3]->nodeID] = true;
+////				}
+////
+////				leaves[l1]->checkedVisibilityWith[leaves[l1]->PVS[l2]->PVS[l3]->nodeID] = true;
+////				leaves[l1]->PVS[l2]->PVS[l3]->checkedVisibilityWith[leaves[l1]->nodeID] = true;
+////			}
+//		}
+//
+//		progress += step;
+//		cout << "\r\t   ";
+//		for(int k = 0 ; k < (int)progress ; k++) {
+//			cout << "*" << flush;
+//		}
+//	}
+//	cout << "   ";
 }
 
 bool
-C_BspTree::CheckVisibility(C_BspNode *node1 , C_BspNode *node2)
+C_BspTree::CheckVisibility(C_BspNode *node1, C_BspNode *node2)
 {
-	for(unsigned int p1 = 0 ; p1 < node1->pointSet.size() ; p1++) {
-		for(unsigned int p2 = 0 ; p2 < node2->pointSet.size() ; p2++) {
-			if(false == C_BspTree::RayIntersectsSomethingInTree(headNode , &node1->pointSet[p1] , &node2->pointSet[p2])) {
+	for(unsigned int p1 = 0; p1 < node1->pointSet.size(); p1++) {
+		for(unsigned int p2 = 0; p2 < node2->pointSet.size(); p2++) {
+			if(C_BspTree::RayIntersectsSomethingInTree(headNode, &node1->pointSet[p1], &node2->pointSet[p2]) == false) {
 				return true;
 			}
 		}
@@ -289,7 +417,7 @@ C_BspTree::CheckVisibility(C_BspNode *node1 , C_BspNode *node2)
 }
 
 bool
-C_BspTree::RayIntersectsSomethingInTree(C_BspNode *node , C_Vertex *start , C_Vertex *end)
+C_BspTree::RayIntersectsSomethingInTree(C_BspNode *node, C_Vertex *start, C_Vertex *end)
 {
 	if(node->isLeaf) {
 		for(int cp = 0 ; cp < node->nTriangles ; cp++) {
@@ -303,8 +431,9 @@ C_BspTree::RayIntersectsSomethingInTree(C_BspNode *node , C_Vertex *start , C_Ve
 	int startSide = C_BspNode::ClassifyVertex(&node->partitionPlane , start);
 	int endSide = C_BspNode::ClassifyVertex(&node->partitionPlane , end);
 
+   /// If the ray spans the node's partition plane, then send the beam down both sides of node
 	if((startSide == COINCIDENT && endSide == COINCIDENT) ||
-			(startSide != endSide && startSide != COINCIDENT && endSide != COINCIDENT)) {
+      (startSide != endSide && startSide != COINCIDENT && endSide != COINCIDENT)) {
 		if(C_BspTree::RayIntersectsSomethingInTree(node->backNode , start , end)) {
 			return true;
 		}
@@ -313,11 +442,14 @@ C_BspTree::RayIntersectsSomethingInTree(C_BspNode *node , C_Vertex *start , C_Ve
 		}
 	}
 
+   /// If beam is whole in front of partition plane the send it down the front node
 	if(startSide == FRONT || endSide == FRONT) {
 		if(C_BspTree::RayIntersectsSomethingInTree(node->frontNode , start , end)) {
 			return true;
 		}
 	}
+
+   /// Respectively send it down to back node
 	if(startSide == BACK || endSide == BACK) {
 		if(C_BspTree::RayIntersectsSomethingInTree(node->backNode , start , end)) {
 			return true;
@@ -393,12 +525,18 @@ C_BspTree::Draw3(void)
 
 	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
 	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+
 	C_BspNode::Draw(NULL, leaves[leafToDraw], this);
+
+   if(drawConnectedToo) {
+      for(unsigned int j = 0 ; j < leaves[leafToDraw]->connectedLeaves.size() ; j++) {
+         C_BspNode::Draw(NULL, leaves[leafToDraw]->connectedLeaves[j], this);
+   //		leaves[leafToDraw]->connectedLeaves[j]->Draw(bspShader);
+      }
+   }
+
 	glFlush();
 	shaderManager->popShader();
-//	for(unsigned int j = 0 ; j < leaves[leafToDraw]->connectedLeaves.size() ; j++) {
-//		leaves[leafToDraw]->connectedLeaves[j]->Draw(bspShader);
-//	}
 }
 
 int
@@ -408,25 +546,27 @@ C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
 	leavesDrawn = 0;
 	nodesDrawn = 0;
 
+   /// Set all leaves as non drawn
 	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
 		leaves[i]->drawn = false;
 	}
 
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
-	shaderManager->pushShader(bspShader);
-	glEnableVertexAttribArray(bspShader->verticesAttribLocation);
-	glEnableVertexAttribArray(bspShader->normalsAttribLocation);
-	ESMatrix mat = globalModelviewMatrix;
-	esTranslate(&mat, position.x , position.y , position.z);
+	shaderManager->pushShader(bspShader); {
+      glEnableVertexAttribArray(bspShader->verticesAttribLocation);
+      glEnableVertexAttribArray(bspShader->normalsAttribLocation);
+      ESMatrix mat = globalModelviewMatrix;
+      esTranslate(&mat, position.x , position.y , position.z);
 
-	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
-	glFrontFace(GL_CW);
-	C_BspNode::Draw_PVS(cameraPosition, headNode, this);
-	glFrontFace(GL_CCW);
-	shaderManager->popShader();
+      glFrontFace(GL_CW);
+      C_BspNode::Draw_PVS(cameraPosition, headNode, this);
+      glFrontFace(GL_CCW);
+   }
+   shaderManager->popShader();
 
 	return polyCount;
 }
@@ -437,6 +577,7 @@ C_BspTree::TessellatePolygons(void)
 	C_BspNode::TessellatePolygonsInLeaves(headNode);
 }
 
+/// Populates both the PVS and connectedLeaves vectors
 void
 C_BspTree::FindConnectedLeaves(void)
 {
@@ -455,6 +596,7 @@ C_BspTree::FindConnectedLeaves(void)
 			if(i == j || leaves[j]->visibleFrom[i] || leaves[i]->visibleFrom[j])
 				continue;
 
+         /// Loop through point sets
 			for(unsigned int p1 = 0; p1 < leaves[i]->pointSet.size(); p1++) {
 				for(unsigned int p2 = 0; p2 < leaves[j]->pointSet.size(); p2++) {
 					if(FLOAT_EQ(leaves[i]->pointSet[p1].x, leaves[j]->pointSet[p2].x) &&

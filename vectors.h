@@ -101,9 +101,15 @@ class C_Vector3 {
 		static C_Vector3 CrossProduct(const C_Vector3* vec1 , const C_Vector3* vec2 , const C_Vector3* vec3);
 		static C_Vector3 CrossProduct(const C_Vertex* v1 , const C_Vertex* v2 , const C_Vertex* v3);
 		static C_Vector3 CrossProduct2(const C_Vertex* v1 , const C_Vertex* v2 , const C_Vertex* v3);
+
 		// Calculate the dot product
-		static float  DotProduct(const C_Vector3* vec1 , const C_Vector3* vec2);
-		static float DotProduct(const C_Vertex* v1 , const C_Vertex* v2);
+      static inline float DotProduct(const C_Vector3* vec1 , const C_Vector3* vec2) {
+         return (vec1->x * vec2->x + vec1->y * vec2->y + vec1->z * vec2->z);
+      }
+
+      static inline float DotProduct(const C_Vertex* v1 , const C_Vertex* v2) {
+         return (v1->x * v2->x + v1->y * v2->y + v1->z * v2->z);
+      }
 
 		// Normalizes the vector
 		void Normalize(void);
