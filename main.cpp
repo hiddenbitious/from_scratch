@@ -2,6 +2,7 @@
 #include <sstream>
 #include <time.h>
 #include <stdio.h>
+#include <sys/sysinfo.h>
 
 #ifndef JNI_COMPATIBLE
 #	include <GL/glew.h>
@@ -34,6 +35,7 @@ bool drawConnectedToo = false;
 /// Global variables
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
 C_GLShaderManager *shaderManager = NULL;
+char MAX_THREADS = 0;
 
 C_GLShader *bspShader = NULL;
 C_GLShader *basicShader = NULL;
@@ -76,6 +78,10 @@ static void CountFPS (void);
 static void
 Initializations(void)
 {
+	/// Find number of cores available
+   MAX_THREADS = get_nprocs();
+   printf("Detected %d cpu cores.\n", MAX_THREADS);
+
 	/// Set clear color
 	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
 

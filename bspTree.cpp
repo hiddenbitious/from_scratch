@@ -213,8 +213,6 @@ C_BspTree::BuildPVS(void)
 //   exit(0);
 }
 
-#define MAX_THREADS  2
-
 typedef struct {
    int tid;
    C_BspTree *tree;
@@ -392,7 +390,7 @@ C_BspTree::TraceVisibility(void)
    elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
    elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
 
-   printf("\n\nDone (%f ms)\n", elapsedTime);
+   printf("\n\nDone (%.2f ms)\n", elapsedTime);
 
 	pthread_mutex_destroy(&mutex);
 }

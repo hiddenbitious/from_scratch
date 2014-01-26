@@ -133,4 +133,6 @@ extern C_GLShader *bspShader;
 extern C_GLShader *basicShader;
 extern C_GLShader *pointShader;
 extern bool drawConnectedToo;
+extern char MAX_THREADS;
+
 #endif
