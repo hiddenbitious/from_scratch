@@ -123,7 +123,7 @@ C_BspNode::IsConvex(C_BspNode *node)
 }
 
 void
-C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
+C_BspNode::BuildBspTree(C_BspNode* node, C_BspTree *tree)
 {
    static int ID = 0;
    bool isConvex;
@@ -153,7 +153,6 @@ C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
 
       /// Calculate leaf's bbox
       node->CalculateBBox();
-
       return;
    }
 
@@ -189,7 +188,6 @@ C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
    }
 
    node->nodeID = ID++;
-   tree->nNodes = ID;
 
    /// Allocate memory
    node->backNode->geometry = nBack ? new poly_t *[nBack] : NULL;
@@ -201,6 +199,7 @@ C_BspNode::BuildBspTree(C_BspNode* node , C_BspTree *tree)
    node->frontNode->nodeID = ID++;
 
    nFront = nBack = 0;
+   tree->nNodes = ID;
 
    /// Distribute the geometry to the two new nodes
    for(i = 0; i < node->nPolys; i++) {

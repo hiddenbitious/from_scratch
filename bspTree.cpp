@@ -187,26 +187,15 @@ C_BspTree::BuildPVS(void)
 {
 	printf("%s\n", __FUNCTION__);
 
-	// An iparhei arheio me tin pliroforia diabase apo ekei
+	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-//	pvsFileFound = this->ReadPVSFile("pvs.txt");
-
-//	ULONG start = timeGetTime ();
+	pvsFileFound = this->ReadPVSFile("pvs.txt");
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points..." << flush;
 	C_BspNode::DistributeSamplePoints(headNode , headNode->pointSet);
 	cout << "Done!" << endl;
 
-	cout << "\tFinding conected leaves..." << flush;
-	if(pvsFileFound) {
-		cout << "Found in file. Skipping calculations." << endl;
-	} else {
-		C_BspTree::FindConnectedLeaves();
-		cout << "Done!" << endl;
-	}
-
-	cout << "\tTracing Visibility..." << flush;
 	if(pvsFileFound) {
 		cout << "Found in file. Skipping calculations." << endl;
 	} else {
@@ -216,10 +205,7 @@ C_BspTree::BuildPVS(void)
 
 	cout << "Done!" << endl << endl;
 
-//	ULONG time = timeGetTime () - start;
-//	cout << "Time elapsed: " << (float)(time/1000.0f) << " seconds.\n\n" << endl;
-
-	// An den eihe brethei arheio apothikeuse gia tin epomeni ektelesi
+	/// Write PVS into a file
 	if(!pvsFileFound) {
 		WritePVSFile("pvs.txt");
 	}
@@ -235,71 +221,84 @@ typedef struct {
 } threadData_t;
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-static float step;
 static float progress;
 
 void *TraceVisibility_Thread(void *data_)
 {
    threadData_t *data = (threadData_t *)data_;
-   int tid = data->tid;
+   int tid = data->tid, s1;
    C_BspTree *tree = data->tree;
-   vector<C_BspNode*> &leaves = tree->leaves;
-   bool res;
+   vector<C_BspNode *> &leaves = tree->leaves;
+   C_BspNode *leaf1, *leaf2, *leaf3;
 
+   bool res;
    int load = leaves.size();
    int start = load / MAX_THREADS * tid;
    int end = load / MAX_THREADS * (tid + 1);
+   float step = 20.0f / (float)load;
 
-//   if(!tid) {
-//      pthread_mutex_lock(&mutex);
-//      step = 20.0f / (float)load;
-//      progress = 0.0f;
-//      pthread_mutex_unlock(&mutex);
-//
-//      cout << "\n\t\t0%|---------50---------|100%\n\t   ";
-//   }
+   /// thread 0 prints progress bar
+   if(!tid) {
+      pthread_mutex_lock(&mutex);
+      progress = step;
+      pthread_mutex_unlock(&mutex);
 
-	for(unsigned int l1 = 0; l1 < leaves.size(); l1++) {
-		for(unsigned int l2 = start; l2 < end; l2++) {
-   		pthread_mutex_lock(&mutex);
-		   if(l1 == l2 || leaves[l1]->visibleFrom[l2] || leaves[l2]->visibleFrom[l1] ||
-		      leaves[l1]->checkedVisibilityWith[l2] || leaves[l2]->checkedVisibilityWith[l1]) {
-		      pthread_mutex_unlock(&mutex);
-		      continue;
-         } else {
+      cout << "\n\t\t0%|---------50---------|100%\n\t   ";
+   }
+
+	for(unsigned int l1 = start; l1 < end; l1++) {
+	   leaf1 = leaves[l1];
+		for(unsigned int l2 = 0; l2 < leaf1->PVS.size(); l2++) {
+		   leaf2 = leaf1->PVS[l2];
+         s1 = leaf2->PVS.size();
+         for(unsigned int l3 = 0; l3 < s1; l3++) {
+            leaf3 = leaf2->PVS[l3];
+
+            /// Sanity checks
+            assert(leaf1->isLeaf);
+            assert(leaf2->isLeaf);
+            assert(leaf3->isLeaf);
+
+            if(leaf1->nodeID == leaf3->nodeID) {
+               continue;
+            }
+
+            pthread_mutex_lock(&mutex);
+            assert(leaf1->checkedVisibilityWith[leaf3->nodeID] == leaf3->checkedVisibilityWith[leaf1->nodeID]);
+            assert(leaf1->visibleFrom[leaf3->nodeID] == leaf3->visibleFrom[leaf1->nodeID]);
+            if(leaf1->visibleFrom[leaf3->nodeID] || leaf1->checkedVisibilityWith[leaf3->nodeID]) {
+               pthread_mutex_unlock(&mutex);
+               continue;
+            }
+            pthread_mutex_unlock(&mutex);
+
+            res = tree->CheckVisibility(leaf1, leaf3);
+
+            pthread_mutex_lock(&mutex);
+            if(res) {
+               leaf1->PVS.push_back(leaf3);
+               leaf1->visibleFrom[leaf3->nodeID] = true;
+
+               leaf3->PVS.push_back(leaf1);
+               leaf3->visibleFrom[leaf1->nodeID] = true;
+            }
+
+            leaf1->checkedVisibilityWith[leaf3->nodeID] = true;
+            leaf3->checkedVisibilityWith[leaf1->nodeID] = true;
             pthread_mutex_unlock(&mutex);
          }
+      }
 
-         res = tree->CheckVisibility(leaves[l1], leaves[l2]);
+		pthread_mutex_lock(&mutex);
+  		progress += step;
+  		pthread_mutex_unlock(&mutex);
 
-         pthread_mutex_lock(&mutex);
-         if(res) {
-            leaves[l1]->PVS.push_back(leaves[l2]);
-            leaves[l1]->visibleFrom[l2] = true;
-
-            leaves[l2]->PVS.push_back(leaves[l1]);
-            leaves[l2]->visibleFrom[l1] = true;
-         }
-
-         leaves[l1]->checkedVisibilityWith[l2] = true;
-         leaves[l2]->checkedVisibilityWith[l1] = true;
-         pthread_mutex_unlock(&mutex);
-		}
-
-//		pthread_mutex_lock(&mutex);
-//  		progress += step;
-//  		pthread_mutex_unlock(&mutex);
-
-//  		if(!tid) {
-//         cout << "\r\t\t   ";
-//         for(int k = 0 ; k < (int)progress ; k++)
-//            cout << "*" << flush;
-//      }
+  		if(!tid) {
+         cout << "\r\t\t   ";
+         for(int k = 0 ; k < (int)progress ; k++)
+            cout << "*" << flush;
+      }
 	}
-
-	pthread_mutex_lock(&mutex);
-	printf("\t\t[Thread %d finished]\n", tid);
-	pthread_mutex_unlock(&mutex);
 
 	pthread_exit(NULL);
 	return NULL;
@@ -310,25 +309,81 @@ C_BspTree::TraceVisibility(void)
 {
    pthread_t threads[MAX_THREADS];
    threadData_t threadData[MAX_THREADS];
-   int cb, ret;
-
-   printf("\n");
-
+   int cb, ret, i, j;
    timeval start, end;
    double elapsedTime;
+
+   assert(nLeaves == leaves.size());
+
+/// Initialize variables
+/// ----------------------
+	for(i = 0 ; i < nLeaves; i++) {
+		leaves[i]->visibleFrom = new bool[nNodes];
+		leaves[i]->checkedVisibilityWith = new bool[nNodes];
+
+		memset(leaves[i]->visibleFrom, false, nNodes * sizeof(bool));
+		memset(leaves[i]->checkedVisibilityWith, false, nNodes * sizeof(bool));
+	}
+
+/// Find connected leaves
+/// ----------------------
+   printf("\tFinding conected leaves...");
+   gettimeofday(&start, NULL);
+
+	for(i = 0; i < nLeaves; i++) {
+		for(j = 0; j < nLeaves; j++) {
+			if(i == j || leaves[j]->visibleFrom[leaves[i]->nodeID] || leaves[i]->visibleFrom[leaves[j]->nodeID])
+				continue;
+
+         /// Loop through point sets
+			for(unsigned int p1 = 0; p1 < leaves[i]->pointSet.size(); p1++) {
+				for(unsigned int p2 = 0; p2 < leaves[j]->pointSet.size(); p2++) {
+					if(FLOAT_EQ(leaves[i]->pointSet[p1].x, leaves[j]->pointSet[p2].x) &&
+                  FLOAT_EQ(leaves[i]->pointSet[p1].y, leaves[j]->pointSet[p2].y) &&
+						FLOAT_EQ(leaves[i]->pointSet[p1].z, leaves[j]->pointSet[p2].z)) {
+						if(leaves[j]->visibleFrom[leaves[i]->nodeID] == false) {
+							leaves[j]->connectedLeaves.push_back(leaves[i]);
+							leaves[j]->PVS.push_back(leaves[i]);
+							leaves[j]->visibleFrom[leaves[i]->nodeID] = true;
+						}
+
+						if(leaves[i]->visibleFrom[leaves[j]->nodeID] == false) {
+							leaves[i]->connectedLeaves.push_back(leaves[j]);
+							leaves[i]->PVS.push_back(leaves[j]);
+							leaves[i]->visibleFrom[leaves[j]->nodeID] = true;
+						}
+
+						p1 = leaves[i]->pointSet.size();
+						break;
+					}
+				}
+			}
+		}
+	}
+
+   gettimeofday(&end, NULL);
+   elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
+   elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
+   printf("Done! (%.2f ms)\n", elapsedTime);
+
+/// Trace visibility
+/// ----------------------
+   printf("\tTracing Visibility...\n");
    gettimeofday(&start, NULL);
 
 	for(cb = 0; cb < MAX_THREADS; cb++) {
 		threadData[cb].tid = cb;
 		threadData[cb].tree = this;
 		printf("\t\t[Creating thread %d]\n", cb);
-		ret = pthread_create(&threads[cb], NULL, TraceVisibility_Thread, (void *) &threadData[cb]);
+      /// Fork threads
+		ret = pthread_create(&threads[cb], NULL, TraceVisibility_Thread, (void *)&threadData[cb]);
 		if(ret) {
 		   printf("Could not create new thread.\n");
 		   abort();
       }
 	}
 
+   /// Join threads here
 	for(cb = 0; cb < MAX_THREADS; cb++) {
 		pthread_join(threads[cb], NULL);
 	}
@@ -337,70 +392,9 @@ C_BspTree::TraceVisibility(void)
    elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
    elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
 
-   printf("\n\ntime building PVS: %f\n", elapsedTime);
+   printf("\n\nDone (%f ms)\n", elapsedTime);
 
 	pthread_mutex_destroy(&mutex);
-
-//	cout << "\n\t0%|---------50---------|100%\n\t   ";
-//
-//	for(unsigned int l1 = 0; l1 < leaves.size(); l1++) {
-//		for(unsigned int l2 = 0; l2 < leaves.size(); l2++) {
-//
-//		   if(l1 == l2 || leaves[l1]->visibleFrom[l2] || leaves[l2]->visibleFrom[l1] ||
-//		      leaves[l1]->checkedVisibilityWith[l2] || leaves[l2]->checkedVisibilityWith[l1]) {
-//		      continue;
-//         }
-//
-//         if(C_BspTree::CheckVisibility(leaves[l1], leaves[l2])) {
-//            leaves[l1]->PVS.push_back(leaves[l2]);
-//            leaves[l1]->visibleFrom[l2] = true;
-//
-//            leaves[l2]->PVS.push_back(leaves[l1]);
-//            leaves[l2]->visibleFrom[l1] = true;
-//         }
-//
-//         leaves[l1]->checkedVisibilityWith[l2] = true;
-//         leaves[l2]->checkedVisibilityWith[l1] = true;
-//
-////			if(leaves[l1]->nodeID == leaves[l1]->PVS[l2]->nodeID) {
-////				continue;
-////			}
-////
-////			for(unsigned int l3 = 0; l3 < leaves[l1]->PVS[l2]->PVS.size(); l3++) {
-////				if(leaves[l1]->PVS[l2]->PVS[l3]->nodeID == leaves[l1]->PVS[l2]->nodeID) {
-////					continue;
-////				}
-////
-////				if(leaves[l1]->PVS[l2]->PVS[l3]->visibleFrom[leaves[l1]->nodeID] ||
-////					leaves[l1]->visibleFrom[leaves[l1]->PVS[l2]->PVS[l3]->nodeID]) {
-////					continue;
-////				}
-////
-////				if(leaves[l1]->checkedVisibilityWith[leaves[l1]->PVS[l2]->PVS[l3]->nodeID] ||
-////               leaves[l1]->PVS[l2]->PVS[l3]->checkedVisibilityWith[leaves[l1]->nodeID]) {
-////					continue;
-////				}
-////
-////				if(C_BspTree::CheckVisibility(leaves[l1], leaves[l1]->PVS[l2]->PVS[l3])) {
-////					leaves[l1]->PVS.push_back(leaves[l1]->PVS[l2]->PVS[l3]);
-////					leaves[l1]->PVS[l2]->PVS[l3]->visibleFrom[leaves[l1]->nodeID] = true;
-////
-////					leaves[l1]->PVS[l2]->PVS[l3]->PVS.push_back(leaves[l1]);
-////					leaves[l1]->visibleFrom[leaves[l1]->PVS[l2]->PVS[l3]->nodeID] = true;
-////				}
-////
-////				leaves[l1]->checkedVisibilityWith[leaves[l1]->PVS[l2]->PVS[l3]->nodeID] = true;
-////				leaves[l1]->PVS[l2]->PVS[l3]->checkedVisibilityWith[leaves[l1]->nodeID] = true;
-////			}
-//		}
-//
-//		progress += step;
-//		cout << "\r\t   ";
-//		for(int k = 0 ; k < (int)progress ; k++) {
-//			cout << "*" << flush;
-//		}
-//	}
-//	cout << "   ";
 }
 
 bool
@@ -481,6 +475,7 @@ C_BspTree::BuildBspTree(void)
 	cout << "\tPolygons splitted: " << nSplits << endl;
 	cout << "\tTotal polygons in tree after splits: " << nPolys + nSplits << endl;
 	cout << "\tNumber of leaves in tree: " << nLeaves << endl;
+	cout << "\tNumber of nodes in tree: " << nNodes << endl;
 	cout << "\tMinimun number of polys assigned in node: " << lessPolysInNodeFound << endl;
 	cout << "\tMaximum depth allowed: " << maxDepth << endl;
 	cout << "\tDepth reached: " << depthReached << endl;
@@ -575,52 +570,6 @@ void
 C_BspTree::TessellatePolygons(void)
 {
 	C_BspNode::TessellatePolygonsInLeaves(headNode);
-}
-
-/// Populates both the PVS and connectedLeaves vectors
-void
-C_BspTree::FindConnectedLeaves(void)
-{
-   assert(nLeaves == leaves.size());
-
-	for(int i = 0 ; i < nLeaves ; i++) {
-		leaves[i]->visibleFrom = new bool[nLeaves];
-		leaves[i]->checkedVisibilityWith = new bool[nLeaves];
-
-		memset(leaves[i]->visibleFrom, false, nLeaves * sizeof(bool));
-		memset(leaves[i]->checkedVisibilityWith, false, nLeaves * sizeof(bool));
-	}
-
-	for(int i = 0; i < nLeaves; i++) {
-		for(int j = 0; j < nLeaves; j++) {
-			if(i == j || leaves[j]->visibleFrom[i] || leaves[i]->visibleFrom[j])
-				continue;
-
-         /// Loop through point sets
-			for(unsigned int p1 = 0; p1 < leaves[i]->pointSet.size(); p1++) {
-				for(unsigned int p2 = 0; p2 < leaves[j]->pointSet.size(); p2++) {
-					if(FLOAT_EQ(leaves[i]->pointSet[p1].x, leaves[j]->pointSet[p2].x) &&
-                  FLOAT_EQ(leaves[i]->pointSet[p1].y, leaves[j]->pointSet[p2].y) &&
-						FLOAT_EQ(leaves[i]->pointSet[p1].z, leaves[j]->pointSet[p2].z)) {
-						if(leaves[j]->visibleFrom[i] == false) {
-							leaves[j]->connectedLeaves.push_back(leaves[i]);
-							leaves[j]->PVS.push_back(leaves[i]);
-							leaves[j]->visibleFrom[i] = true;
-						}
-
-						if(leaves[i]->visibleFrom[j] == false) {
-							leaves[i]->connectedLeaves.push_back(leaves[j]);
-							leaves[i]->PVS.push_back(leaves[j]);
-							leaves[i]->visibleFrom[j] = true;
-						}
-
-						p1 = leaves[i]->pointSet.size();
-						break;
-					}
-				}
-			}
-		}
-	}
 }
 
 void
