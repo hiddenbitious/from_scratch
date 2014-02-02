@@ -630,7 +630,7 @@ C_BspTree::ReadMapFile(const char *filename)
    if(!readMap(filename))
       return false;
 
-   /// Count walls in map
+   /// Count wall tiles in map
    int nWalls = 0;
    for(int x = 0; x < TILES_ON_X; x++) {
       for(int y = 0; y < TILES_ON_Y; y++) {
@@ -646,9 +646,11 @@ C_BspTree::ReadMapFile(const char *filename)
    pRawPolys = new poly_t *[nPolys];
    /// Use just one brush
    nBrushes = 1;
-   pBrushes = new brush_t[1];
+   pBrushes = new brush_t[nBrushes];
+
    pBrushes[0].nPolys = nPolys;
    pBrushes[0].pPolys = new poly_t[nPolys];
+
    int wall = 0;
    C_TexCoord center;
 
@@ -662,6 +664,8 @@ C_BspTree::ReadMapFile(const char *filename)
          /// Generate vertices from tile coordinates
          center.u = x * tileSize + tileSize / 2.0f;
          center.v = y * tileSize + tileSize / 2.0f;
+
+         printf("tile: (%d, %d) center(%f, %f)\n",x, y, center.u, center.v);
 
          /// Left wall
          pBrushes[0].pPolys[wall].nVertices = 4;
@@ -704,13 +708,13 @@ C_BspTree::ReadMapFile(const char *filename)
          pBrushes[0].pPolys[wall].pVertices[1].y = -tileSize / 2.0f;
          pBrushes[0].pPolys[wall].pVertices[1].z = center.v + tileSize / 2.0f;
 
-         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].z = center.v + tileSize / 2.0f;
 
-         pBrushes[0].pPolys[wall].pVertices[0].x = center.u - tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].z = center.v + tileSize / 2.0f;
          ++wall;
 
          /// Right wall
@@ -729,13 +733,13 @@ C_BspTree::ReadMapFile(const char *filename)
          pBrushes[0].pPolys[wall].pVertices[1].y = -tileSize / 2.0f;
          pBrushes[0].pPolys[wall].pVertices[1].z = center.v - tileSize / 2.0f;
 
-         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].z = center.v - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].z = center.v - tileSize / 2.0f;
 
-         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].z = center.v + tileSize / 2.0f;
          ++wall;
 
          /// Back wall
@@ -750,17 +754,17 @@ C_BspTree::ReadMapFile(const char *filename)
          pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
          pBrushes[0].pPolys[wall].pVertices[0].z = center.v - tileSize / 2.0f;
 
-         pBrushes[0].pPolys[wall].pVertices[1].x = center.u + tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[1].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].y = -tileSize / 2.0f;
          pBrushes[0].pPolys[wall].pVertices[1].z = center.v - tileSize / 2.0f;
 
-         pBrushes[0].pPolys[wall].pVertices[0].x = center.u - tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].z = center.v - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].z = center.v - tileSize / 2.0f;
 
-         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].z = center.v - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].z = center.v - tileSize / 2.0f;
          ++wall;
 
          /// Top/roof wall
@@ -779,18 +783,18 @@ C_BspTree::ReadMapFile(const char *filename)
          pBrushes[0].pPolys[wall].pVertices[1].y = tileSize / 2.0f;
          pBrushes[0].pPolys[wall].pVertices[1].z = center.v - tileSize / 2.0f;
 
-         pBrushes[0].pPolys[wall].pVertices[0].x = center.u - tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].z = center.v - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].z = center.v - tileSize / 2.0f;
 
-         pBrushes[0].pPolys[wall].pVertices[0].x = center.u - tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
-         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].z = center.v + tileSize / 2.0f;
          ++wall;
       }
    }
 
-   assert(wall == 5 * nWalls);
+   assert(wall == nPolys);
 
 	CalcNorms();
    return true;
