@@ -23,8 +23,8 @@
 class C_BspNode;
 class C_BspTree;
 
-#define BACK		0
-#define FRONT		1
+#define BACK		   0
+#define FRONT		   1
 #define INTERSECTS	2
 #define COINCIDENT	3
 

@@ -306,9 +306,9 @@ C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
 
    geometry[bestPlane]->usedAsDivider = true;
    // Keep plane's information so we can draw it
-   debug.push_back(finalPlane->points[0]);
-   debug.push_back(finalPlane->points[1]);
-   debug.push_back(finalPlane->points[2]);
+//   debug.push_back(finalPlane->points[0]);
+//   debug.push_back(finalPlane->points[1]);
+//   debug.push_back(finalPlane->points[2]);
 
    return found;
 }

@@ -16,7 +16,7 @@ int leavesDrawn;
 int nodesDrawn;
 int nConvexRooms;
 
-vector<C_Vertex> debug;
+const static float tileSize = 20.0f;
 
 C_BspTree::C_BspTree(USHORT depth)
 {
@@ -39,7 +39,6 @@ C_BspTree::C_BspTree(USHORT depth)
 	nNodesToDraw = 0;
 	nNodes = 0;
 }
-
 
 C_BspTree::~C_BspTree(void)
 {
@@ -108,6 +107,7 @@ C_BspTree::ReadGeometryFile(const char* fileName)
 	for(int i = 0 ; i < nBrushes ; i++) {
 		/// ...read number of polys
 		file.read((char*)&pBrushes[i].nPolys , sizeof(int));
+		cout << pBrushes[i].nPolys << endl;
 
 		pBrushes[i].pPolys = new poly_t[pBrushes[i].nPolys];
 
@@ -592,10 +592,10 @@ C_BspTree::WritePVSFile(const char *fileName)
 }
 
 bool
-C_BspTree::ReadPVSFile(const char *fileName)
+C_BspTree::ReadPVSFile(const char *filename)
 {
 	fstream filestr;
-	filestr.open(fileName , fstream::in);
+	filestr.open(filename , fstream::in);
 
 	if(filestr.fail()) {
 		return false;
@@ -621,5 +621,224 @@ C_BspTree::ReadPVSFile(const char *fileName)
 		}
 	}
 
+	return true;
+}
+
+bool
+C_BspTree::ReadMapFile(const char *filename)
+{
+   if(!readMap(filename))
+      return false;
+
+   /// Count walls in map
+   int nWalls = 0;
+   for(int x = 0; x < TILES_ON_X; x++) {
+      for(int y = 0; y < TILES_ON_Y; y++) {
+         nWalls += tiles[x][y].getType() == 1;
+      }
+   }
+
+   printf("%s: nWalls: %d nPolys: %d\n", __FUNCTION__, nWalls, nWalls * 5);
+
+   /// Allocate raw polys
+   /// 4 faces for each wall + 1 for top/roof
+   nPolys = nWalls * 5;
+   pRawPolys = new poly_t *[nPolys];
+   /// Use just one brush
+   nBrushes = 1;
+   pBrushes = new brush_t[1];
+   pBrushes[0].nPolys = nPolys;
+   pBrushes[0].pPolys = new poly_t[nPolys];
+   int wall = 0;
+   C_TexCoord center;
+
+   /// Generate wall geometry
+   for(int x = 0; x < TILES_ON_X; x++) {
+      for(int y = 0; y < TILES_ON_Y; y++) {
+         if(tiles[x][y].getType() != 1) {
+            continue;
+         }
+
+         /// Generate vertices from tile coordinates
+         center.u = x * tileSize + tileSize / 2.0f;
+         center.v = y * tileSize + tileSize / 2.0f;
+
+         /// Left wall
+         pBrushes[0].pPolys[wall].nVertices = 4;
+         pBrushes[0].pPolys[wall].pVertices = new C_Vertex[4];
+         pBrushes[0].pPolys[wall].pNorms = new C_Vertex[4];
+
+         pRawPolys[wall] = &pBrushes[0].pPolys[wall];
+			pRawPolys[wall]->usedAsDivider = false;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[1].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].z = center.v + tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[2].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[2].z = center.v - tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[3].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].y = -tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[3].z = center.v - tileSize / 2.0f;
+         ++wall;
+
+         /// Front wall
+         pBrushes[0].pPolys[wall].nVertices = 4;
+         pBrushes[0].pPolys[wall].pVertices = new C_Vertex[4];
+         pBrushes[0].pPolys[wall].pNorms = new C_Vertex[4];
+
+         pRawPolys[wall] = &pBrushes[0].pPolys[wall];
+			pRawPolys[wall]->usedAsDivider = false;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[1].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].y = -tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].z = center.v + tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+         ++wall;
+
+         /// Right wall
+         pBrushes[0].pPolys[wall].nVertices = 4;
+         pBrushes[0].pPolys[wall].pVertices = new C_Vertex[4];
+         pBrushes[0].pPolys[wall].pNorms = new C_Vertex[4];
+
+         pRawPolys[wall] = &pBrushes[0].pPolys[wall];
+			pRawPolys[wall]->usedAsDivider = false;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[1].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].y = -tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].z = center.v - tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v - tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+         ++wall;
+
+         /// Back wall
+         pBrushes[0].pPolys[wall].nVertices = 4;
+         pBrushes[0].pPolys[wall].pVertices = new C_Vertex[4];
+         pBrushes[0].pPolys[wall].pNorms = new C_Vertex[4];
+
+         pRawPolys[wall] = &pBrushes[0].pPolys[wall];
+			pRawPolys[wall]->usedAsDivider = false;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v - tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[1].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].z = center.v - tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v - tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v - tileSize / 2.0f;
+         ++wall;
+
+         /// Top/roof wall
+         pBrushes[0].pPolys[wall].nVertices = 4;
+         pBrushes[0].pPolys[wall].pVertices = new C_Vertex[4];
+         pBrushes[0].pPolys[wall].pNorms = new C_Vertex[4];
+
+         pRawPolys[wall] = &pBrushes[0].pPolys[wall];
+			pRawPolys[wall]->usedAsDivider = false;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[1].x = center.u + tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[1].z = center.v - tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v - tileSize / 2.0f;
+
+         pBrushes[0].pPolys[wall].pVertices[0].x = center.u - tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
+         pBrushes[0].pPolys[wall].pVertices[0].z = center.v + tileSize / 2.0f;
+         ++wall;
+      }
+   }
+
+   assert(wall == 5 * nWalls);
+
+	CalcNorms();
+   return true;
+}
+
+bool
+C_BspTree::readMap(const char *fileName)
+{
+	int _xTiles, _yTiles, _tileSize, tmp, nTiles, _x, _y;
+	int i, c;
+	char buf[MAX_PARAMETER_LENGTH];
+
+	FILE *fd;
+
+	if((fd = fopen(fileName, "r")) == NULL)
+		return false;
+
+	fscanf(fd, "%d", &_xTiles);		/// Read size on x.
+	fscanf(fd, "%d", &_yTiles);		/// Read size on y.
+	fscanf(fd, "%d", &nTiles);		   /// Read number of tiles stored in file.
+	fscanf(fd, "%f", &_tileSize);	   /// Read tile size (not used).
+
+   assert(_xTiles == TILES_ON_X);
+   assert(_yTiles == TILES_ON_Y);
+   assert(nTiles <= TILES_ON_X * TILES_ON_Y);
+
+	for(i = 0; i < nTiles; i++) {
+		fscanf(fd, "%d", &_x);			/// Read x coords
+		fscanf(fd, "%d", &_y);			/// Read y coords
+		c = fscanf(fd, "%d", &tmp);	/// Read tile type
+		assert(_x < TILES_ON_X);
+		assert(_y < TILES_ON_Y);
+		assert(tmp <= MAX_TILE_TYPES);
+
+		tiles[_x][_y].setType(tmp);
+		tiles[_x][_y].setCoordX(_x);
+		tiles[_x][_y].setCoordY(_y);
+
+   	/// There's a parameter. Read it.
+		if(!c) {
+		   /// fgets doesn't stop at white spaces but it stops at '\n'
+			fgets(buf, MAX_PARAMETER_LENGTH, fd);
+			tiles[_x][_y].setParameter(buf);
+		   /// One loop is lost everytime a parameter is read.
+			--i;
+		}
+	}
+
+	fclose(fd);
 	return true;
 }

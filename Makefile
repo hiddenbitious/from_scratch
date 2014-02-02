@@ -8,11 +8,11 @@ GLUT_PATH=/usr/lib/x86_64-linux-gnu/
 #LDFLAGS=-Wl,-rpath=../oglRenderer
 LDFLAGS=
 #LIBS=-L$(GLEW_PATH) -L$(GL_PATH) -lm -lGL -lglut -lGLU -lGLEW -L../oglRenderer -lOglRenderer
-LIBS=-L$(GLEW_PATH) -L$(GL_PATH) -lm -lGL -lglut -lGLU -lGLEW
+LIBS=-L$(GLEW_PATH) -L$(GL_PATH) -lm -lGL -lglut -lGLU -lGLEW -lpthread
 
 SOURCES=main.cpp bbox.cpp metaballs/cubeGrid.cpp quaternion.cpp \
 		  math.cpp frustum.cpp vectors.cpp plane.cpp camera.cpp timer.cpp glsl/glsl.cpp \
-		  bspTree.cpp bspNode.cpp bspHelperFunctions.cpp
+		  bspTree.cpp bspNode.cpp bspHelperFunctions.cpp map.cpp tile.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=from_scratch
 

@@ -86,6 +86,7 @@ Initializations(void)
 	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
 
 	/// Backface culling
+	glDisable(GL_CULL_FACE);
 //	glEnable(GL_CULL_FACE);
 //	glFrontFace(GL_CCW);
 //	glCullFace(GL_BACK);
@@ -105,11 +106,12 @@ Initializations(void)
 
 	// Diabase tin geometria gia to bsp
 	bspTest = new C_BspTree(15);
-	bspTest->ReadGeometryFile("properMap2.BSP");
+//	bspTest->ReadGeometryFile("properMap2.BSP");
+	bspTest->ReadMapFile("map.txt");
 
 	// Kataskeuase bsp kai pvs
 	bspTest->BuildBspTree();
-	bspTest->BuildPVS();
+//	bspTest->BuildPVS();
 
 	/// metaballs initialization
 	grid = new C_CubeGrid();
@@ -183,32 +185,32 @@ Draw(void)
    grid->Update(metaball , 3 , NULL);
    grid->Draw(NULL);
 
-	switch(bspRenderingType) {
-		case 0:
-		   /// Draw tree using PVS
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			mapPolys = bspTest->Draw_PVS(&cameraPosition);
-			break;
-
-      case 1:
+//	switch(bspRenderingType) {
+//		case 0:
+//		   /// Draw tree using PVS
+//			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//			mapPolys = bspTest->Draw_PVS(&cameraPosition);
+//			break;
+//
+//      case 1:
          /// Draw the whole tree without PVS
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			mapPolys = bspTest->Draw2(&cameraPosition);
-			break;
-
-		case 2:
-		   /// Draw PVS in wireframe mode
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			mapPolys = bspTest->Draw_PVS(&cameraPosition);
-			break;
-
-      case 3:
-  			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-         mapPolys = bspTest->Draw2(&cameraPosition);
-         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			bspTest->Draw3();
-			break;
-	}
+//			break;
+//
+//		case 1:
+//		   /// Draw PVS in wireframe mode
+//			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//			mapPolys = bspTest->Draw_PVS(&cameraPosition);
+//			break;
+//
+////      case 3:
+////  			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+////         mapPolys = bspTest->Draw2(&cameraPosition);
+////         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+////			bspTest->Draw3();
+////			break;
+//	}
 
 #ifndef JNI_COMPATIBLE
 	/// Print text on screem
@@ -292,18 +294,18 @@ hande_simple_keys(unsigned char key , int x , int y)
 			break;
 
 		case 'x' : case 'X' :
-			bspRenderingType = (bspRenderingType + 1) % 4;
+			bspRenderingType = (bspRenderingType + 1) % 2;
 			printf("bspRenderingType: %d\n", bspRenderingType);
 			break;
 
 		case 'q' : case 'Q' :{
 			bspTest->IncreaseLeavesDrawn();
 
-			printf("Drawing leaf: %d (%d)\n", bspTest->leafToDraw, bspTest->leaves[bspTest->leafToDraw]->nodeID);
+			printf("Drawing leaf: %d (%lu)\n", bspTest->leafToDraw, bspTest->leaves[bspTest->leafToDraw]->nodeID);
 			int nleaves = bspTest->leaves[bspTest->leafToDraw]->connectedLeaves.size();
 			printf("Connected leaves: %d\n", nleaves);
 			for(int i = 0; i < nleaves; i++) {
-   			printf("%d, ", bspTest->leaves[bspTest->leafToDraw]->connectedLeaves[i]->nodeID);
+   			printf("%lu, ", bspTest->leaves[bspTest->leafToDraw]->connectedLeaves[i]->nodeID);
          }
          printf("\n\n");
 
@@ -313,11 +315,11 @@ hande_simple_keys(unsigned char key , int x , int y)
 		case 'w' : case 'W' :{
 			bspTest->DecreaseLeavesDrawn();
 
-			printf("Drawing leaf: %d (%d)\n", bspTest->leafToDraw, bspTest->leaves[bspTest->leafToDraw]->nodeID);
+			printf("Drawing leaf: %d (%lu)\n", bspTest->leafToDraw, bspTest->leaves[bspTest->leafToDraw]->nodeID);
 			int nleaves = bspTest->leaves[bspTest->leafToDraw]->connectedLeaves.size();
 			printf("Connected leaves: %d\n", nleaves);
 			for(int i = 0; i < nleaves; i++) {
-   			printf("%d, ", bspTest->leaves[bspTest->leafToDraw]->connectedLeaves[i]->nodeID);
+   			printf("%ld, ", bspTest->leaves[bspTest->leafToDraw]->connectedLeaves[i]->nodeID);
          }
          printf("\n\n");
 
@@ -365,7 +367,7 @@ int
 main(int argc, char* argv[])
 {
 #ifndef JNI_COMPATIBLE
-	glutInit(&argc , argv);
+	glutInit(&argc, argv);
 
 	/// Double buffering with depth buffer
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);

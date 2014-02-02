@@ -1,19 +1,3 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
@@ -34,6 +18,7 @@
 #	include <limits>
 #	include <assert.h>
 #	include <GL/glew.h>
+using namespace std;
 #endif
 
 typedef unsigned long ULONG;
