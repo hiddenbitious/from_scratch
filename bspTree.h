@@ -36,9 +36,7 @@ class C_BspTree {
 		USHORT nNodesToDraw;
 
    private:
-//      static const float tileSize = 10.0f;
-      bool readMap(const char *filename);
-      tile tiles[TILES_ON_X][TILES_ON_Y];
+      C_Map *map;
 
 	public:
 		C_BspTree(USHORT depth);

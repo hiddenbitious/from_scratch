@@ -9,16 +9,30 @@
 #define TILES_ON_X                   80
 #define TILES_ON_Y                   50
 
+typedef struct {
+   /// Tile center
+   int x, y;
+   /// Tile size
+   int width, height;
+} mergedTile_t;
+
 class C_Map {
+   friend class C_BspTree;
+
 public:
    C_Map(void) {};
+   ~C_Map(void);
    bool readMap(const char *filename);
-   void Draw(void);
+   void mergeTiles(void);
+//   void Draw(void);
 
 private:
    float tileSize;
-   tile tiles[80][50];							   /// Holds the tile data
+   tile tiles[80][50];
+   vector<mergedTile_t> mergedTiles;
 
+   void firstPass(int x, int y, bool **visitedTiles);
+   void secondPass(void);
 };
 
 #endif
