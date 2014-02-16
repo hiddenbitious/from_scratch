@@ -93,8 +93,8 @@ class C_BspNode {
 		void DrawPointSet(void);
 
 
-		static void Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
-		static void Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
+		static void Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, bool usePVS);
+//		static void Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
 		void Draw(C_GLShader *shader);
 
 		/// Brakes down CONVEX polygon of 4 or 5 vertices into triangles.

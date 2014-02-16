@@ -394,48 +394,19 @@ C_BspNode::SplitPolygon(C_Plane *plane , poly_t *polygon , poly_t **front , poly
 }
 
 void
-C_BspNode::Draw(C_Vector3* cameraPosition, C_BspNode* node, C_BspTree* tree)
+C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, bool usePVS)
 {
-   float side;
-   if(!node) {
-      return;
-   }
-
    if(!node->isLeaf) {
-      side = node->partitionPlane.distanceFromPoint(cameraPosition);
-
-//		node->partitionPlane.Draw ();
-//		node->bbox->Draw ( 1.0f , 0.0f , 0.0f );
-//		node->DrawPointSet ();
+      float side = node->partitionPlane.distanceFromPoint(cameraPosition);
 
       if(side > 0.0f) {
-         C_BspNode::Draw(cameraPosition, node->backNode, tree);
-         C_BspNode::Draw(cameraPosition, node->frontNode, tree);
+         if(!usePVS)
+            C_BspNode::Draw(cameraPosition, node->backNode, tree, usePVS);
+         C_BspNode::Draw(cameraPosition, node->frontNode, tree, usePVS);
       } else {
-         C_BspNode::Draw(cameraPosition, node->frontNode, tree);
-         C_BspNode::Draw(cameraPosition, node->backNode, tree);
-      }
-   } else {
-      node->Draw(bspShader);
-      polyCount += node->nPolys;
-   }
-}
-
-void
-C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree)
-{
-   float side;
-   if(!node) {
-      return;
-   }
-
-   if(!node->isLeaf) {
-      side = node->partitionPlane.distanceFromPoint(cameraPosition);
-
-      if(side > 0.0f) {
-         C_BspNode::Draw_PVS(cameraPosition, node->frontNode, tree);
-      } else {
-         C_BspNode::Draw_PVS(cameraPosition, node->backNode, tree);
+         if(!usePVS)
+            C_BspNode::Draw(cameraPosition, node->frontNode, tree, usePVS);
+         C_BspNode::Draw(cameraPosition, node->backNode, tree, usePVS);
       }
    } else {
       if(node->drawn) {
@@ -445,19 +416,22 @@ C_BspNode::Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tre
       node->drawn = true;
       node->Draw(bspShader);
       node->DrawPointSet();
+      polyCount += node->nPolys;
 
-      for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
-         if(node->PVS[i]->drawn) {
-            continue;
+      if(usePVS) {
+         for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
+            if(node->PVS[i]->drawn) {
+               continue;
+            }
+
+            node->PVS[i]->drawn = true;
+            node->PVS[i]->Draw(bspShader);
+
+            node->PVS[i]->bbox->Draw();
+   //			node->PVS[i]->DrawPointSet();
+
+            polyCount += node->PVS[i]->nPolys;
          }
-
-         node->PVS[i]->drawn = true;
-         node->PVS[i]->Draw(bspShader);
-
-			node->PVS[i]->bbox->Draw();
-//			node->PVS[i]->DrawPointSet();
-
-         polyCount += node->PVS[i]->nPolys;
       }
    }
 }

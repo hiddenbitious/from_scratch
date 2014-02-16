@@ -492,19 +492,24 @@ C_BspTree::Draw2(C_Vector3* cameraPosition)
 	leavesDrawn = 0;
 	nodesDrawn = 0;
 
+	/// Set all leaves as non drawn
+	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
+		leaves[i]->drawn = false;
+	}
+
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
 	shaderManager->pushShader(bspShader);
-   glEnableVertexAttribArray(bspShader->verticesAttribLocation);
-	glEnableVertexAttribArray(bspShader->normalsAttribLocation);
+      glEnableVertexAttribArray(bspShader->verticesAttribLocation);
+      glEnableVertexAttribArray(bspShader->normalsAttribLocation);
 
-	ESMatrix mat = globalModelviewMatrix;
-	esTranslate(&mat, position.x , position.y , position.z);
+      ESMatrix mat = globalModelviewMatrix;
+      esTranslate(&mat, position.x , position.y , position.z);
 
-	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
-	C_BspNode::Draw(cameraPosition, headNode, this);
-	glFlush();
+      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+      C_BspNode::Draw(cameraPosition, headNode, this, false);
+//      glFlush();
 	shaderManager->popShader();
 
 	return polyCount;
@@ -523,11 +528,11 @@ C_BspTree::Draw3(void)
 	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
 	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
-	C_BspNode::Draw(NULL, leaves[leafToDraw], this);
+	C_BspNode::Draw(NULL, leaves[leafToDraw], this, false);
 
    if(drawConnectedToo) {
       for(unsigned int j = 0 ; j < leaves[leafToDraw]->connectedLeaves.size() ; j++) {
-         C_BspNode::Draw(NULL, leaves[leafToDraw]->connectedLeaves[j], this);
+         C_BspNode::Draw(NULL, leaves[leafToDraw]->connectedLeaves[j], this, false);
    //		leaves[leafToDraw]->connectedLeaves[j]->Draw(bspShader);
       }
    }
@@ -559,9 +564,9 @@ C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
-      glFrontFace(GL_CW);
-      C_BspNode::Draw_PVS(cameraPosition, headNode, this);
-      glFrontFace(GL_CCW);
+//      glFrontFace(GL_CW);
+      C_BspNode::Draw(cameraPosition, headNode, this, true);
+//      glFrontFace(GL_CCW);
    }
    shaderManager->popShader();
 
