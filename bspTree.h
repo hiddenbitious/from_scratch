@@ -5,7 +5,6 @@
 #include "plane.h"
 #include "trimesh.h"
 #include "bspCommon.h"
-#include "map.h"
 
 #include <vector>
 #include <iostream>
@@ -35,18 +34,12 @@ class C_BspTree {
 		USHORT leafToDraw;
 		USHORT nNodesToDraw;
 
-   private:
-      C_Map *map;
-
 	public:
 		C_BspTree(USHORT depth);
 		~C_BspTree();
 
 		/// Read geometry file
 		bool ReadGeometryFile(const char* fileName);
-
-		/// Read a map created with the editor and generate the geometry
-		bool ReadMapFile(const char* fileName);
 
 		void WritePVSFile(const char *fileName);
 		bool ReadPVSFile(const char *fileName);

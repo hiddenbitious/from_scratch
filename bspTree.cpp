@@ -16,8 +16,6 @@ int leavesDrawn;
 int nodesDrawn;
 int nConvexRooms;
 
-const static float tileSize = 20.0f;
-
 C_BspTree::C_BspTree(USHORT depth)
 {
 	nBrushes = 0;
@@ -26,7 +24,6 @@ C_BspTree::C_BspTree(USHORT depth)
 	pBrushes = NULL;
 	headNode = NULL;
 	pRawPolys = NULL;
-	map = NULL;
 
 	maxDepth = depth;
 	lessPolysInNodeFound = INT_MAX;
@@ -54,9 +51,6 @@ C_BspTree::~C_BspTree(void)
 
 	delete[] pBrushes;
 	delete[] pRawPolys;
-
-	if(map)
-	   delete map;
 }
 
 
@@ -87,31 +81,34 @@ C_BspTree::DecreaseNodesDrawn()
 bool
 C_BspTree::ReadGeometryFile(const char* fileName)
 {
-	printf("%s\n", __FUNCTION__);
+   printf("\n**********\n");
+	printf("%s: Reading geometry file \"%s\"\n", __FUNCTION__, fileName);
 
 	ifstream file(fileName , ios::in | ios::binary);
 
 	if(!file.is_open()) {
-		cout << "Couldn't open \"" << fileName << "\"" << endl;
+	   printf("Couldn't open \"%s\"\n", fileName);
+	   assert(0);
 		return false;
 	}
 
 	file.read((char*)&nPolys , sizeof(int));
-	cout << nPolys << endl;
+	printf("Total number of polygons: %d\n", nPolys);
 	pRawPolys = new poly_t*[nPolys];
 	int currentPoly = 0;
 
 	/// Read number of brushes/meshes
 	file.read((char*)&nBrushes , sizeof(int));
-	cout << nBrushes << endl;
+	printf("Number of brushes: %d\n", nBrushes);
+	printf("Reading brushes...\n");
 
 	pBrushes = new brush_t[nBrushes];
 
 	/// For each brush...
 	for(int i = 0 ; i < nBrushes ; i++) {
 		/// ...read number of polys
-		file.read((char*)&pBrushes[i].nPolys , sizeof(int));
-		cout << pBrushes[i].nPolys << endl;
+		file.read((char*)&pBrushes[i].nPolys, sizeof(int));
+		printf("   brush %d: %d polys\n", i, pBrushes[i].nPolys);
 
 		pBrushes[i].pPolys = new poly_t[pBrushes[i].nPolys];
 
@@ -144,6 +141,8 @@ C_BspTree::ReadGeometryFile(const char* fileName)
 
 	assert(currentPoly == nPolys);
 
+   printf("**********\n");
+
 	CalcNorms();
 	return true;
 }
@@ -167,7 +166,6 @@ C_BspTree::Draw(void)
 void
 C_BspTree::CalcNorms(void)
 {
-	printf("%s\n", __FUNCTION__);
 	C_Vector3 norm;
 
 	// For each brush
@@ -193,7 +191,7 @@ C_BspTree::BuildPVS(void)
 
 	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-	pvsFileFound = this->ReadPVSFile("pvs.txt");
+//	pvsFileFound = this->ReadPVSFile("pvs_correct.txt");
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points..." << flush;
@@ -210,11 +208,9 @@ C_BspTree::BuildPVS(void)
 	cout << "Done!" << endl << endl;
 
 	/// Write PVS into a file
-	if(!pvsFileFound) {
-		WritePVSFile("pvs.txt");
-	}
-
-//   exit(0);
+//	if(!pvsFileFound) {
+//		WritePVSFile("pvs.txt");
+//	}
 }
 
 typedef struct {
@@ -631,178 +627,4 @@ C_BspTree::ReadPVSFile(const char *filename)
 	}
 
 	return true;
-}
-
-bool
-C_BspTree::ReadMapFile(const char *filename)
-{
-   if(!map)
-      map = new C_Map();
-
-   if(!map->readMap(filename))
-      return false;
-
-   /// Count wall tiles in map
-   int nWalls = map->mergedTiles.size();
-
-   /// Allocate raw polys
-   /// 4 faces for each wall + 1 for top/roof
-   nPolys = nWalls * 5;
-   pRawPolys = new poly_t *[nPolys];
-   /// Use just one brush
-   nBrushes = 1;
-   pBrushes = new brush_t[nBrushes];
-
-   pBrushes[0].nPolys = nPolys;
-   pBrushes[0].pPolys = new poly_t[nPolys];
-
-   printf("\n*****\n");
-   printf("%s: nWalls: %d nPolys: %d\n", __FUNCTION__, nWalls, nWalls * 5);
-
-   int wall = 0;
-   C_TexCoord center;
-   C_TexCoord halfDims;
-   /// Generate wall geometry
-   for(int i = 0; i < map->mergedTiles.size(); i++) {
-
-      /// Generate vertices from tile coordinates
-      halfDims.u = map->mergedTiles[i].width * tileSize / 2.0f;
-      halfDims.v = map->mergedTiles[i].height * tileSize / 2.0f;
-      center.u = map->mergedTiles[i].x * tileSize + halfDims.u;
-      center.v = map->mergedTiles[i].y * tileSize + halfDims.v;
-
-      printf("\ttile: (%d, %d) center(%f, %f)\n", map->mergedTiles[i].x, map->mergedTiles[i].y, center.u, center.v);
-
-      /// Left wall
-      pBrushes[0].pPolys[wall].nVertices = 4;
-      pBrushes[0].pPolys[wall].pVertices = new C_Vertex[4];
-      pBrushes[0].pPolys[wall].pNorms = new C_Vertex[4];
-      pBrushes[0].pPolys[wall].usedAsDivider = false;
-
-      pRawPolys[wall] = &pBrushes[0].pPolys[wall];
-
-      pBrushes[0].pPolys[wall].pVertices[0].x = center.u - halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[0].z = center.v + halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[1].x = center.u - halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[1].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[1].z = center.v + halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[2].x = center.u - halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[2].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[2].z = center.v - halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[3].x = center.u - halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[3].y = -tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[3].z = center.v - halfDims.v;
-      ++wall;
-
-      /// Front wall
-      pBrushes[0].pPolys[wall].nVertices = 4;
-      pBrushes[0].pPolys[wall].pVertices = new C_Vertex[4];
-      pBrushes[0].pPolys[wall].pNorms = new C_Vertex[4];
-      pBrushes[0].pPolys[wall].usedAsDivider = false;
-
-      pRawPolys[wall] = &pBrushes[0].pPolys[wall];
-
-      pBrushes[0].pPolys[wall].pVertices[0].x = center.u - halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[0].z = center.v + halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[1].x = center.u + halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[1].y = -tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[1].z = center.v + halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[2].x = center.u + halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[2].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[2].z = center.v + halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[3].x = center.u - halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[3].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[3].z = center.v + halfDims.v;
-      ++wall;
-
-      /// Right wall
-      pBrushes[0].pPolys[wall].nVertices = 4;
-      pBrushes[0].pPolys[wall].pVertices = new C_Vertex[4];
-      pBrushes[0].pPolys[wall].pNorms = new C_Vertex[4];
-      pBrushes[0].pPolys[wall].usedAsDivider = false;
-
-      pRawPolys[wall] = &pBrushes[0].pPolys[wall];
-
-      pBrushes[0].pPolys[wall].pVertices[0].x = center.u + halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[0].z = center.v + halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[1].x = center.u + halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[1].y = -tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[1].z = center.v - halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[2].x = center.u + halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[2].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[2].z = center.v - halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[3].x = center.u + halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[3].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[3].z = center.v + halfDims.v;
-      ++wall;
-
-      /// Back wall
-      pBrushes[0].pPolys[wall].nVertices = 4;
-      pBrushes[0].pPolys[wall].pVertices = new C_Vertex[4];
-      pBrushes[0].pPolys[wall].pNorms = new C_Vertex[4];
-      pBrushes[0].pPolys[wall].usedAsDivider = false;
-
-      pRawPolys[wall] = &pBrushes[0].pPolys[wall];
-
-      pBrushes[0].pPolys[wall].pVertices[0].x = center.u + halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[0].y = -tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[0].z = center.v - halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[1].x = center.u - halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[1].y = -tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[1].z = center.v - halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[2].x = center.u - halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[2].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[2].z = center.v - halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[3].x = center.u + halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[3].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[3].z = center.v - halfDims.v;
-      ++wall;
-
-      /// Top/roof wall
-      pBrushes[0].pPolys[wall].nVertices = 4;
-      pBrushes[0].pPolys[wall].pVertices = new C_Vertex[4];
-      pBrushes[0].pPolys[wall].pNorms = new C_Vertex[4];
-      pBrushes[0].pPolys[wall].usedAsDivider = false;
-
-      pRawPolys[wall] = &pBrushes[0].pPolys[wall];
-
-      pBrushes[0].pPolys[wall].pVertices[0].x = center.u + halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[0].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[0].z = center.v + halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[1].x = center.u + halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[1].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[1].z = center.v - halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[2].x = center.u - halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[2].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[2].z = center.v - halfDims.v;
-
-      pBrushes[0].pPolys[wall].pVertices[3].x = center.u - halfDims.u;
-      pBrushes[0].pPolys[wall].pVertices[3].y = tileSize / 2.0f;
-      pBrushes[0].pPolys[wall].pVertices[3].z = center.v + halfDims.v;
-      ++wall;
-   }
-
-   printf("*****\n");
-   assert(wall == nPolys);
-
-   CalcNorms();
-
-   return true;
 }
