@@ -29,7 +29,7 @@
 #define MIN(a,b)              (( a < b ) ? a : b)
 
 #define EPSILON               1.0e-4f
-#define FLOAT_EQ(a,b)         ((((b) - EPSILON) <= (a)) && ((a) <= ((b) + EPSILON)))
+#define FLOAT_EQ(a,b)         ((((b) - EPSILON) <= (a)) && (((b) + EPSILON)) >= (a))
 #define FLOAT_GREATER(a, b)   (!(FLOAT_EQ((a), (b))) && (a) > (b))
 #define FLOAT_SMALLER(a, b)   (!(FLOAT_EQ((a), (b))) && (a) < (b))
 

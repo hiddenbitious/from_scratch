@@ -9,8 +9,8 @@
 #define MINIMUMRELATION			0.5f
 #define MINIMUMRELATIONSCALE	2.0f
 
-#define NPOINTS_U 50
-#define NPOINTS_V 50
+#define NPOINTS_U 20
+#define NPOINTS_V 20
 
 C_BspNode::C_BspNode(void)
 {
@@ -66,9 +66,9 @@ C_BspNode::ClassifyVertex(C_Plane *plane , C_Vertex *vertex)
 {
    float dist = plane->distanceFromPoint(vertex);
 
-   if(dist >= -EPSILON && dist <= EPSILON) {
+   if(FLOAT_EQ(dist, 0.0f)) {
       return COINCIDENT;
-   } else 	if(dist > EPSILON) {
+   } else if(dist > EPSILON) {
       return FRONT;
    } else {
       return BACK;
@@ -222,7 +222,7 @@ C_BspNode::BuildBspTree(C_BspNode* node, C_BspTree *tree)
       }
    }
 
-   /// Calculate node's (not leaf) bbox
+   /// Calculate node's bbox
    node->CalculateBBox();
 
    if(nFront) {
@@ -396,6 +396,7 @@ C_BspNode::SplitPolygon(C_Plane *plane , poly_t *polygon , poly_t **front , poly
 void
 C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, bool usePVS)
 {
+   static int lastNode = -1;
    if(!node->isLeaf) {
       float side = node->partitionPlane.distanceFromPoint(cameraPosition);
 
@@ -411,6 +412,11 @@ C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, b
    } else {
       if(node->drawn) {
          return;
+      }
+
+      if(lastNode != node->nodeID) {
+         lastNode = node->nodeID;
+         printf("Entered leaf: %d\n", lastNode);
       }
 
       node->drawn = true;

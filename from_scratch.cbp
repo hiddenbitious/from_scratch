@@ -61,8 +61,6 @@
 		<Unit filename="glsl/glsl.cpp" />
 		<Unit filename="glsl/glsl.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="map.cpp" />
-		<Unit filename="map.h" />
 		<Unit filename="math.cpp" />
 		<Unit filename="math.h" />
 		<Unit filename="mesh.cpp" />

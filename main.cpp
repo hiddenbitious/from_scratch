@@ -86,7 +86,7 @@ Initializations(void)
 	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
 
 	/// Backface culling
-	glDisable(GL_CULL_FACE);
+//	glDisable(GL_CULL_FACE);
 //	glEnable(GL_CULL_FACE);
 //	glFrontFace(GL_CCW);
 //	glCullFace(GL_BACK);
@@ -105,13 +105,15 @@ Initializations(void)
 	camera.zNear = 1.0f;
 
 	// Diabase tin geometria gia to bsp
-	bspTest = new C_BspTree(15);
+	bspTest = new C_BspTree(2);
 //	bspTest->ReadGeometryFile("properMap2.BSP");
-	bspTest->ReadMapFile("map.txt");
+
+	bspTest->ReadGeometryFile("mapGeometry.bsp");
+//	bspTest->ReadMapFile("map.txt");
 
 	// Kataskeuase bsp kai pvs
 	bspTest->BuildBspTree();
-//	bspTest->BuildPVS();
+	bspTest->BuildPVS();
 
 	/// metaballs initialization
 	grid = new C_CubeGrid();
@@ -185,32 +187,32 @@ Draw(void)
    grid->Update(metaball , 3 , NULL);
    grid->Draw(NULL);
 
-//	switch(bspRenderingType) {
-//		case 0:
-//		   /// Draw tree using PVS
-//			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//			mapPolys = bspTest->Draw_PVS(&cameraPosition);
-//			break;
-//
-//      case 1:
+	switch(bspRenderingType) {
+		case 0:
+		   /// Draw tree using PVS
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			mapPolys = bspTest->Draw_PVS(&cameraPosition);
+			break;
+
+      case 1:
          /// Draw the whole tree without PVS
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			mapPolys = bspTest->Draw2(&cameraPosition);
-//			break;
-//
-//		case 1:
-//		   /// Draw PVS in wireframe mode
-//			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//			mapPolys = bspTest->Draw_PVS(&cameraPosition);
-//			break;
-//
-////      case 3:
-////  			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-////         mapPolys = bspTest->Draw2(&cameraPosition);
-////         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-////			bspTest->Draw3();
-////			break;
-//	}
+			break;
+
+		case 2:
+		   /// Draw PVS in wireframe mode
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			mapPolys = bspTest->Draw_PVS(&cameraPosition);
+			break;
+
+      case 3:
+  			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+         mapPolys = bspTest->Draw2(&cameraPosition);
+         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			bspTest->Draw3();
+			break;
+	}
 
 #ifndef JNI_COMPATIBLE
 	/// Print text on screem
@@ -294,7 +296,7 @@ hande_simple_keys(unsigned char key , int x , int y)
 			break;
 
 		case 'x' : case 'X' :
-			bspRenderingType = (bspRenderingType + 1) % 2;
+			bspRenderingType = (bspRenderingType + 1) % 4;
 			printf("bspRenderingType: %d\n", bspRenderingType);
 			break;
 
