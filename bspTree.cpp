@@ -20,7 +20,7 @@ C_BspTree::C_BspTree(USHORT depth)
 {
 	nBrushes = 0;
 	nPolys = 0;
-	scaleFactor = 10.0f;
+	scaleFactor = 1.0f;
 	pBrushes = NULL;
 	headNode = NULL;
 	pRawPolys = NULL;
@@ -100,7 +100,7 @@ C_BspTree::ReadGeometryFile(const char* fileName)
 	/// Read number of brushes/meshes
 	file.read((char*)&nBrushes , sizeof(int));
 	printf("Number of brushes: %d\n", nBrushes);
-	printf("Reading brushes...\n");
+	printf("Reading brushes... \n");
 
 	pBrushes = new brush_t[nBrushes];
 
@@ -191,15 +191,17 @@ C_BspTree::BuildPVS(void)
 
 	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-//	pvsFileFound = this->ReadPVSFile("pvs_correct.txt");
+//	pvsFileFound = this->ReadPVSFile("map_pvs.txt");
 
 	cout << "Building PVS..." << endl;
-	cout << "\tDistributing sample points..." << flush;
+	cout << "\tDistributing sample points... " << flush;
 	C_BspNode::DistributeSamplePoints(headNode , headNode->pointSet);
 	cout << "Done!" << endl;
 
+//   cout << "\tTracing visibility... " << flush;
+
 	if(pvsFileFound) {
-		cout << "Found in file. Skipping calculations." << endl;
+		cout << "\tTracing visibility... Found in file. Skipping calculations." << endl;
 	} else {
 		C_BspTree::TraceVisibility();
 		cout << "Done!" << endl << endl;
@@ -209,7 +211,7 @@ C_BspTree::BuildPVS(void)
 
 	/// Write PVS into a file
 //	if(!pvsFileFound) {
-//		WritePVSFile("pvs.txt");
+//		WritePVSFile("map_pvs.txt");
 //	}
 }
 
@@ -224,7 +226,7 @@ static float progress;
 void *TraceVisibility_Thread(void *data_)
 {
    threadData_t *data = (threadData_t *)data_;
-   int tid = data->tid, s1;
+   int tid = data->tid;
    C_BspTree *tree = data->tree;
    vector<C_BspNode *> &leaves = tree->leaves;
    C_BspNode *leaf1, *leaf2, *leaf3;
@@ -248,8 +250,7 @@ void *TraceVisibility_Thread(void *data_)
 	   leaf1 = leaves[l1];
 		for(unsigned int l2 = 0; l2 < leaf1->PVS.size(); l2++) {
 		   leaf2 = leaf1->PVS[l2];
-         s1 = leaf2->PVS.size();
-         for(unsigned int l3 = 0; l3 < s1; l3++) {
+         for(unsigned int l3 = 0; l3 < leaf2->PVS.size(); l3++) {
             leaf3 = leaf2->PVS[l3];
 
             /// Sanity checks
@@ -324,8 +325,10 @@ C_BspTree::TraceVisibility(void)
 	}
 
 /// Find connected leaves
+/// Two leaves sharing at least one visibility point will be considered as connected
 /// ----------------------
-   printf("\tFinding conected leaves...");
+   printf("\tDetecting conected leaves... ");
+   fflush(stdout);
    gettimeofday(&start, NULL);
 
 	for(i = 0; i < nLeaves; i++) {
@@ -363,6 +366,20 @@ C_BspTree::TraceVisibility(void)
    elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
    elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
    printf("Done! (%.2f ms)\n", elapsedTime);
+
+
+   /// After finding connected leaves try to furter clean up the visibility points
+   printf("\tRemoving redundant visibility points...");
+   fflush(stdout);
+
+   C_BspNode *leaf;
+   for(i = 0; i < nLeaves; i++) {
+      leaf = leaves[i];
+      for(j = 0; j < leaf->PVS.size(); j++) {
+         C_BspNode::CleanUpPointSet(leaf->PVS[j], leaf->pointSet, false);
+      }
+   }
+   printf("Done!\n");
 
 /// Trace visibility
 /// ----------------------
@@ -455,7 +472,7 @@ void
 C_BspTree::BuildBspTree(void)
 {
 	cout << "***********************************************" << endl;
-	cout << "Building bsp tree...";
+	cout << "Building bsp tree... ";
 
 //	ULONG start = timeGetTime ();
 
@@ -524,14 +541,19 @@ C_BspTree::Draw3(void)
 	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
 	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
+	/// Set all leaves as non drawn
+	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
+		leaves[i]->drawn = false;
+	}
+
 	C_BspNode::Draw(NULL, leaves[leafToDraw], this, false);
 
-   if(drawConnectedToo) {
-      for(unsigned int j = 0 ; j < leaves[leafToDraw]->connectedLeaves.size() ; j++) {
-         C_BspNode::Draw(NULL, leaves[leafToDraw]->connectedLeaves[j], this, false);
-   //		leaves[leafToDraw]->connectedLeaves[j]->Draw(bspShader);
-      }
-   }
+//   if(drawConnectedToo) {
+//      for(unsigned int j = 0 ; j < leaves[leafToDraw]->connectedLeaves.size() ; j++) {
+//         C_BspNode::Draw(NULL, leaves[leafToDraw]->connectedLeaves[j], this, false);
+//   //		leaves[leafToDraw]->connectedLeaves[j]->Draw(bspShader);
+//      }
+//   }
 
 	glFlush();
 	shaderManager->popShader();
@@ -579,7 +601,7 @@ void
 C_BspTree::WritePVSFile(const char *fileName)
 {
 	fstream filestr;
-	filestr.open("pvs.txt" , fstream::out);
+	filestr.open(fileName, fstream::out);
 
 	filestr << nLeaves << endl;
 

@@ -82,7 +82,7 @@ class C_BspNode {
 
 		void DistributePointsAlongPartitionPlane(void);
 		static void DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points);
-		static void CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points);
+		static void CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool testBbox);
 
 		vector<C_BspNode*> connectedLeaves;
 		vector<C_BspNode*> PVS;

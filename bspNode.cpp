@@ -557,17 +557,16 @@ C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
 }
 
 void
-C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points)
+C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool testBbox)
 {
    unsigned int cPoint = 0;
 
    /// Remove points outside the bbox
-   while(cPoint < points.size()) {
+   while(cPoint < points.size() && testBbox) {
       if(node->bbox->IsInside(&points[cPoint]) == false) {
          points.erase(points.begin() + cPoint);
          cPoint--;
       }
-
       cPoint++;
    }
 
@@ -590,7 +589,7 @@ void
 C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points)
 {
    // CLEAN UP POINTS
-   CleanUpPointSet(node, points);
+   CleanUpPointSet(node, points, true);
 
    if(node->isLeaf) {
       node->pointSet = points;
@@ -624,7 +623,7 @@ C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points)
 void
 C_BspNode::DistributePointsAlongPartitionPlane(void)
 {
-   C_Vertex min , max , tmp;
+   C_Vertex min, max, tmp;
    float maxU, maxV, minU, minV;
    float tmpU, tmpV;
    maxU = maxV = SMALLEST_FLOAT;
@@ -659,7 +658,9 @@ C_BspNode::DistributePointsAlongPartitionPlane(void)
    for(float uu = minU; uu < maxU; uu += stepU) {
       for(float vv = minV; vv < maxV; vv += stepV) {
          P = A + v0 * uu + v1 * vv;
-         tmp.x = P.x; tmp.y = P.y; tmp.z = P.z;
+         tmp.x = P.x;
+         tmp.y = P.y;
+         tmp.z = P.z;
          pointSet.push_back(tmp);
       }
    }

@@ -105,11 +105,10 @@ Initializations(void)
 	camera.zNear = 1.0f;
 
 	// Diabase tin geometria gia to bsp
-	bspTest = new C_BspTree(2);
+	bspTest = new C_BspTree(4);
 //	bspTest->ReadGeometryFile("properMap2.BSP");
 
 	bspTest->ReadGeometryFile("mapGeometry.bsp");
-//	bspTest->ReadMapFile("map.txt");
 
 	// Kataskeuase bsp kai pvs
 	bspTest->BuildBspTree();
@@ -207,8 +206,8 @@ Draw(void)
 			break;
 
       case 3:
-  			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-         mapPolys = bspTest->Draw2(&cameraPosition);
+//  			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//         mapPolys = bspTest->Draw2(&cameraPosition);
          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			bspTest->Draw3();
 			break;
