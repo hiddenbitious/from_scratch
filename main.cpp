@@ -113,6 +113,7 @@ Initializations(void)
 	// Kataskeuase bsp kai pvs
 	bspTest->BuildBspTree();
 	bspTest->BuildPVS();
+	bspTest->dumpSamplePoints("samplePoints.txt");
 
 	/// metaballs initialization
 	grid = new C_CubeGrid();
@@ -195,7 +196,7 @@ Draw(void)
 
       case 1:
          /// Draw the whole tree without PVS
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			mapPolys = bspTest->Draw2(&cameraPosition);
 			break;
 

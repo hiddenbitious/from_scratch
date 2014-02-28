@@ -84,6 +84,8 @@ class C_BspTree {
 
 		inline USHORT GetnLeavesToDraw() { return leafToDraw; }
 		inline USHORT GetnNodesToDraw() { return nNodesToDraw; }
+
+		void dumpSamplePoints(const char *filename);
 };
 
 #endif

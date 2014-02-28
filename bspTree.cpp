@@ -210,9 +210,9 @@ C_BspTree::BuildPVS(void)
 	cout << "Done!" << endl << endl;
 
 	/// Write PVS into a file
-//	if(!pvsFileFound) {
-//		WritePVSFile("map_pvs.txt");
-//	}
+	if(!pvsFileFound) {
+		WritePVSFile("map_pvs.txt");
+	}
 }
 
 typedef struct {
@@ -369,7 +369,7 @@ C_BspTree::TraceVisibility(void)
 
 
    /// After finding connected leaves try to furter clean up the visibility points
-   printf("\tRemoving redundant visibility points...");
+   printf("\tRemoving redundant sample points...");
    fflush(stdout);
 
    C_BspNode *leaf;
@@ -650,3 +650,35 @@ C_BspTree::ReadPVSFile(const char *filename)
 
 	return true;
 }
+
+void
+C_BspTree::dumpSamplePoints(const char *filename)
+{
+   unsigned int i, j, sp;
+   C_Vertex p;
+   C_BspNode leaf;
+   FILE *fp;
+
+   fp = fopen(filename, "w");
+   assert(fp);
+
+   for(i = 0; i < leaves.size(); i++) {
+      fprintf(fp, "Node: %lu (connected to: ", leaves[i]->nodeID);
+
+      for(j = 0; j < leaves[i]->connectedLeaves.size(); j++)
+         fprintf(fp, "%lu ", leaves[i]->connectedLeaves[j]->nodeID);
+
+      fprintf(fp, ")\n");
+
+      for(sp = 0; sp < leaves[i]->pointSet.size(); sp++) {
+         p = leaves[i]->pointSet[sp];
+         fprintf(fp, "   (%.3f, %.3f, %.3f)\n", p.x, p.y, p.z);
+      }
+   }
+
+   fclose(fp);
+}
+
+
+
+
