@@ -1,4 +1,4 @@
-CC=clang++
+CXX=clang++
 CFLAGS=-c -Wall -O0 -g
 
 GL_PATH=/usr/lib/x86_64-linux-gnu/mesa/
@@ -19,10 +19,10 @@ EXECUTABLE=from_scratch
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
+	$(CXX) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
 
 .cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
+	$(CXX) $(CFLAGS) $< -o $@
 
 clean:
 	rm *.o metaballs/*.o glsl/glsl.o $(EXECUTABLE)

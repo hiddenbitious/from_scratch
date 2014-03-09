@@ -82,13 +82,19 @@ Initializations(void)
    MAX_THREADS = get_nprocs();
    printf("Detected %d cpu cores.\n", MAX_THREADS);
 
+   printf("EPSILON: %g\n", EPSILON);
+   printf("GREATEST_FLOAT: %g\n", GREATEST_FLOAT);
+   printf("SMALLEST_FLOAT: %g\n", SMALLEST_FLOAT);
+   printf("FLT_MAX: %g\n", FLT_MAX);
+   printf("FLT_MIN: %g\n", FLT_MIN);
+
 	/// Set clear color
 	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
 
 	/// Backface culling
-//	glDisable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
 //	glEnable(GL_CULL_FACE);
-//	glFrontFace(GL_CCW);
+//	glFrontFace(GL_CW);
 //	glCullFace(GL_BACK);
 
 	glEnable(GL_DEPTH_TEST);
@@ -100,12 +106,12 @@ Initializations(void)
 
 	// Enose tin camera me to frustum kai dose times gia tin proboli
 	camera.frustum = &frustum;
-	camera.fov = 50.0f;
+	camera.fov = 70.0f;
 	camera.zFar = 1000.0f;
 	camera.zNear = 1.0f;
 
 	// Diabase tin geometria gia to bsp
-	bspTest = new C_BspTree(4);
+	bspTest = new C_BspTree(6);
 //	bspTest->ReadGeometryFile("properMap2.BSP");
 
 	bspTest->ReadGeometryFile("mapGeometry.bsp");
@@ -113,7 +119,7 @@ Initializations(void)
 	// Kataskeuase bsp kai pvs
 	bspTest->BuildBspTree();
 	bspTest->BuildPVS();
-	bspTest->dumpSamplePoints("samplePoints.txt");
+//	bspTest->dumpSamplePoints("samplePoints.txt");
 
 	/// metaballs initialization
 	grid = new C_CubeGrid();
@@ -184,8 +190,8 @@ Draw(void)
 
 	metaball[2].position.z = 15.0f + 10.0f * cos(angle);
 
-   grid->Update(metaball , 3 , NULL);
-   grid->Draw(NULL);
+//   grid->Update(metaball , 3 , NULL);
+//   grid->Draw(NULL);
 
 	switch(bspRenderingType) {
 		case 0:
@@ -196,7 +202,7 @@ Draw(void)
 
       case 1:
          /// Draw the whole tree without PVS
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			mapPolys = bspTest->Draw2(&cameraPosition);
 			break;
 

@@ -1,19 +1,3 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #ifndef _MATH_H_
 #define _MATH_H_
 
@@ -29,14 +13,16 @@
 #define MIN(a,b)              (( a < b ) ? a : b)
 
 #define EPSILON               1.0e-4f
-#define FLOAT_EQ(a,b)         ((((b) - EPSILON) <= (a)) && (((b) + EPSILON)) >= (a))
+//#define EPSILON               std::numeric_limits<float>::epsilon()
+//#define FLOAT_EQ(a,b)         ((((b) - EPSILON) <= (a)) && (((b) + EPSILON)) >= (a))
+#define FLOAT_EQ(a, b)        (fabs((a) - (b)) < EPSILON)
 #define FLOAT_GREATER(a, b)   (!(FLOAT_EQ((a), (b))) && (a) > (b))
 #define FLOAT_SMALLER(a, b)   (!(FLOAT_EQ((a), (b))) && (a) < (b))
 
 /// Numeric limts
 #define FLT_MAX numeric_limits<float>::max()
-//#define FLT_MIN numeric_limits<float>::min()
-#define INT_MAX numeric_limits<int>::min()
+#define FLT_MIN numeric_limits<float>::min()
+#define INT_MAX numeric_limits<int>::max()
 #define INT_MIN numeric_limits<int>::min()
 #define UINT_MAX numeric_limits<unsigned int>::min()
 #define UINT_MIN numeric_limits<unsigned int>::min()

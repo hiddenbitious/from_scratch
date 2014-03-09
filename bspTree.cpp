@@ -781,9 +781,6 @@ C_BspTree::closeLeafHoles(void)
       total = 0;
       memset(faces, 0, sizeof(bool) * TOTAL_FACES);
 
-//      if(leaf1->nodeID == 130)
-//         printf("fuck\n");
-
       /// Take into consideration that a leaf might be at the boundary of the tree
       if(leaf1Min.x == treeMin.x) {total++; faces[X_MINUS] = true;}
       if(leaf1Max.x == treeMax.x) {total++; faces[X_PLUS] = true;}
@@ -794,9 +791,6 @@ C_BspTree::closeLeafHoles(void)
 
       for(unsigned int b2 = 0; b2 < leaves.size(); b2++) {
          leaf2 = leaves[b2];
-
-         if(leaf1->nodeID == 130 && (leaf2->nodeID == 26 || leaf2->nodeID == 133))
-            printf("oh boy!\n");
 
          if((res = leaf1->bbox.areBboxesAdjacent(&leaf2->bbox)) != TOTAL_FACES) {
             assert((int) res >= 0 && (int) res < 6);
