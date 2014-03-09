@@ -1,20 +1,5 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #include "bbox.h"
+#include <stdio.h>
 
 C_BBox::C_BBox()
 {
@@ -292,4 +277,35 @@ bool C_BBox::IsInside(const C_Vertex* p)
 	}
 
 	return true;
+}
+
+/// XXX: Bad hard float comparing goes on in this function
+adjacent_face_t
+C_BBox::areBboxesAdjacent(const C_BBox *box)
+{
+   if(FLOAT_EQ(min.x, box->max.x) &&
+      ((min.z >= box->min.z && min.z <= box->max.z) ||
+      (box->min.z >= min.z && box->min.z <= max.z))) {
+      return X_MINUS;
+   }
+
+   if(FLOAT_EQ(max.x, box->min.x) &&
+      ((min.z >= box->min.z && min.z <= box->max.z) ||
+      (box->min.z >= min.z && box->min.z <= max.z))) {
+      return X_PLUS;
+   }
+
+   if(FLOAT_EQ(min.z, box->max.z) &&
+      ((min.x >= box->min.x && min.x <= box->max.x) ||
+      (box->min.x >= min.x && box->min.x <= max.x))) {
+      return Z_MINUS;
+   }
+
+   if(FLOAT_EQ(max.z, box->min.z) &&
+      ((min.x >= box->min.x && min.x <= box->max.x) ||
+      (box->min.x >= min.x && box->min.x <= max.x))) {
+      return Z_PLUS;
+   }
+
+   return TOTAL_FACES;
 }

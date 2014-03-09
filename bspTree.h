@@ -48,8 +48,8 @@ class C_BspTree {
 		void BuildPVS(void);
 
 		void TraceVisibility(void);
-		bool CheckVisibility(C_BspNode *node1 , C_BspNode *node2);
-		bool RayIntersectsSomethingInTree(C_BspNode *node , C_Vertex *start , C_Vertex *end);
+		C_BspNode *CheckVisibility(C_BspNode *node1 , C_BspNode *node2);
+		C_BspNode *RayIntersectsSomethingInTree(C_BspNode *node , C_Vertex *start , C_Vertex *end);
 
 		void TessellatePolygons(void);
 
@@ -86,6 +86,14 @@ class C_BspTree {
 		inline USHORT GetnNodesToDraw() { return nNodesToDraw; }
 
 		void dumpSamplePoints(const char *filename);
+
+		C_BBox bbox;
+
+		/**
+		 * Detect holes in the map (void space that does not belong to any leaf)
+		 * and close them by merging leaves
+		 */
+		void closeLeafHoles(void);
 };
 
 #endif

@@ -81,6 +81,14 @@ C_BspTree::DecreaseNodesDrawn()
 bool
 C_BspTree::ReadGeometryFile(const char* fileName)
 {
+   float maxX = SMALLEST_FLOAT;
+   float maxY = SMALLEST_FLOAT;
+   float maxZ = SMALLEST_FLOAT;
+
+   float minX = GREATEST_FLOAT;
+   float minY = GREATEST_FLOAT;
+   float minZ = GREATEST_FLOAT;
+
    printf("\n**********\n");
 	printf("%s: Reading geometry file \"%s\"\n", __FUNCTION__, fileName);
 
@@ -133,17 +141,31 @@ C_BspTree::ReadGeometryFile(const char* fileName)
 				pBrushes[i].pPolys[j].pVertices[k].x /= scaleFactor;
 				pBrushes[i].pPolys[j].pVertices[k].y /= scaleFactor;
 				pBrushes[i].pPolys[j].pVertices[k].z /= scaleFactor;
+
+				/// Calculate tree's bbox
+				if(pBrushes[i].pPolys[j].pVertices[k].x > maxX) maxX = pBrushes[i].pPolys[j].pVertices[k].x;
+				if(pBrushes[i].pPolys[j].pVertices[k].y > maxY) maxY = pBrushes[i].pPolys[j].pVertices[k].y;
+				if(pBrushes[i].pPolys[j].pVertices[k].z > maxZ) maxZ = pBrushes[i].pPolys[j].pVertices[k].z;
+
+				if(pBrushes[i].pPolys[j].pVertices[k].x < minX) minX = pBrushes[i].pPolys[j].pVertices[k].x;
+				if(pBrushes[i].pPolys[j].pVertices[k].y < minY) minY = pBrushes[i].pPolys[j].pVertices[k].y;
+				if(pBrushes[i].pPolys[j].pVertices[k].z < minZ) minZ = pBrushes[i].pPolys[j].pVertices[k].z;
 			}
-//			TessellatePolygon ( &pBrushes[i].pPolys[j] );
 		}
 	}
 	file.close();
 
 	assert(currentPoly == nPolys);
 
-   printf("**********\n");
+   /// Set bbox
+   bbox.SetMax(maxX , maxY , maxZ);
+   bbox.SetMin(minX , minY , minZ);
+   bbox.SetVertices();
 
 	CalcNorms();
+
+   printf("**********\n");
+
 	return true;
 }
 
@@ -191,14 +213,12 @@ C_BspTree::BuildPVS(void)
 
 	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-//	pvsFileFound = this->ReadPVSFile("map_pvs.txt");
+//	pvsFileFound = this->ReadPVSFile("map_pvs6_lean.txt");
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points... " << flush;
 	C_BspNode::DistributeSamplePoints(headNode , headNode->pointSet);
 	cout << "Done!" << endl;
-
-//   cout << "\tTracing visibility... " << flush;
 
 	if(pvsFileFound) {
 		cout << "\tTracing visibility... Found in file. Skipping calculations." << endl;
@@ -210,9 +230,9 @@ C_BspTree::BuildPVS(void)
 	cout << "Done!" << endl << endl;
 
 	/// Write PVS into a file
-	if(!pvsFileFound) {
-		WritePVSFile("map_pvs.txt");
-	}
+//	if(!pvsFileFound) {
+//		WritePVSFile("map_pvs6_bulk.txt");
+//	}
 }
 
 typedef struct {
@@ -231,7 +251,7 @@ void *TraceVisibility_Thread(void *data_)
    vector<C_BspNode *> &leaves = tree->leaves;
    C_BspNode *leaf1, *leaf2, *leaf3;
 
-   bool res;
+   C_BspNode *res;
    int load = leaves.size();
    int start = load / MAX_THREADS * tid;
    int end = load / MAX_THREADS * (tid + 1);
@@ -245,6 +265,54 @@ void *TraceVisibility_Thread(void *data_)
 
       cout << "\n\t\t0%|---------50---------|100%\n\t   ";
    }
+
+//   for(unsigned int l1 = start; l1 < end; l1++) {
+//	   leaf1 = leaves[l1];
+//      for(unsigned int l2 = 0; l2 < leaves.size(); l2++) {
+//         leaf2 = leaves[l2];
+//
+//         assert(leaf1->isLeaf);
+//         assert(leaf2->isLeaf);
+//
+//         if(leaf1->nodeID == leaf2->nodeID) {
+//            continue;
+//         }
+//
+//         pthread_mutex_lock(&mutex);
+//         assert(leaf1->checkedVisibilityWith[leaf2->nodeID] == leaf2->checkedVisibilityWith[leaf1->nodeID]);
+//         assert(leaf1->visibleFrom[leaf2->nodeID] == leaf2->visibleFrom[leaf1->nodeID]);
+//         if(leaf1->visibleFrom[leaf2->nodeID] || leaf1->checkedVisibilityWith[leaf2->nodeID]) {
+//            pthread_mutex_unlock(&mutex);
+//            continue;
+//         }
+//         pthread_mutex_unlock(&mutex);
+//
+//         res = tree->CheckVisibility(leaf1, leaf2);
+//
+//         pthread_mutex_lock(&mutex);
+//         if(res) {
+//            leaf1->PVS.push_back(leaf2);
+//            leaf1->visibleFrom[leaf2->nodeID] = true;
+//
+//            leaf2->PVS.push_back(leaf1);
+//            leaf2->visibleFrom[leaf1->nodeID] = true;
+//         }
+//
+//         leaf1->checkedVisibilityWith[leaf2->nodeID] = true;
+//         leaf2->checkedVisibilityWith[leaf1->nodeID] = true;
+//         pthread_mutex_unlock(&mutex);
+//      }
+//
+//      pthread_mutex_lock(&mutex);
+//  		progress += step;
+//  		pthread_mutex_unlock(&mutex);
+//
+//  		if(!tid) {
+//         cout << "\r\t\t   ";
+//         for(int k = 0 ; k < (int)progress ; k++)
+//            cout << "*" << flush;
+//      }
+//   }
 
 	for(unsigned int l1 = start; l1 < end; l1++) {
 	   leaf1 = leaves[l1];
@@ -274,13 +342,8 @@ void *TraceVisibility_Thread(void *data_)
             res = tree->CheckVisibility(leaf1, leaf3);
 
             pthread_mutex_lock(&mutex);
-            if(res) {
-               leaf1->PVS.push_back(leaf3);
-               leaf1->visibleFrom[leaf3->nodeID] = true;
-
-               leaf3->PVS.push_back(leaf1);
-               leaf3->visibleFrom[leaf1->nodeID] = true;
-            }
+            if(!res)
+               leaf1->addNodeToPVS(leaf3);
 
             leaf1->checkedVisibilityWith[leaf3->nodeID] = true;
             leaf3->checkedVisibilityWith[leaf1->nodeID] = true;
@@ -325,9 +388,9 @@ C_BspTree::TraceVisibility(void)
 	}
 
 /// Find connected leaves
-/// Two leaves sharing at least one visibility point will be considered as connected
+/// NOTE: Two leaves sharing at least one visibility point will be considered as connected
 /// ----------------------
-   printf("\tDetecting conected leaves... ");
+   printf("\tDetecting connected leaves... ");
    fflush(stdout);
    gettimeofday(&start, NULL);
 
@@ -365,21 +428,40 @@ C_BspTree::TraceVisibility(void)
    gettimeofday(&end, NULL);
    elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
    elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
-   printf("Done! (%.2f ms)\n", elapsedTime);
+   printf("Done! (%.2f s)\n", elapsedTime / 1000.0);
 
+//return;
 
    /// After finding connected leaves try to furter clean up the visibility points
+   /// Removes sample points that coincide with connected leaves' geometry
    printf("\tRemoving redundant sample points...");
    fflush(stdout);
 
    C_BspNode *leaf;
    for(i = 0; i < nLeaves; i++) {
       leaf = leaves[i];
+//      C_BspNode::CleanUpPointSet(leaf, leaf->pointSet, false, true);
       for(j = 0; j < leaf->PVS.size(); j++) {
-         C_BspNode::CleanUpPointSet(leaf->PVS[j], leaf->pointSet, false);
+         C_BspNode::CleanUpPointSet(leaf->PVS[j], leaf->pointSet, false, true);
       }
    }
    printf("Done!\n");
+
+//	return;
+
+   /// Close possible space holes between the tree's leaves
+   printf("\tDetecting and closing space holes... ");
+   fflush(stdout);
+   gettimeofday(&start, NULL);
+
+   closeLeafHoles();
+
+   gettimeofday(&end, NULL);
+   elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
+   elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
+   printf("Done! (%.2f s)\n", elapsedTime / 1000.0);
+
+//   return;
 
 /// Trace visibility
 /// ----------------------
@@ -407,65 +489,72 @@ C_BspTree::TraceVisibility(void)
    elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
    elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
 
-   printf("\n\nDone (%.2f ms)\n", elapsedTime);
+   printf("\n\nDone (%.2f s)\n", elapsedTime / 1000.0f);
 
 	pthread_mutex_destroy(&mutex);
 }
 
-bool
+C_BspNode *
 C_BspTree::CheckVisibility(C_BspNode *node1, C_BspNode *node2)
 {
+   C_BspNode *occluderNode = NULL;
+
 	for(unsigned int p1 = 0; p1 < node1->pointSet.size(); p1++) {
 		for(unsigned int p2 = 0; p2 < node2->pointSet.size(); p2++) {
-			if(C_BspTree::RayIntersectsSomethingInTree(headNode, &node1->pointSet[p1], &node2->pointSet[p2]) == false) {
-				return true;
+			if((occluderNode = C_BspTree::RayIntersectsSomethingInTree(headNode, &node1->pointSet[p1], &node2->pointSet[p2])) == NULL) {
+				return NULL;
 			}
 		}
 	}
-	return false;
+
+	return occluderNode;
 }
 
-bool
+C_BspNode *
 C_BspTree::RayIntersectsSomethingInTree(C_BspNode *node, C_Vertex *start, C_Vertex *end)
 {
+   C_BspNode *occluderNode;
+
 	if(node->isLeaf) {
 		for(int cp = 0 ; cp < node->nTriangles ; cp++) {
-			if(RayTriangleIntersection(start , end , &node->triangles[cp])) {
-				return true;
+			if(RayTriangleIntersection(start, end, &node->triangles[cp])) {
+				return node;
 			}
 		}
-		return false;
+		return NULL;
 	}
 
-	int startSide = C_BspNode::ClassifyVertex(&node->partitionPlane , start);
-	int endSide = C_BspNode::ClassifyVertex(&node->partitionPlane , end);
+	int startSide = C_BspNode::ClassifyVertex(&node->partitionPlane, start);
+	int endSide = C_BspNode::ClassifyVertex(&node->partitionPlane, end);
 
-   /// If the ray spans the node's partition plane, then send the beam down both sides of node
+   /// If the ray spans the node's partition plane, then send the ray down both sides of node
 	if((startSide == COINCIDENT && endSide == COINCIDENT) ||
       (startSide != endSide && startSide != COINCIDENT && endSide != COINCIDENT)) {
-		if(C_BspTree::RayIntersectsSomethingInTree(node->backNode , start , end)) {
-			return true;
+		if((occluderNode = C_BspTree::RayIntersectsSomethingInTree(node->backNode, start, end))) {
+			return occluderNode;
 		}
-		if(C_BspTree::RayIntersectsSomethingInTree(node->frontNode , start , end)) {
-			return true;
+		if((occluderNode = C_BspTree::RayIntersectsSomethingInTree(node->frontNode, start, end))) {
+			return occluderNode;
 		}
 	}
 
-   /// If beam is whole in front of partition plane the send it down the front node
+   /// If ray is whole in front of partition plane the send it down the front node
+   /// The or in the if statement is because one of the points might be coinciding with the plane.
 	if(startSide == FRONT || endSide == FRONT) {
-		if(C_BspTree::RayIntersectsSomethingInTree(node->frontNode , start , end)) {
-			return true;
+		if((occluderNode = C_BspTree::RayIntersectsSomethingInTree(node->frontNode, start, end))) {
+			return occluderNode;
 		}
 	}
 
    /// Respectively send it down to back node
+   /// The or in the if statement is because one of the points might be coinciding with the plane.
 	if(startSide == BACK || endSide == BACK) {
-		if(C_BspTree::RayIntersectsSomethingInTree(node->backNode , start , end)) {
-			return true;
+		if((occluderNode = C_BspTree::RayIntersectsSomethingInTree(node->backNode, start, end))) {
+			return occluderNode;
 		}
 	}
 
-	return false;
+	return NULL;
 }
 
 void
@@ -474,14 +563,10 @@ C_BspTree::BuildBspTree(void)
 	cout << "***********************************************" << endl;
 	cout << "Building bsp tree... ";
 
-//	ULONG start = timeGetTime ();
-
 	headNode = new C_BspNode(pRawPolys , nPolys);
 	C_BspNode::BuildBspTree(headNode , this);
 
 	TessellatePolygons();
-
-//	ULONG time = timeGetTime () - start;
 
 	cout << "Done!" << endl;
 
@@ -582,9 +667,7 @@ C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
-//      glFrontFace(GL_CW);
       C_BspNode::Draw(cameraPosition, headNode, this, true);
-//      glFrontFace(GL_CCW);
    }
    shaderManager->popShader();
 
@@ -679,6 +762,56 @@ C_BspTree::dumpSamplePoints(const char *filename)
    fclose(fp);
 }
 
+void
+C_BspTree::closeLeafHoles(void)
+{
+   int total;
+   C_BspNode *leaf1, *leaf2;
+   bool faces[TOTAL_FACES];
+   adjacent_face_t res;
+   C_Vertex treeMax, treeMin, leaf1Min, leaf1Max;
 
+   bbox.GetMax(&treeMax);
+   bbox.GetMin(&treeMin);
 
+   for(unsigned int b1 = 0; b1 < leaves.size(); b1++) {
+      leaf1 = leaves[b1];
+      leaf1->bbox.GetMax(&leaf1Max);
+      leaf1->bbox.GetMin(&leaf1Min);
+      total = 0;
+      memset(faces, 0, sizeof(bool) * TOTAL_FACES);
 
+//      if(leaf1->nodeID == 130)
+//         printf("fuck\n");
+
+      /// Take into consideration that a leaf might be at the boundary of the tree
+      if(leaf1Min.x == treeMin.x) {total++; faces[X_MINUS] = true;}
+      if(leaf1Max.x == treeMax.x) {total++; faces[X_PLUS] = true;}
+      if(leaf1Min.z == treeMin.z) {total++; faces[Z_MINUS] = true;}
+      if(leaf1Max.z == treeMax.z) {total++; faces[Z_PLUS] = true;}
+      if(leaf1Min.y == treeMin.y) {total++; faces[Y_MINUS] = true;} else assert(0);
+      if(leaf1Max.y == treeMax.y) {total++; faces[Y_PLUS] = true;} else assert(0);
+
+      for(unsigned int b2 = 0; b2 < leaves.size(); b2++) {
+         leaf2 = leaves[b2];
+
+         if(leaf1->nodeID == 130 && (leaf2->nodeID == 26 || leaf2->nodeID == 133))
+            printf("oh boy!\n");
+
+         if((res = leaf1->bbox.areBboxesAdjacent(&leaf2->bbox)) != TOTAL_FACES) {
+            assert((int) res >= 0 && (int) res < 6);
+            if(!faces[(int)res]) total++;
+            faces[(int)res] = true;
+         }
+      }
+
+      if(total < TOTAL_FACES) {
+         printf("leaf %lu is not tightly packed.", leaf1->nodeID);
+         printf("Uncovered faces are: ");
+         for(int i = 0; i < TOTAL_FACES; i++)
+            if(!faces[i]) printf("%d ", i);
+
+         printf("\n");
+      }
+   }
+}

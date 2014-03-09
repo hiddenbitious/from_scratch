@@ -26,7 +26,6 @@ C_BspNode::C_BspNode(void)
    triangles = NULL;
    checkedVisibilityWith = NULL;
    visibleFrom = NULL;
-   bbox = NULL;
 }
 
 C_BspNode::C_BspNode(poly_t** geometry , int nPolys)
@@ -38,7 +37,6 @@ C_BspNode::C_BspNode(poly_t** geometry , int nPolys)
    frontNode = NULL;
    backNode = NULL;
    fatherNode = NULL;
-   bbox = NULL;
    nTriangles = 0;
    triangles = NULL;
    depth = 0;
@@ -57,8 +55,6 @@ C_BspNode::~C_BspNode()
    if(visibleFrom != NULL) {
       delete[] visibleFrom;
    }
-
-   delete bbox;
 }
 
 int
@@ -163,10 +159,12 @@ C_BspNode::BuildBspTree(C_BspNode* node, C_BspTree *tree)
    node->frontNode = new C_BspNode();
    node->frontNode->depth = node->depth + 1;
    node->frontNode->fatherNode = node;
+   node->frontNode->partitionPlane.setPlane(&tempPlane);
 
    node->backNode = new C_BspNode();
    node->backNode->depth = node->depth + 1;
    node->backNode->fatherNode = node;
+   node->backNode->partitionPlane.setPlane(&tempPlane);
 
    int result, nFront, nBack, i;
    nFront = nBack = 0;
@@ -268,6 +266,11 @@ C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
                              &(geometry[currentPlane]->pVertices[1]),
                              &(geometry[currentPlane]->pVertices[2]));
 
+//         printf("(%f %f %f) - (%f %f %f) - (%f %f %f)\n",
+//         geometry[currentPlane]->pVertices[0].x, geometry[currentPlane]->pVertices[0].y, geometry[currentPlane]->pVertices[0].z,
+//         geometry[currentPlane]->pVertices[1].x, geometry[currentPlane]->pVertices[1].y, geometry[currentPlane]->pVertices[1].z,
+//         geometry[currentPlane]->pVertices[2].x, geometry[currentPlane]->pVertices[2].y, geometry[currentPlane]->pVertices[2].z);
+
          for(int i = 0; i < nPolys; i++) {
             if(i == currentPlane)
                continue;
@@ -288,6 +291,9 @@ C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
 //			printf("nFront: %u\n", nFront);
 //			printf("nBack: %u\n", nBack);
 //			printf("nSplits: %u\n", nSplits);
+//			printf("relation: %f\n", relation);
+//			printf("minRelation: %f\n", minRelation);
+//			printf("bestRelation: %f\n", bestRelation);
 
          if((relation > minRelation && nSplits < bestSplits) || (nSplits == bestSplits && relation > bestRelation)) {
             finalPlane->setPlane(&tempPlane);
@@ -298,6 +304,8 @@ C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
 //				printf("****\n");
          }
       }
+
+//      printf("****\n");
 
       /// An ehoun dokimastei ola ta polygona kai den ehei brethei akoma epipedo diahorismou
       /// halarose ligo ta kritiria kai ksanapsakse
@@ -417,12 +425,24 @@ C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, b
       if(lastNode != node->nodeID) {
          lastNode = node->nodeID;
          printf("Entered leaf: %d\n", lastNode);
+////         printf("partition plane:\n");
+//         printf("\t(%f %f %f) - (%f %f %f) (%f %f %f)\n",
+//         node->partitionPlane.points[0].x, node->partitionPlane.points[0].y, node->partitionPlane.points[0].z,
+//         node->partitionPlane.points[1].x, node->partitionPlane.points[1].y, node->partitionPlane.points[1].z,
+//         node->partitionPlane.points[2].x, node->partitionPlane.points[2].y, node->partitionPlane.points[2].z);
+         C_Vertex min, max;
+         node->bbox.GetMax(&max);
+         node->bbox.GetMin(&min);
+         printf("leaf's bbox:\n");
+         printf("\t(%G %G %G) -- (%G %G %G)\n", min.x, min.y, min.z, max.x, max.y, max.z);
       }
 
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       node->drawn = true;
       node->Draw(bspShader);
       node->DrawPointSet();
       polyCount += node->nPolys;
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
       if(usePVS) {
          for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
@@ -433,7 +453,7 @@ C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, b
             node->PVS[i]->drawn = true;
             node->PVS[i]->Draw(bspShader);
 
-            node->PVS[i]->bbox->Draw();
+            node->PVS[i]->bbox.Draw();
    //			node->PVS[i]->DrawPointSet();
 
             polyCount += node->PVS[i]->nPolys;
@@ -459,10 +479,6 @@ C_BspNode::CalculateBBox(void)
    if(geometry == NULL || !nPolys)
       return;
 
-   assert(!bbox);
-   if(bbox) delete bbox;
-   bbox = new C_BBox();
-
    float minX , minY , minZ , maxX , maxY , maxZ;
 
    maxX = maxY = maxZ = SMALLEST_FLOAT;
@@ -480,9 +496,9 @@ C_BspNode::CalculateBBox(void)
       }
    }
 
-   bbox->SetMax(maxX , maxY , maxZ);
-   bbox->SetMin(minX , minY , minZ);
-   bbox->SetVertices();
+   bbox.SetMax(maxX , maxY , maxZ);
+   bbox.SetMin(minX , minY , minZ);
+   bbox.SetVertices();
 }
 
 void
@@ -557,30 +573,34 @@ C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
 }
 
 void
-C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool testBbox)
+C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool testWithBbox, bool testWithGeometry)
 {
    unsigned int cPoint = 0;
 
    /// Remove points outside the bbox
-   while(cPoint < points.size() && testBbox) {
-      if(node->bbox->IsInside(&points[cPoint]) == false) {
-         points.erase(points.begin() + cPoint);
-         cPoint--;
+   if(testWithBbox) {
+      while(cPoint < points.size()) {
+         if(!node->bbox.IsInside(&points[cPoint])) {
+            points.erase(points.begin() + cPoint);
+            cPoint--;
+         }
+         cPoint++;
       }
-      cPoint++;
    }
 
    /// Remove points coinciding with the triangles of the given node
    /// NOTE: VERY BRUTE FORCE WAY. MUST FIND SOMETHING FASTER.
-   for(int cTri = 0 ; cTri < node->nTriangles ; cTri++) {
-      cPoint = 0;
-      while(cPoint < points.size()) {
-         if(PointInTriangle(&points[cPoint] , &node->triangles[cTri])) {
-            points.erase(points.begin() + cPoint);
-            cPoint--;
-         }
+   if(testWithGeometry) {
+      for(int cTri = 0 ; cTri < node->nTriangles ; cTri++) {
+         cPoint = 0;
+         while(cPoint < points.size()) {
+            if(PointInTriangle(&points[cPoint], &node->triangles[cTri])) {
+               points.erase(points.begin() + cPoint);
+               cPoint--;
+            }
 
-         cPoint++;
+            cPoint++;
+         }
       }
    }
 }
@@ -588,8 +608,8 @@ C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool test
 void
 C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points)
 {
-   // CLEAN UP POINTS
-   CleanUpPointSet(node, points, true);
+   /// CLEAN UP POINTS
+   CleanUpPointSet(node, points, true, true);
 
    if(node->isLeaf) {
       node->pointSet = points;
@@ -605,12 +625,9 @@ C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points)
       for(unsigned int i = 0 ; i < points.size() ; i++) {
          dist = node->partitionPlane.distanceFromPoint(&points[i]);
 
-         if(FLOAT_GREATER(dist, 0.0f)) {
+         if(dist > 0.0f) {
             frontPoints.push_back(points[i]);
-         } else if(FLOAT_GREATER(0.0f, dist)) {
-            backPoints.push_back(points[i]);
          } else {
-            frontPoints.push_back(points[i]);
             backPoints.push_back(points[i]);
          }
       }
@@ -632,7 +649,7 @@ C_BspNode::DistributePointsAlongPartitionPlane(void)
    max.x = max.y = max.z = SMALLEST_FLOAT;
 
    /// Find where the node's partition plane intersects with the node's bounding box
-   vector<C_Vertex> intersectionPoints = FindBBoxPlaneIntersections(bbox, &partitionPlane);
+   vector<C_Vertex> intersectionPoints = FindBBoxPlaneIntersections(&bbox, &partitionPlane);
 
    for(USHORT i = 0 ; i < intersectionPoints.size() ; i++) {
       CalculateUV(&partitionPlane, &intersectionPoints[i], &tmpU, &tmpV);
@@ -680,4 +697,21 @@ void C_BspNode::DrawPointSet(void)
    glVertexAttribPointer(pointShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, &pointSet[0]);
    glDrawArrays(GL_POINTS, 0, n);
    shaderManager->popShader();
+}
+
+bool
+C_BspNode::addNodeToPVS(C_BspNode *node)
+{
+   for(unsigned int i = 0; i < PVS.size(); i++) {
+      if(PVS[i]->nodeID == node->nodeID)
+         return false;
+   }
+
+   PVS.push_back(node);
+   visibleFrom[node->nodeID] = true;
+
+   node->PVS.push_back(this);
+   node->visibleFrom[nodeID] = true;
+
+   return true;
 }

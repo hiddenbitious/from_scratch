@@ -1,19 +1,3 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #ifndef _C_BSPNODE_H_
 #define _C_BSPNODE_H_
 
@@ -51,13 +35,13 @@ class C_BspNode {
 		triangle_vn *triangles;
 
 		/// Children nodes
-		C_BspNode* frontNode;
-		C_BspNode* backNode;
-		C_BspNode* fatherNode;
-		C_BspTree* tree;
+		C_BspNode *frontNode;
+		C_BspNode *backNode;
+		C_BspNode *fatherNode;
+		C_BspTree *tree;
 
 		/// Node's bounding box.
-		C_BBox *bbox;
+		C_BBox bbox;
 
 		/// Algorithm that chooses a polygon from a given geometry set and returns it as a splitting plane
 		static bool SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane);
@@ -82,7 +66,8 @@ class C_BspNode {
 
 		void DistributePointsAlongPartitionPlane(void);
 		static void DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points);
-		static void CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool testBbox);
+		static void CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool testWithBbox, bool testWithGeometry);
+		bool addNodeToPVS(C_BspNode *node);
 
 		vector<C_BspNode*> connectedLeaves;
 		vector<C_BspNode*> PVS;
