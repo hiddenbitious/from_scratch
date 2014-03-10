@@ -765,47 +765,131 @@ C_BspTree::dumpSamplePoints(const char *filename)
 void
 C_BspTree::closeLeafHoles(void)
 {
-   int total;
-   C_BspNode *leaf1, *leaf2;
-   bool faces[TOTAL_FACES];
-   adjacent_face_t res;
-   C_Vertex treeMax, treeMin, leaf1Min, leaf1Max;
+   typedef struct {
+      vector<C_BspNode *> adjacentNodes[TOTAL_FACES];
+      C_BspNode *bestNodeToConnect[TOTAL_FACES];
+   } nodeAdjacentData_t;
 
-   bbox.GetMax(&treeMax);
+   float bestDists[TOTAL_FACES];
+
+   nodeAdjacentData_t *aData = new nodeAdjacentData_t[leaves.size()];
+
+   C_BspNode *leaf1, *leaf2;
+   C_Vertex treeMin, treeMax, leaf1Min, leaf1Max, leaf2Min, leaf2Max;
+
    bbox.GetMin(&treeMin);
+   bbox.GetMax(&treeMax);
 
    for(unsigned int b1 = 0; b1 < leaves.size(); b1++) {
+      nodeAdjacentData_t *cNode = &aData[b1];
       leaf1 = leaves[b1];
-      leaf1->bbox.GetMax(&leaf1Max);
       leaf1->bbox.GetMin(&leaf1Min);
-      total = 0;
-      memset(faces, 0, sizeof(bool) * TOTAL_FACES);
+      leaf1->bbox.GetMax(&leaf1Max);
+      memset(cNode->bestNodeToConnect, NULL, sizeof(C_BspNode *) * TOTAL_FACES);
+      memset(bestDists, 0, sizeof(float) * TOTAL_FACES);
 
       /// Take into consideration that a leaf might be at the boundary of the tree
-      if(leaf1Min.x == treeMin.x) {total++; faces[X_MINUS] = true;}
-      if(leaf1Max.x == treeMax.x) {total++; faces[X_PLUS] = true;}
-      if(leaf1Min.z == treeMin.z) {total++; faces[Z_MINUS] = true;}
-      if(leaf1Max.z == treeMax.z) {total++; faces[Z_PLUS] = true;}
-      if(leaf1Min.y == treeMin.y) {total++; faces[Y_MINUS] = true;} else assert(0);
-      if(leaf1Max.y == treeMax.y) {total++; faces[Y_PLUS] = true;} else assert(0);
+      if(leaf1Min.x == treeMin.x) {cNode->adjacentNodes[X_MINUS].push_back(NULL);}
+      if(leaf1Max.x == treeMax.x) {cNode->adjacentNodes[X_PLUS].push_back(NULL);}
+      if(leaf1Min.z == treeMin.z) {cNode->adjacentNodes[Z_MINUS].push_back(NULL);}
+      if(leaf1Max.z == treeMax.z) {cNode->adjacentNodes[Z_PLUS].push_back(NULL);}
+      if(leaf1Min.y == treeMin.y) {cNode->adjacentNodes[Y_MINUS].push_back(NULL);} else assert(0);
+      if(leaf1Max.y == treeMax.y) {cNode->adjacentNodes[Y_PLUS].push_back(NULL);} else assert(0);
 
       for(unsigned int b2 = 0; b2 < leaves.size(); b2++) {
          leaf2 = leaves[b2];
 
-         if((res = leaf1->bbox.areBboxesAdjacent(&leaf2->bbox)) != TOTAL_FACES) {
-            assert((int) res >= 0 && (int) res < 6);
-            if(!faces[(int)res]) total++;
-            faces[(int)res] = true;
-         }
+         leaf2->bbox.GetMin(&leaf2Min);
+         leaf2->bbox.GetMax(&leaf2Max);
+
+         if(leaf1->nodeID == 167 && (leaf2->nodeID == 155 || leaf2->nodeID == 154))
+            printf("oh boy\n");
+
+         /// X_MINUS
+         if(FLOAT_EQ(leaf1Min.x, leaf2Max.x) &&
+            ((FLOAT_GREATER(leaf1Min.z, leaf2Min.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Max.z)) ||
+            (FLOAT_GREATER(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf2Min.z, leaf1Max.z)) ||
+
+            (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf1Max.z, leaf2Max.z)) ||
+            (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_GREATER(leaf1Max.z, leaf2Max.z)) ||
+
+            (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Min.z)) ||
+            (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_GREATER(leaf1Min.z, leaf2Min.z)) ||
+
+            (FLOAT_EQ(leaf1Min.z, leaf2Min.z) && FLOAT_EQ(leaf1Max.z, leaf2Max.z))))
+            cNode->adjacentNodes[X_MINUS].push_back(leaf2);
+
+         /// X_PLUS
+         if(FLOAT_EQ(leaf1Max.x, leaf2Min.x) &&
+            ((FLOAT_GREATER(leaf1Min.z, leaf2Min.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Max.z)) ||
+            (FLOAT_GREATER(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf2Min.z, leaf1Max.z)) ||
+
+            (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf1Max.z, leaf2Max.z)) ||
+            (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_GREATER(leaf1Max.z, leaf2Max.z)) ||
+
+            (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Min.z)) ||
+            (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_GREATER(leaf1Min.z, leaf2Min.z)) ||
+
+            (FLOAT_EQ(leaf1Min.z, leaf2Min.z) && FLOAT_EQ(leaf1Max.z, leaf2Max.z))))
+            cNode->adjacentNodes[X_PLUS].push_back(leaf2);
+
+         /// Z_MINUS
+         if(FLOAT_EQ(leaf1Min.z, leaf2Max.z) &&
+            ((FLOAT_GREATER(leaf1Min.x, leaf2Min.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Max.x)) ||
+            (FLOAT_GREATER(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf2Min.x, leaf1Max.x)) ||
+
+            (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf1Max.x, leaf2Max.x)) ||
+            (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_GREATER(leaf1Max.x, leaf2Max.x)) ||
+
+            (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Min.x)) ||
+            (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_GREATER(leaf1Min.x, leaf2Min.x)) ||
+
+            (FLOAT_EQ(leaf1Min.x, leaf2Min.x) && FLOAT_EQ(leaf1Max.x, leaf2Max.x))))
+            cNode->adjacentNodes[Z_MINUS].push_back(leaf2);
+
+         /// Z_PLUS
+         if(FLOAT_EQ(leaf1Max.z, leaf2Min.z) &&
+            ((FLOAT_GREATER(leaf1Min.x, leaf2Min.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Max.x)) ||
+            (FLOAT_GREATER(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf2Min.x, leaf1Max.x)) ||
+
+            (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf1Max.x, leaf2Max.x)) ||
+            (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_GREATER(leaf1Max.x, leaf2Max.x)) ||
+
+            (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Min.x)) ||
+            (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_GREATER(leaf1Min.x, leaf2Min.x)) ||
+
+            (FLOAT_EQ(leaf1Min.x, leaf2Min.x) && FLOAT_EQ(leaf1Max.x, leaf2Max.x))))
+            cNode->adjacentNodes[Z_PLUS].push_back(leaf2);
       }
 
-      if(total < TOTAL_FACES) {
+      if(!cNode->adjacentNodes[X_MINUS].size() || !cNode->adjacentNodes[X_PLUS].size() ||
+         !cNode->adjacentNodes[Z_MINUS].size() || !cNode->adjacentNodes[Z_PLUS].size()) {
+
          printf("leaf %lu is not tightly packed.", leaf1->nodeID);
          printf("Uncovered faces are: ");
          for(int i = 0; i < TOTAL_FACES; i++)
-            if(!faces[i]) printf("%d ", i);
-
+            if(!cNode->adjacentNodes[i].size()) printf("%d ", i);
          printf("\n");
       }
+//         /// Try to fix it
+//         int bestNode;
+//         float dist = GREATEST_FLOAT;
+//         for(unsigned int b2 = 0; b2 < leaves.size(); b2++) {
+//            leaf2 = leaves[b2];
+//            leaf2->bbox.GetMax(&leaf2Max);
+//            leaf2->bbox.GetMin(&leaf2Min);
+//
+//            if(faces[Z_MINUS]) {
+//               if((leaf1Min.x >= leaf2Min.x && leaf1Min.x <= leaf2Max.x) ||
+//                  (leaf2Min.x >= leaf1Min.x && leaf2Min.x <= leaf1Max.x)) {
+//                  assert(leaf1Min.z > leaf2Max.z);
+//                  dist = leaf1Min.z - leaf2Max.z;
+//               }
+//            }
+//         }
+//      }
    }
+
+
+   delete[] aData;
 }
