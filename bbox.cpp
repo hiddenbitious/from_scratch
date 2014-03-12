@@ -8,6 +8,12 @@ C_BBox::C_BBox()
 C_BBox::~C_BBox()
 {
 }
+char *C_BBox::ADJACENT_FACE_NAMES[TOTAL_FACES] = { "X_MINUS",
+                                                   "Y_MINUS",
+                                                   "Z_MINUS",
+                                                   "X_PLUS",
+                                                   "Y_PLUS",
+                                                   "Z_PLUS" };
 
 void C_BBox::SetMax(const float x , const float y , const float z)
 {

@@ -461,7 +461,7 @@ C_BspTree::TraceVisibility(void)
    elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
    printf("Done! (%.2f s)\n", elapsedTime / 1000.0);
 
-//   return;
+   return;
 
 /// Trace visibility
 /// ----------------------
@@ -768,12 +768,12 @@ C_BspTree::closeLeafHoles(void)
    typedef struct {
       vector<C_BspNode *> adjacentNodes[TOTAL_FACES];
       C_BspNode *bestNodeToConnect[TOTAL_FACES];
+      float bestNodeDistances[TOTAL_FACES];
    } nodeAdjacentData_t;
-
-   float bestDists[TOTAL_FACES];
-
    nodeAdjacentData_t *aData = new nodeAdjacentData_t[leaves.size()];
 
+   int i;
+   float dist;
    C_BspNode *leaf1, *leaf2;
    C_Vertex treeMin, treeMax, leaf1Min, leaf1Max, leaf2Min, leaf2Max;
 
@@ -785,8 +785,9 @@ C_BspTree::closeLeafHoles(void)
       leaf1 = leaves[b1];
       leaf1->bbox.GetMin(&leaf1Min);
       leaf1->bbox.GetMax(&leaf1Max);
+      /// Init node's data
       memset(cNode->bestNodeToConnect, NULL, sizeof(C_BspNode *) * TOTAL_FACES);
-      memset(bestDists, 0, sizeof(float) * TOTAL_FACES);
+      for(i = 0; i < TOTAL_FACES; i++) cNode->bestNodeDistances[i] = GREATEST_FLOAT;
 
       /// Take into consideration that a leaf might be at the boundary of the tree
       if(leaf1Min.x == treeMin.x) {cNode->adjacentNodes[X_MINUS].push_back(NULL);}
@@ -806,60 +807,92 @@ C_BspTree::closeLeafHoles(void)
             printf("oh boy\n");
 
          /// X_MINUS
-         if(FLOAT_EQ(leaf1Min.x, leaf2Max.x) &&
-            ((FLOAT_GREATER(leaf1Min.z, leaf2Min.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Max.z)) ||
-            (FLOAT_GREATER(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf2Min.z, leaf1Max.z)) ||
+         if(((FLOAT_GREATER(leaf1Min.z, leaf2Min.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Max.z)) ||
+         (FLOAT_GREATER(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf2Min.z, leaf1Max.z)) ||
 
-            (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf1Max.z, leaf2Max.z)) ||
-            (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_GREATER(leaf1Max.z, leaf2Max.z)) ||
+         (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf1Max.z, leaf2Max.z)) ||
+         (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_GREATER(leaf1Max.z, leaf2Max.z)) ||
 
-            (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Min.z)) ||
-            (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_GREATER(leaf1Min.z, leaf2Min.z)) ||
+         (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Min.z)) ||
+         (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_GREATER(leaf1Min.z, leaf2Min.z)) ||
 
-            (FLOAT_EQ(leaf1Min.z, leaf2Min.z) && FLOAT_EQ(leaf1Max.z, leaf2Max.z))))
-            cNode->adjacentNodes[X_MINUS].push_back(leaf2);
+         (FLOAT_EQ(leaf1Min.z, leaf2Min.z) && FLOAT_EQ(leaf1Max.z, leaf2Max.z)))) {
+            if(FLOAT_EQ(leaf1Min.x, leaf2Max.x)) {
+               cNode->adjacentNodes[X_MINUS].push_back(leaf2);
+            } else if(FLOAT_GREATER(leaf1Min.x, leaf2Max.x)) {
+               dist = leaf1Min.x - leaf2Max.x;
+               if(dist < cNode->bestNodeDistances[X_MINUS]) {
+                  cNode->bestNodeDistances[X_MINUS] = dist;
+                  cNode->bestNodeToConnect[X_MINUS] = leaf2;
+               }
+            }
+         }
 
          /// X_PLUS
-         if(FLOAT_EQ(leaf1Max.x, leaf2Min.x) &&
-            ((FLOAT_GREATER(leaf1Min.z, leaf2Min.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Max.z)) ||
-            (FLOAT_GREATER(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf2Min.z, leaf1Max.z)) ||
+         if(((FLOAT_GREATER(leaf1Min.z, leaf2Min.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Max.z)) ||
+         (FLOAT_GREATER(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf2Min.z, leaf1Max.z)) ||
 
-            (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf1Max.z, leaf2Max.z)) ||
-            (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_GREATER(leaf1Max.z, leaf2Max.z)) ||
+         (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_SMALLER(leaf1Max.z, leaf2Max.z)) ||
+         (FLOAT_EQ(leaf2Min.z, leaf1Min.z) && FLOAT_GREATER(leaf1Max.z, leaf2Max.z)) ||
 
-            (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Min.z)) ||
-            (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_GREATER(leaf1Min.z, leaf2Min.z)) ||
+         (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_SMALLER(leaf1Min.z, leaf2Min.z)) ||
+         (FLOAT_EQ(leaf2Max.z, leaf1Max.z) && FLOAT_GREATER(leaf1Min.z, leaf2Min.z)) ||
 
-            (FLOAT_EQ(leaf1Min.z, leaf2Min.z) && FLOAT_EQ(leaf1Max.z, leaf2Max.z))))
-            cNode->adjacentNodes[X_PLUS].push_back(leaf2);
+         (FLOAT_EQ(leaf1Min.z, leaf2Min.z) && FLOAT_EQ(leaf1Max.z, leaf2Max.z)))) {
+            if(FLOAT_EQ(leaf1Max.x, leaf2Min.x)) {
+               cNode->adjacentNodes[X_PLUS].push_back(leaf2);
+            } else if(FLOAT_SMALLER(leaf1Max.x, leaf2Min.x)) {
+               dist = leaf2Min.x - leaf1Max.x;
+               if(dist < cNode->bestNodeDistances[X_PLUS]) {
+                  cNode->bestNodeDistances[X_PLUS] = dist;
+                  cNode->bestNodeToConnect[X_PLUS] = leaf2;
+               }
+            }
+         }
 
          /// Z_MINUS
-         if(FLOAT_EQ(leaf1Min.z, leaf2Max.z) &&
-            ((FLOAT_GREATER(leaf1Min.x, leaf2Min.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Max.x)) ||
-            (FLOAT_GREATER(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf2Min.x, leaf1Max.x)) ||
+         if(((FLOAT_GREATER(leaf1Min.x, leaf2Min.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Max.x)) ||
+         (FLOAT_GREATER(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf2Min.x, leaf1Max.x)) ||
 
-            (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf1Max.x, leaf2Max.x)) ||
-            (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_GREATER(leaf1Max.x, leaf2Max.x)) ||
+         (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf1Max.x, leaf2Max.x)) ||
+         (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_GREATER(leaf1Max.x, leaf2Max.x)) ||
 
-            (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Min.x)) ||
-            (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_GREATER(leaf1Min.x, leaf2Min.x)) ||
+         (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Min.x)) ||
+         (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_GREATER(leaf1Min.x, leaf2Min.x)) ||
 
-            (FLOAT_EQ(leaf1Min.x, leaf2Min.x) && FLOAT_EQ(leaf1Max.x, leaf2Max.x))))
-            cNode->adjacentNodes[Z_MINUS].push_back(leaf2);
+         (FLOAT_EQ(leaf1Min.x, leaf2Min.x) && FLOAT_EQ(leaf1Max.x, leaf2Max.x)))) {
+            if(FLOAT_EQ(leaf1Min.z, leaf2Max.z)) {
+               cNode->adjacentNodes[Z_MINUS].push_back(leaf2);
+            } else if(FLOAT_GREATER(leaf1Min.z, leaf2Max.z)) {
+               dist = leaf1Min.z - leaf2Max.z;
+               if(dist < cNode->bestNodeDistances[Z_MINUS]) {
+                  cNode->bestNodeDistances[Z_MINUS] = dist;
+                  cNode->bestNodeToConnect[Z_MINUS] = leaf2;
+               }
+            }
+         }
 
          /// Z_PLUS
-         if(FLOAT_EQ(leaf1Max.z, leaf2Min.z) &&
-            ((FLOAT_GREATER(leaf1Min.x, leaf2Min.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Max.x)) ||
-            (FLOAT_GREATER(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf2Min.x, leaf1Max.x)) ||
+         if(((FLOAT_GREATER(leaf1Min.x, leaf2Min.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Max.x)) ||
+         (FLOAT_GREATER(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf2Min.x, leaf1Max.x)) ||
 
-            (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf1Max.x, leaf2Max.x)) ||
-            (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_GREATER(leaf1Max.x, leaf2Max.x)) ||
+         (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_SMALLER(leaf1Max.x, leaf2Max.x)) ||
+         (FLOAT_EQ(leaf2Min.x, leaf1Min.x) && FLOAT_GREATER(leaf1Max.x, leaf2Max.x)) ||
 
-            (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Min.x)) ||
-            (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_GREATER(leaf1Min.x, leaf2Min.x)) ||
+         (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_SMALLER(leaf1Min.x, leaf2Min.x)) ||
+         (FLOAT_EQ(leaf2Max.x, leaf1Max.x) && FLOAT_GREATER(leaf1Min.x, leaf2Min.x)) ||
 
-            (FLOAT_EQ(leaf1Min.x, leaf2Min.x) && FLOAT_EQ(leaf1Max.x, leaf2Max.x))))
-            cNode->adjacentNodes[Z_PLUS].push_back(leaf2);
+         (FLOAT_EQ(leaf1Min.x, leaf2Min.x) && FLOAT_EQ(leaf1Max.x, leaf2Max.x)))) {
+            if(FLOAT_EQ(leaf1Max.z, leaf2Min.z)) {
+               cNode->adjacentNodes[Z_PLUS].push_back(leaf2);
+            } else if(FLOAT_SMALLER(leaf1Max.z, leaf2Min.z)) {
+               dist = leaf2Min.z - leaf1Max.z;
+               if(dist < cNode->bestNodeDistances[Z_PLUS]) {
+                  cNode->bestNodeDistances[Z_PLUS] = dist;
+                  cNode->bestNodeToConnect[Z_PLUS] = leaf2;
+               }
+            }
+         }
       }
 
       if(!cNode->adjacentNodes[X_MINUS].size() || !cNode->adjacentNodes[X_PLUS].size() ||
@@ -867,27 +900,17 @@ C_BspTree::closeLeafHoles(void)
 
          printf("leaf %lu is not tightly packed.", leaf1->nodeID);
          printf("Uncovered faces are: ");
-         for(int i = 0; i < TOTAL_FACES; i++)
-            if(!cNode->adjacentNodes[i].size()) printf("%d ", i);
-         printf("\n");
+         for(int i = 0; i < TOTAL_FACES; i++) {
+            if(!cNode->adjacentNodes[i].size()) {
+               printf("%s ", C_BBox::ADJACENT_FACE_NAMES[i]);
+               printf("Best candidate: ");
+               if(cNode->bestNodeToConnect[i])
+                  printf("%lu\n",cNode->bestNodeToConnect[i]->nodeID);
+               else
+                  printf("none!\n");
+            }
+         }
       }
-//         /// Try to fix it
-//         int bestNode;
-//         float dist = GREATEST_FLOAT;
-//         for(unsigned int b2 = 0; b2 < leaves.size(); b2++) {
-//            leaf2 = leaves[b2];
-//            leaf2->bbox.GetMax(&leaf2Max);
-//            leaf2->bbox.GetMin(&leaf2Min);
-//
-//            if(faces[Z_MINUS]) {
-//               if((leaf1Min.x >= leaf2Min.x && leaf1Min.x <= leaf2Max.x) ||
-//                  (leaf2Min.x >= leaf1Min.x && leaf2Min.x <= leaf1Max.x)) {
-//                  assert(leaf1Min.z > leaf2Max.z);
-//                  dist = leaf1Min.z - leaf2Max.z;
-//               }
-//            }
-//         }
-//      }
    }
 
 
