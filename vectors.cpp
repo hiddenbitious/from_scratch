@@ -65,6 +65,15 @@ C_Vector3::C_Vector3(C_Vertex* point)
 	z = point->z;
 }
 
+C_Vector3 &C_Vector3::operator= (const C_Vector3 &vec)
+{
+   if(this != &vec) {
+      x = vec.x;
+      y = vec.y;
+      z = vec.z;
+   }
+   return *this;
+}
 
 C_Vector3 C_Vector3::operator + (C_Vector3 vec)
 {

@@ -19,18 +19,11 @@ C_BBox::~C_BBox()
 C_BBox & C_BBox::operator= (const C_BBox &box)
 {
    if (this != &box) {
-      min.x = box.min.x;
-      min.y = box.min.y;
-      min.z = box.min.z;
-
-      max.x = box.max.x;
-      max.y = box.max.y;
-      max.z = box.max.z;
+      min = box.min;
+      max = box.max;
 
       for(int i = 0; i < 8; i++) {
-         vertices[i].x = box.vertices[i].x;
-         vertices[i].y = box.vertices[i].y;
-         vertices[i].z = box.vertices[i].z;
+         vertices[i] = box.vertices[i];
       }
    }
 

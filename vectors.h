@@ -55,6 +55,8 @@ class C_Vector3 {
 		bool operator < (C_Vector3* vec) const;
 		bool operator > (C_Vector3* vec) const;
 
+      C_Vector3 &operator= (const C_Vector3 &vec);
+
 		C_Vector3 operator + (C_Vector3);
 		C_Vector3& operator += (C_Vector3);
 		C_Vector3& operator += (const float);
