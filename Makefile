@@ -1,5 +1,5 @@
 CXX=clang++
-CFLAGS=-c -Wall -O0 -g
+CFLAGS=-c -Wall -O3
 
 GL_PATH=/usr/lib/x86_64-linux-gnu/mesa/
 GLEW_PATH=/usr/lib/x86_64-linux-gnu/

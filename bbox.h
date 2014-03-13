@@ -45,8 +45,9 @@ private:
 public:
    C_BBox();
    ~C_BBox();
+   C_BBox &operator= (const C_BBox &box);
 
-   static char *ADJACENT_FACE_NAMES[TOTAL_FACES];
+   const static char *ADJACENT_FACE_NAMES[TOTAL_FACES];
    adjacent_face_t areBboxesAdjacent(const C_BBox *box);
 
    void SetMin(const float x , const float y , const float z);
