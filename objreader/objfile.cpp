@@ -7,8 +7,8 @@
 
 void glmFirstPass(GLMmodel* model, FILE* file);
 void glmSecondPass(GLMmodel* model, FILE* file);
-GLMgroup* glmAddGroup(GLMmodel* model, char* name);
-GLMgroup* glmFindGroup(GLMmodel* model, char* name);
+GLMgroup* glmAddGroup(GLMmodel* model, const char* name);
+GLMgroup* glmFindGroup(GLMmodel* model, const char* name);
 void glmDelete(GLMmodel* model);
 static void glmReadMTL(GLMmodel* model, char* name);
 char* glmDirName(char* path);
@@ -653,7 +653,7 @@ static void glmReadMTL(GLMmodel* model, char* name)
 
 
 /// glmFindGroup: Find a group in the model
-GLMgroup* glmFindGroup(GLMmodel* model, char* name)
+GLMgroup* glmFindGroup(GLMmodel* model, const char* name)
 {
 	GLMgroup* group;
 
@@ -671,7 +671,7 @@ GLMgroup* glmFindGroup(GLMmodel* model, char* name)
 }
 
 /// glmAddGroup: Add a group to the model
-GLMgroup* glmAddGroup(GLMmodel* model, char* name)
+GLMgroup* glmAddGroup(GLMmodel* model, const char* name)
 {
 	GLMgroup* group;
 
