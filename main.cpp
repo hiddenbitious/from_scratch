@@ -20,10 +20,12 @@
 #include "bspTree.h"
 #include "bspNode.h"
 #include "vectors.h"
+#include "mesh.h"
 #include "timer.h"
 #include "glsl/glsl.h"
 #include "metaballs/cubeGrid.h"
 #include "metaballs/metaball.h"
+#include "objreader/objfile.h"
 
 using namespace std;
 
@@ -40,6 +42,7 @@ char MAX_THREADS = 0;
 C_GLShader *bspShader = NULL;
 C_GLShader *basicShader = NULL;
 C_GLShader *pointShader = NULL;
+C_GLShader *wallShader = NULL;
 
 /// Camera and frustum
 static C_Camera camera;
@@ -74,6 +77,8 @@ static C_CubeGrid *grid;
 static C_Metaball metaball[3];
 
 static void CountFPS (void);
+
+C_MeshGroup group;
 
 static void
 Initializations(void)
@@ -158,6 +163,47 @@ Initializations(void)
    assert(pointShader->verticesAttribLocation >= 0);
    assert(pointShader->normalsAttribLocation == -1);
 
+   wallShader = shaderManager->LoadShaderProgram("shaders/shader1.vert", "shaders/shader1.frag");
+   assert(wallShader->verticesAttribLocation >= 0);
+   assert(wallShader->normalsAttribLocation == -1);
+   assert(wallShader->textureUniformLocation_0 >= 0);
+   assert(wallShader->textureUniformLocation_1 == -1);
+
+   glmReadOBJ("objmodels/fence.obj", &group);
+   group.shader = wallShader;
+
+   printf("--------------------------------------------------\n");
+
+   C_Mesh *mesh = group.meshes;
+   while(mesh) {
+      assert(!(mesh->nVertices%3));
+      for(int i = 0; i < mesh->nVertices / 3; i++) {
+         printf("v%d(%f %f %f) -- ", i, mesh->vertices[3 * i    ].x,
+                                        mesh->vertices[3 * i    ].y,
+                                        mesh->vertices[3 * i    ].z);
+
+         printf("(%f %f %f) -- ", mesh->vertices[3 * i + 1].x,
+                                  mesh->vertices[3 * i + 1].y,
+                                  mesh->vertices[3 * i + 1].z);
+
+         printf("(%f %f %f)\n",   mesh->vertices[3 * i + 2].x,
+                                  mesh->vertices[3 * i + 2].y,
+                                  mesh->vertices[3 * i + 2].z);
+
+         if(mesh->textCoords) {
+            printf("t%d(%f %f) -- ", i, mesh->textCoords[3 * i    ].u,
+                                        mesh->textCoords[3 * i    ].v);
+
+            printf("(%f %f) -- ", mesh->textCoords[3 * i + 1].u,
+                                  mesh->textCoords[3 * i + 1].v);
+
+            printf("(%f %f)\n\n", mesh->textCoords[3 * i + 2].u,
+                                  mesh->textCoords[3 * i + 2].v);
+         }
+      }
+      mesh = mesh->next;
+   }
+
 	/// timer initialization
 	timer.Initialize ();
 }
@@ -182,16 +228,20 @@ Draw(void)
 	metaballPolys = 0;
 
 	/// Draw metaballs
-	metaball[0].position.y = 20.0f + 5 * cos(angle2);
-	metaball[0].position.x = 20.0f + 10 * cos(angle2);
+//	metaball[0].position.y = 20.0f + 5 * cos(angle2);
+//	metaball[0].position.x = 20.0f + 10 * cos(angle2);
+//
+//	metaball[1].position.x = 20.0f + 8.0f * cos(angle);
+//	metaball[1].position.z = 20.0f + 5.0f * cos(angle);
+//
+//	metaball[2].position.z = 15.0f + 10.0f * cos(angle);
 
-	metaball[1].position.x = 20.0f + 8.0f * cos(angle);
-	metaball[1].position.z = 20.0f + 5.0f * cos(angle);
-
-	metaball[2].position.z = 15.0f + 10.0f * cos(angle);
 
 //   grid->Update(metaball , 3 , NULL);
 //   grid->Draw(NULL);
+
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	group.draw();
 
 	switch(bspRenderingType) {
 		case 0:
