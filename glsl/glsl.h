@@ -43,6 +43,9 @@
 
 #define UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX     "u_modelviewMatrix"
 #define UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX    "u_projectionMatrix"
+#define UNIFORM_VARIABLE_NAME_TEXTURE_0            "u_texture_0"
+#define UNIFORM_VARIABLE_NAME_TEXTURE_1            "u_texture_1"
+#define UNIFORM_VARIABLE_NAME_TEXTURE_2            "u_texture_2"
 
 using namespace std;
 class C_GLShader;
@@ -131,6 +134,7 @@ public:
    void printAttribInfo(GLint attrib);
 
    GLint verticesAttribLocation, normalsAttribLocation, texCoordsAttribLocation, colorsAttribLocation;
+   GLint textureUniformLocation_0, textureUniformLocation_1, textureUniformLocation_2;
 
 protected:
    char *linkerLog;

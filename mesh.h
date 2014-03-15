@@ -1,69 +1,48 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #ifndef _MESH_H_
 #define _MESH_H_
 
+#include "tgaLoader/texture.h"
 #include "globals.h"
-#include "frustum.h"
-//#include "../oglRenderer/textureLoader/TextureLoader.h"
+#include "bbox.h"
 
 class C_Mesh {
-		friend class C_3DSReader;
+public:
+   C_Vertex       *vertices;     /// vertices
+   C_Vertex       *colors;       /// colors
+   C_TexCoord     *textCoords;   /// texture coordinates
+   C_Normal       *normals;      /// normals
+   int            *indices;      /// Vertex indices
+   C_Mesh         *next;         /// Pointer to next mesh in meshGroup
+   Texture        *texture;      /// Pointer to texture struct
 
-	public:
+   int            nVertices;     /// Number of vertices in mesh
+   int            nFaces;        /// Number of triangles in mesh
 
-		//Number of vertices
-		ULONG nVertices;
-		//Number of polys (= number of indices)
-		ULONG nPolys;
+   C_Mesh(void);
+   ~C_Mesh(void);
 
-		//Vertex data
-		C_Vertex* vertices;
-		//Index data
-		C_TriIndices* indices;
-		//Color data
-		C_Color* color;
-		//Normal data
-		C_Normal* normals;
-		//Texture coords data
-		C_TexCoord* texCoords;
-
-	private:
-
-		//Count numer of referces to this mesh
-		UINT nReferences;
-
-	public:
-
-		C_Mesh(void);
-
-		ULONG GetnVertices(void) { return nVertices; }
-		ULONG GetnPolys(void) { return nPolys; }
-
-		//return number of references to this mesh
-		UINT GetRef(void) { return nReferences; }
-
-		//A triMesh is making a reference to this mesh. Increase counter.
-		void Ref(void);
-		//Decrease references by 1.
-		//If references <= 0 then the object is destroyed.
-		void UnRef(void);
-
-		void CalcNormals(bool invertNormals);
+   void draw(C_GLShader *shader);
 };
+
+class C_MeshGroup {
+public:
+   C_Mesh         *meshes;       /// Linked list of meshes in group
+   int            nMeshes;       /// Number of meshes in group
+   C_Vertex       position;      /// Group's position
+   C_BBox         bbox;
+   C_GLShader     *shader;
+
+   C_MeshGroup(void);
+   ~C_MeshGroup(void);
+
+   C_Mesh *addMesh(void);        /// Creates a new mesh, adds it in the linked list and returns
+                                 /// a pointer to it
+   void draw(void);
+};
+
+//mesh_t *addMesh(meshGroup_t *meshGroup);
+//void deleteGroup(meshGroup_t *group);
+//void drawGroup(const meshGroup_t *meshGroup, int attr0, int attr1, int attr2, int uniform0);
+//void drawMesh(const mesh_t *mesh, int attr0, int attr1, int attr2);
 
 #endif

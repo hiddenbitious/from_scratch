@@ -94,12 +94,12 @@ typedef enum {
 } eglTexFilterType;
 
 typedef	struct {
-	uint32_t 	TextureID;									// Texture ID Used To Select A Texture
-	eglTexType	TexType;									// Texture Format
-	uint32_t	Width;										// Image Width
-	uint32_t	Height;										// Image Height
-	uint32_t	Type;										// Image Type (GL_RGB, GL_RGBA)
-	uint32_t	Bpp;										// Image Color Depth In Bits Per Pixel
+	uint32_t 	TextureID;     // Texture ID Used To Select A Texture
+	eglTexType	TexType;       // Texture Format
+	uint32_t	Width;            // Image Width
+	uint32_t	Height;           // Image Height
+	uint32_t	Type;             // Image Type (GL_RGB, GL_RGBA)
+	uint32_t	Bpp;              // Image Color Depth In Bits Per Pixel
 	std::string	textureName;
 } glTexture;
 
@@ -117,6 +117,8 @@ extern C_GLShaderManager *shaderManager;
 extern C_GLShader *bspShader;
 extern C_GLShader *basicShader;
 extern C_GLShader *pointShader;
+extern C_GLShader *wallShader;
+
 extern bool drawConnectedToo;
 extern char MAX_THREADS;
 

@@ -672,6 +672,10 @@ void C_GLShader::UpdateAttribLocations(void)
    normalsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_NORMALS);
    texCoordsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_TEXCOORDS);
    colorsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_COLORS);
+
+   textureUniformLocation_0 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_0);
+   textureUniformLocation_1 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_1);
+   textureUniformLocation_2 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_2);
 }
 
 C_GLShaderManager::C_GLShaderManager(void)
@@ -856,9 +860,10 @@ C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const 
 		return shaderObject;
 	}
 
+	cout << "done!" << endl;
+
 	shaderObject->UpdateAttribLocations();
 
-	cout << "done!" << endl;
 	shaderList.push_back(shaderObject);
 
 	return shaderObject;

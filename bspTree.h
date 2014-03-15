@@ -3,7 +3,7 @@
 
 #include "globals.h"
 #include "plane.h"
-#include "trimesh.h"
+#include "bbox.h"
 #include "bspCommon.h"
 
 #include <vector>

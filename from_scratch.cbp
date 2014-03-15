@@ -71,6 +71,8 @@
 		<Unit filename="metaballs/cubeGrid.h" />
 		<Unit filename="metaballs/metaball.h" />
 		<Unit filename="metaballs/tables.h" />
+		<Unit filename="objreader/objfile.cpp" />
+		<Unit filename="objreader/objfile.h" />
 		<Unit filename="plane.cpp" />
 		<Unit filename="plane.h" />
 		<Unit filename="quaternion.cpp" />
@@ -79,6 +81,11 @@
 		<Unit filename="shaders/basic.vert" />
 		<Unit filename="shaders/metaballs_shader.frag" />
 		<Unit filename="shaders/metaballs_shader.vert" />
+		<Unit filename="tgaLoader/texture.h" />
+		<Unit filename="tgaLoader/tga.h" />
+		<Unit filename="tgaLoader/tgaLoader.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="timer.cpp" />
 		<Unit filename="timer.h" />
 		<Unit filename="trimesh.cpp" />

@@ -439,7 +439,7 @@ C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, b
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       node->drawn = true;
-      node->Draw(bspShader);
+      node->Draw();
       node->DrawPointSet();
       polyCount += node->nPolys;
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -451,7 +451,7 @@ C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, b
             }
 
             node->PVS[i]->drawn = true;
-            node->PVS[i]->Draw(bspShader);
+            node->PVS[i]->Draw();
 
             node->PVS[i]->bbox.Draw();
    //			node->PVS[i]->DrawPointSet();
@@ -463,12 +463,12 @@ C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, b
 }
 
 void
-C_BspNode::Draw(C_GLShader *shader)
+C_BspNode::Draw()
 {
    /// Vertices
-	glVertexAttribPointer(shader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
+	glVertexAttribPointer(bspShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
 	/// Normals
-	glVertexAttribPointer(shader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)triangles + 3 * sizeof(float));
+	glVertexAttribPointer(bspShader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)triangles + 3 * sizeof(float));
 
    glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
 }
