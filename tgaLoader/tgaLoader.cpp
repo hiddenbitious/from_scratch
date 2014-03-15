@@ -23,7 +23,7 @@
 /			filename, string pointing to file to open							*
 /********************************************************************************/
 
-int LoadTGA(Texture * texture, const char *filename)				// Load a TGA file
+int LoadTGA(C_Texture* texture, const char *filename)				// Load a TGA file
 {
 	FILE * fTGA;												// File pointer to texture file
 	fTGA = fopen(filename, "rb");								// Open file for reading
@@ -61,7 +61,7 @@ int LoadTGA(Texture * texture, const char *filename)				// Load a TGA file
 	return 1;															// All went well, continue on
 }
 
-int LoadUncompressedTGA(Texture * texture, const char *filename, FILE *fTGA)	// Load an uncompressed TGA (note, much of this code is based on NeHe's
+int LoadUncompressedTGA(C_Texture * texture, const char *filename, FILE *fTGA)	// Load an uncompressed TGA (note, much of this code is based on NeHe's
 {																			// TGA Loading code nehe.gamedev.net)
 	if(fread(tga.header, sizeof(tga.header), 1, fTGA) == 0)					// Read TGA header
 	{
@@ -97,7 +97,8 @@ int LoadUncompressedTGA(Texture * texture, const char *filename, FILE *fTGA)	// 
 
 	tga.bytesPerPixel	= (tga.Bpp / 8);									// Compute the number of BYTES per pixel
 	tga.imageSize		= (tga.bytesPerPixel * tga.Width * tga.Height);		// Compute the total amout ofmemory needed to store data
-	texture->imageData	= (GLubyte *)malloc(tga.imageSize);					// Allocate that much memory
+//	texture->imageData	= (GLubyte *)malloc(tga.imageSize);					// Allocate that much memory
+	texture->imageData	= new GLubyte[tga.imageSize];					// Allocate that much memory
 
 	if(texture->imageData == NULL)											// If no space was allocated
 	{
@@ -128,7 +129,7 @@ int LoadUncompressedTGA(Texture * texture, const char *filename, FILE *fTGA)	// 
 	return 1;															// Return success
 }
 
-int LoadCompressedTGA(Texture * texture, const char *filename, FILE * fTGA)		// Load COMPRESSED TGAs
+int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)		// Load COMPRESSED TGAs
 {
 	if(fread(tga.header, sizeof(tga.header), 1, fTGA) == 0)					// Attempt to read header
 	{
@@ -164,8 +165,8 @@ int LoadCompressedTGA(Texture * texture, const char *filename, FILE * fTGA)		// 
 
 	tga.bytesPerPixel	= (tga.Bpp / 8);									// Compute BYTES per pixel
 	tga.imageSize		= (tga.bytesPerPixel * tga.Width * tga.Height);		// Compute amout of memory needed to store image
-	texture->imageData	= (GLubyte *)malloc(tga.imageSize);					// Allocate that much memory
-
+//	texture->imageData	= (GLubyte *)malloc(tga.imageSize);					// Allocate that much memory
+   texture->imageData	= new GLubyte[tga.imageSize];
 	if(texture->imageData == NULL)											// If it wasnt allocated correctly..
 	{
 		//MessageBox(NULL, "Could not allocate memory for image", "ERROR", MB_OK);	// Display Error
@@ -327,28 +328,36 @@ int LoadCompressedTGA(Texture * texture, const char *filename, FILE * fTGA)		// 
 	return 1;																		// return success
 }
 
-Texture *loadGLTexture(const char *filename)
+bool
+C_Texture::loadGLTexture(const char *filename)
 {
-   Texture *texture = (Texture *)malloc(sizeof(Texture));
-   if(!LoadTGA(texture, filename)) {
+//   Texture *texture = new Texture;
+   if(!LoadTGA(this, filename)) {
       printf("Error loading texture %s.\n", filename);
+      return false;
       assert(0);
    }
 
-   glGenTextures(1, &texture->texID);
-   glBindTexture(GL_TEXTURE_2D, texture->texID);
-   glTexImage2D(GL_TEXTURE_2D, 0, texture->bpp / 8, texture->width, texture->height, 0, texture->type, GL_UNSIGNED_BYTE, texture->imageData);
+   glGenTextures(1, &texID);
+   glBindTexture(GL_TEXTURE_2D, texID);
+   glTexImage2D(GL_TEXTURE_2D, 0, bpp / 8, width, height, 0, type, GL_UNSIGNED_BYTE, imageData);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
    printf("Loaded texture %s:\n", filename);
-   printf("\tbpp: %d\n", texture->bpp);
-   printf("\twidth: %d\n", texture->width);
-   printf("\theight: %d\n", texture->height);
-   printf("\ttexID: %d\n", texture->texID);
-   printf("\ttype: %d\n", texture->type);
+   printf("\tbpp: %d\n", bpp);
+   printf("\twidth: %d\n", width);
+   printf("\theight: %d\n", height);
+   printf("\ttexID: %d\n", texID);
+   printf("\ttype: %d\n", type);
 
-   return texture;
+   return true;
+}
+
+C_Texture::~C_Texture()
+{
+   delete[] imageData;
+   glDeleteTextures(1, &texID);
 }

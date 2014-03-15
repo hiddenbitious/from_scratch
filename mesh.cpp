@@ -3,6 +3,13 @@
 
 #include "mesh.h"
 
+C_BaseMesh::C_BaseMesh(void)
+{
+   nVertices = 0;
+   nTriangles = 0;
+   position.x = position.y = position.z = 0.0f;
+}
+
 C_Mesh::C_Mesh(void)
 {
    vertices = NULL;
@@ -14,7 +21,7 @@ C_Mesh::C_Mesh(void)
    texture = NULL;
 
    nVertices = 0;
-   nFaces = 0;
+   nTriangles = 0;
 }
 
 C_Mesh::~C_Mesh(void)
@@ -24,11 +31,7 @@ C_Mesh::~C_Mesh(void)
    if(textCoords) delete[] textCoords;
    if(normals)    delete[] normals;
    if(indices)    delete[] indices;
-   if(texture) {
-//      delete[] mesh->texture->imageData);
-//      glDeleteTextures(1, &mesh->texture->texID);
-      delete[] texture;
-   }
+   if(texture)    delete texture;
 }
 
 C_MeshGroup::C_MeshGroup(void)
@@ -44,16 +47,17 @@ C_MeshGroup::~C_MeshGroup(void)
    while(mesh) {
       oldMesh = mesh;
       mesh = mesh->next;
-      delete[] oldMesh;
+      delete oldMesh;
    }
 
    nMeshes = 0;
    meshes = NULL;
 }
 
-C_Mesh *C_MeshGroup::addMesh(void)
+C_Mesh *
+C_MeshGroup::addMesh(void)
 {
-   C_Mesh *newMesh = (C_Mesh *)new C_Mesh();
+   C_Mesh *newMesh = new C_Mesh();
    newMesh->next = meshes;
    meshes = newMesh;
    nMeshes++;
@@ -61,7 +65,8 @@ C_Mesh *C_MeshGroup::addMesh(void)
    return newMesh;
 }
 
-void C_MeshGroup::draw(void)
+void
+C_MeshGroup::draw(void)
 {
 //   vertex_t *mesh_transformedVerts, *tmpVerts;
 	shaderManager->pushShader(shader);
@@ -110,7 +115,8 @@ void C_MeshGroup::draw(void)
    glFlush();
 }
 
-void C_Mesh::draw(C_GLShader *shader)
+void
+C_Mesh::draw(C_GLShader *shader)
 {
    if(shader->verticesAttribLocation >= 0)   glVertexAttribPointer(shader->verticesAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, vertices);
    if(shader->colorsAttribLocation >= 0)     glVertexAttribPointer(shader->colorsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
@@ -119,5 +125,5 @@ void C_Mesh::draw(C_GLShader *shader)
    if(!indices)
       glDrawArrays(GL_TRIANGLES, 0, nVertices);
    else
-      glDrawElements(GL_TRIANGLES, 3 * nFaces, GL_UNSIGNED_INT, indices);
+      glDrawElements(GL_TRIANGLES, 3 * nTriangles, GL_UNSIGNED_INT, indices);
 }

@@ -5,7 +5,19 @@
 #include "globals.h"
 #include "bbox.h"
 
-class C_Mesh {
+class C_BaseMesh {
+public:
+   int nVertices;
+   int nTriangles;
+   C_Vertex position;
+   C_BBox bbox;
+
+   C_BaseMesh(void);
+//   virtual draw(void) = 0;
+
+};
+
+class C_Mesh : public C_BaseMesh {
 public:
    C_Vertex       *vertices;     /// vertices
    C_Vertex       *colors;       /// colors
@@ -13,25 +25,21 @@ public:
    C_Normal       *normals;      /// normals
    int            *indices;      /// Vertex indices
    C_Mesh         *next;         /// Pointer to next mesh in meshGroup
-   Texture        *texture;      /// Pointer to texture struct
-
-   int            nVertices;     /// Number of vertices in mesh
-   int            nFaces;        /// Number of triangles in mesh
+   C_Texture      *texture;      /// Pointer to texture struct
 
    C_Mesh(void);
    ~C_Mesh(void);
+   void calculateBbox(void);
 
    void draw(C_GLShader *shader);
 };
 
-class C_MeshGroup {
+class C_MeshGroup : public C_BaseMesh  {
 public:
    C_Mesh         *meshes;       /// Linked list of meshes in group
    int            nMeshes;       /// Number of meshes in group
    int            nTriangles;    /// Total number of triangles in all meshes
    int            nVertices;     /// Total number of vertices in all meshes
-   C_Vertex       position;      /// Group's position
-   C_BBox         bbox;
    C_GLShader     *shader;
 
    C_MeshGroup(void);

@@ -98,15 +98,16 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 
       /// Allocate memory
       mesh = meshgroup->addMesh();
+      mesh->nTriangles = group->numtriangles;
       mesh->nVertices = 3 * group->numtriangles;
-      mesh->vertices = (C_Vertex *) malloc(mesh->nVertices * sizeof(C_Vertex));
+      mesh->vertices = new C_Vertex[mesh->nVertices];
       if(group->properties & HAS_TEXCOORDS)
-         mesh->textCoords = (C_TexCoord *) malloc(mesh->nVertices * sizeof(C_TexCoord));
+         mesh->textCoords = new C_TexCoord[mesh->nVertices];
       if(group->properties & HAS_NORMALS)
-         mesh->normals = (C_Normal *) malloc(mesh->nVertices * sizeof(C_Normal));
+         mesh->normals = new C_Normal[mesh->nVertices];
 
       totalVertices += mesh->nVertices;
-      totalTriangles += mesh->nFaces;
+      totalTriangles += mesh->nTriangles;
 
       for(i = 0; i < group->numtriangles; i++) {
          /// Copy vertices
@@ -164,7 +165,8 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 
       /// Copy material
 //      printf("material: %d", group->material);
-      mesh->texture = loadGLTexture(model->materials[group->material].texture);
+      mesh->texture = new C_Texture();
+      mesh->texture->loadGLTexture(model->materials[group->material].texture);
 
       size += mesh->nVertices * sizeof(C_Vertex);
       if(group->properties & HAS_TEXCOORDS)
