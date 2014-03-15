@@ -175,34 +175,34 @@ Initializations(void)
    printf("--------------------------------------------------\n");
 
    C_Mesh *mesh = group.meshes;
-   while(mesh) {
-      assert(!(mesh->nVertices%3));
-      for(int i = 0; i < mesh->nVertices / 3; i++) {
-         printf("v%d(%f %f %f) -- ", i, mesh->vertices[3 * i    ].x,
-                                        mesh->vertices[3 * i    ].y,
-                                        mesh->vertices[3 * i    ].z);
-
-         printf("(%f %f %f) -- ", mesh->vertices[3 * i + 1].x,
-                                  mesh->vertices[3 * i + 1].y,
-                                  mesh->vertices[3 * i + 1].z);
-
-         printf("(%f %f %f)\n",   mesh->vertices[3 * i + 2].x,
-                                  mesh->vertices[3 * i + 2].y,
-                                  mesh->vertices[3 * i + 2].z);
-
-         if(mesh->textCoords) {
-            printf("t%d(%f %f) -- ", i, mesh->textCoords[3 * i    ].u,
-                                        mesh->textCoords[3 * i    ].v);
-
-            printf("(%f %f) -- ", mesh->textCoords[3 * i + 1].u,
-                                  mesh->textCoords[3 * i + 1].v);
-
-            printf("(%f %f)\n\n", mesh->textCoords[3 * i + 2].u,
-                                  mesh->textCoords[3 * i + 2].v);
-         }
-      }
-      mesh = mesh->next;
-   }
+//   while(mesh) {
+//      assert(!(mesh->nVertices%3));
+//      for(int i = 0; i < mesh->nVertices / 3; i++) {
+//         printf("v%d(%f %f %f) -- ", i, mesh->vertices[3 * i    ].x,
+//                                        mesh->vertices[3 * i    ].y,
+//                                        mesh->vertices[3 * i    ].z);
+//
+//         printf("(%f %f %f) -- ", mesh->vertices[3 * i + 1].x,
+//                                  mesh->vertices[3 * i + 1].y,
+//                                  mesh->vertices[3 * i + 1].z);
+//
+//         printf("(%f %f %f)\n",   mesh->vertices[3 * i + 2].x,
+//                                  mesh->vertices[3 * i + 2].y,
+//                                  mesh->vertices[3 * i + 2].z);
+//
+//         if(mesh->textCoords) {
+//            printf("t%d(%f %f) -- ", i, mesh->textCoords[3 * i    ].u,
+//                                        mesh->textCoords[3 * i    ].v);
+//
+//            printf("(%f %f) -- ", mesh->textCoords[3 * i + 1].u,
+//                                  mesh->textCoords[3 * i + 1].v);
+//
+//            printf("(%f %f)\n\n", mesh->textCoords[3 * i + 2].u,
+//                                  mesh->textCoords[3 * i + 2].v);
+//         }
+//      }
+//      mesh = mesh->next;
+//   }
 
 	/// timer initialization
 	timer.Initialize ();

@@ -29,7 +29,8 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 	int i, index;
    size_t size = 0;
 
-	/* open the file */
+   printf("Reading \"%s\" file... \n", filename);
+
 	file = fopen(filename, "r");
 	if (!file) {
 		fprintf(stderr, "glmReadOBJ() failed: can't open data file \"%s\".\n", filename);
@@ -83,15 +84,15 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 /// ================================================================
 
 	/// Init mesh struct
-//	meshgroup = new C_MeshGroup();
 	meshgroup->nMeshes = model->numgroups;
 
    /// Copy mesh information
    GLMgroup *group = model->groups;
    C_Mesh *mesh;
+   int totalVertices = 0, totalTriangles = 0;
    while(group) {
-      if(group->name)
-         printf("%s:\n", group->name);
+//      if(group->name)
+//         printf("%s:\n", group->name);
 
       assert(group->properties);
 
@@ -104,25 +105,25 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       if(group->properties & HAS_NORMALS)
          mesh->normals = (C_Normal *) malloc(mesh->nVertices * sizeof(C_Normal));
 
+      totalVertices += mesh->nVertices;
+      totalTriangles += mesh->nFaces;
+
       for(i = 0; i < group->numtriangles; i++) {
          /// Copy vertices
          index = 3 * model->triangles[group->triangles[i]].vindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
          mesh->vertices[3 * i    ].x = model->vertices[index    ];
          mesh->vertices[3 * i    ].y = model->vertices[index + 1];
          mesh->vertices[3 * i    ].z = model->vertices[index + 2];
-//         mesh->vertices[3 * i    ].w = 1.0f;
 
          index = 3 * model->triangles[group->triangles[i]].vindices[1];
          mesh->vertices[3 * i + 1].x = model->vertices[index    ];
          mesh->vertices[3 * i + 1].y = model->vertices[index + 1];
          mesh->vertices[3 * i + 1].z = model->vertices[index + 2];
-//         mesh->vertices[3 * i + 1].w = 1.0f;
 
          index = 3 * model->triangles[group->triangles[i]].vindices[2];
          mesh->vertices[3 * i + 2].x = model->vertices[index    ];
          mesh->vertices[3 * i + 2].y = model->vertices[index + 1];
          mesh->vertices[3 * i + 2].z = model->vertices[index + 2];
-//         mesh->vertices[3 * i + 2].w = 1.0f;
 
          /// Copy texture coordinates
          if(group->properties & HAS_TEXCOORDS) {
@@ -174,7 +175,13 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       group = group->next;
    }
 
-   printf("Total size of model: %lu bytes\n", size);
+   meshgroup->nTriangles = totalTriangles;
+   meshgroup->nVertices = totalVertices;
+
+   printf("\t%d vertices - %d triangles\n", totalVertices, totalTriangles);
+   printf("\tTotal size of model: %lu bytes\n", size);
+
+   printf("Done!\n");
 
    glmDelete(model);
 }

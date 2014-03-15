@@ -60,14 +60,12 @@ public:
    C_GLShaderObject();
    virtual ~C_GLShaderObject();
 
-   bool LoadShaderProgram(const char *);
-
-   //Compile shader
+   bool LoadShaderProgram(const char *filename);
    bool compile(bool printSource);
    char *compilerLog;
 
 protected:
-   // shader object
+   /// shader object. This is the shader ID returned from GL
    GLuint shaderObject;
    shader_type_t type;
    GLubyte *shaderSource;
@@ -100,7 +98,7 @@ public:
    void Begin(void);
    void End(void);
 
-   // Uniform Variables
+   /// Uniform Variables
    bool setUniform1f(const char* varname, GLfloat v0);  //!< set float uniform to program
    bool setUniform2f(const char* varname, GLfloat v0, GLfloat v1); //!< set vec2 uniform to program
    bool setUniform3f(const char* varname, GLfloat v0, GLfloat v1, GLfloat v2); //!< set vec3 uniform to program
@@ -163,7 +161,7 @@ public :
    ~C_GLShaderManager();
    static C_GLShaderManager *getSingleton(void);
 
-   // Load a vertex and a fragment shader and returns a pointer to a C_GLShader object that holds both
+   /// Load a vertex and a fragment shader and returns a pointer to a C_GLShader object that holds both
    C_GLShader* LoadShaderProgram(const char *, const char *);
    void pushShader(C_GLShader *shader);
    void popShader(void);
@@ -179,6 +177,7 @@ private:
    /// Stack of active shaders
    vector<C_GLShader *> activeShader;
 
+   /// Finds if a shader has already been loaded by comparing it's source
    C_GLShaderObject *shaderObjectExists(const C_GLShaderObject *shaderObject, shader_type_t type);
    C_GLShader *shaderExists(const C_GLShaderObject *shaderObject1, const C_GLShaderObject *shaderObject2);
 };

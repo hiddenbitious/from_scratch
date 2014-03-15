@@ -28,6 +28,8 @@ class C_MeshGroup {
 public:
    C_Mesh         *meshes;       /// Linked list of meshes in group
    int            nMeshes;       /// Number of meshes in group
+   int            nTriangles;    /// Total number of triangles in all meshes
+   int            nVertices;     /// Total number of vertices in all meshes
    C_Vertex       position;      /// Group's position
    C_BBox         bbox;
    C_GLShader     *shader;

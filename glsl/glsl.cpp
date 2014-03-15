@@ -157,12 +157,12 @@ bool C_GLShaderObject::compile(bool printSource)
 
 	glShaderSource(shaderObject , 1 , (const GLchar **)&shaderSource , NULL);
 
-	//Compile shader
+	/// Compile shader
 	int success = 0;
 	glCompileShader(shaderObject);
 	glGetShaderiv(shaderObject , GL_COMPILE_STATUS , &success);
 
-	//Get log size
+	/// Get log size
 	int logSize = 0;
 	glGetShaderiv(shaderObject , GL_INFO_LOG_LENGTH , &logSize);
 	compilerLog = new char[logSize];
@@ -629,9 +629,9 @@ GLint C_GLShader::GetUniLoc(const GLcharARB *name)
 	GLint loc;
 
 	loc = glGetUniformLocation(programObject, name);
-	if(loc == -1) {
-		LOGE("Error: can't find uniform variable \"%s\"\n", name);
-	}
+//	if(loc == -1) {
+//		LOGE("Error: can't find uniform variable \"%s\"\n", name);
+//	}
 //    CHECK_GL_ERROR();
 	return loc;
 }
@@ -697,7 +697,7 @@ C_GLShaderManager *C_GLShaderManager::getSingleton(void)
    return classInstance;
 }
 
-/// Finds if a shader has already been loaded comparing it's source
+/// Finds if a shader has already been loaded by comparing it's source
 C_GLShaderObject *C_GLShaderManager::shaderObjectExists(const C_GLShaderObject *shaderObject, shader_type_t type)
 {
    C_GLShaderObject *currentShader;
@@ -755,22 +755,26 @@ void C_GLShaderManager::popShader(void)
 }
 
 #ifndef JNI_COMPATIBLE
-C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const char *fragmentFile)
+C_GLShader *
+C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const char *fragmentFile)
 {
-   bool fragmentExists = false, vertexExists = false;
+   bool fragmentExists = false;
+   bool vertexExists = false;
    C_GLShaderObject *tmpShader;
 	C_GLShader* shaderObject;
 	C_GLVertexShader* tVertexShader;
 	C_GLFragmentShader* tFragmentShader;
 
-	cout << "Loading shader . . ." << endl;
+   cout.flush();
+   fflush(stdout);
+	printf("----------------------------------------------------------\n");
+	printf("Loading shader ...\n");
 
-	// Load vertex shader
+	/// Load vertex shader
 	tVertexShader = new C_GLVertexShader();
-//	cout << "----------------------------------------------------------" << endl;
-	cout << "Loading vertex shader from file:   \"" << vertexFile << "\" ... ";
+	printf("\tLoading vertex shader from file:   \"%s\"... ", vertexFile);
 	if(!tVertexShader->LoadShaderProgram(vertexFile)) {
-		cout << "\nCan't load vertex shader file: \"" << vertexFile << "\"." << endl;
+		printf("Failed: Error reading file.\n");
 		delete tVertexShader;
 		return NULL;
 	}
@@ -779,17 +783,16 @@ C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const 
       vertexExists = true;
 	   delete tVertexShader;
 	   tVertexShader = (C_GLVertexShader *)tmpShader;
-	   cout << "Shader already loaded." << endl;
+	   printf("Shader already loaded.\n");
 	} else {
-   	cout << "done!" << endl;
+   	printf("done!\n");
 	}
 
-	// Load fragment shader
+	/// Load fragment shader
 	tFragmentShader = new C_GLFragmentShader();
-//	cout << "----------------------------------------------------------" << endl;
-	cout << "Loading fragment shader from file: \"" << fragmentFile << "\" ... ";
+	printf("\tLoading fragment shader from file: \"%s\"... ", fragmentFile);
 	if(!tFragmentShader->LoadShaderProgram(fragmentFile)) {
-		cout << "\nCan't load fragment shader file: " << fragmentFile << "." << endl;
+		printf("Failed: Error reading file.\n");
 		delete tVertexShader;
 		delete tFragmentShader;
 		return NULL;
@@ -799,46 +802,49 @@ C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const 
       fragmentExists = true;
 	   delete tFragmentShader;
 	   tFragmentShader = (C_GLFragmentShader *)tmpShader;
-	   cout << "Shader already loaded." << endl;
+	   printf("Shader already loaded.\n");
 	} else {
-   	cout << "done!" << endl;
+   	printf("done!\n");
 	}
 
-	// Compile vertex shader
-//	cout << "----------------------------------------------------------" << endl;
-	cout << "Compiling vertex shader...";
+	/// Compile vertex shader
+	printf("\tCompiling vertex shader...");
+//	fflush(stdout);
 	if(!tVertexShader->compile(false)) {
-		cout << "Error compiling vertex shader in file: " << vertexFile << "\n\n";
-		cout << "Compiler log: " << endl;
-		cout << tVertexShader->compilerLog << endl;
+		printf("Error compiling vertex shader in file: %s\n\n", vertexFile);
+		printf("Compiler log:\n");
+		printf("%s\n", tVertexShader->compilerLog);
 		delete tVertexShader;
 		delete tFragmentShader;
 		return NULL;
-	}
-	cout << "...done!" << endl;
+	} else {
+	   printf(" done!\n");
+   }
+
 	if(strlen(tVertexShader->compilerLog)) {
-		cout << "Compiler log: " << endl;
-		cout << tVertexShader->compilerLog << endl;
+		printf("Compiler log: \n");
+		printf("%s\n", tVertexShader->compilerLog);
 	}
 
-	// Compile fragment shader
-//	cout << "----------------------------------------------------------" << endl;
-	cout << "Compiling fragment shader...";
+	/// Compile fragment shader
+	printf("\tCompiling fragment shader...");
 	if(!tFragmentShader->compile(false)) {
-		cout << "Error compiling fragment shader in file: " << fragmentFile << "\n\n";
-		cout << "Compiler log: " << endl;
-		cout << tFragmentShader->compilerLog << endl;
+		printf("Error compiling fragment shader in file: %s\n\n", fragmentFile);
+		printf("Compiler log:\n");
+		printf("%s\n", tFragmentShader->compilerLog);
 		delete tVertexShader;
 		delete tFragmentShader;
 		return NULL;
-	}
-	cout << "...done!" << endl;
+	} else {
+	   printf("done!\n");
+   }
+
 	if(strlen(tFragmentShader->compilerLog)) {
-		cout << "Compiler log: " << endl;
-		cout << tFragmentShader->compilerLog << endl;
+		printf("Compiler log:\n");
+		printf("%s\n", tFragmentShader->compilerLog);
 	}
 
-	// Add shaders to shader object
+	/// Add shaders to shader object
 	if(fragmentExists && vertexExists) {
       shaderObject = shaderExists(tVertexShader, tFragmentShader);
       assert(shaderObject);
@@ -849,21 +855,23 @@ C_GLShader* C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const 
       shaderObject->AddShader(tFragmentShader);
    }
 
-	// Link shader object
-//	cout << "----------------------------------------------------------" << endl;
-	cout << "Linking shaders into shader object...";
+	/// Link shader object
+	printf("\tLinking shaders into shader object...");
 	if(!shaderObject->Link()) {
-		cout << "\nError linking shader programs." << endl;
-		cout << shaderObject->linkerLog << "\n\n";
+		printf(" Error linking shader programs.\n");
+		printf("%s\n\n", shaderObject->linkerLog);
+		return shaderObject;
 		delete tVertexShader;
 		delete tFragmentShader;
-		return shaderObject;
 	}
 
-	cout << "done!" << endl;
+   printf("done!\n");
+	printf("----------------------------------------------------------\n");
 
+   /// Detect all default vertex atributes and shader uniforms
 	shaderObject->UpdateAttribLocations();
 
+   /// Put the new shader in the shader manager's list
 	shaderList.push_back(shaderObject);
 
 	return shaderObject;
