@@ -1,19 +1,3 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #include "glsl.h"
 
 //#ifndef JNI_COMPATIBLE
