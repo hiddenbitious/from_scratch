@@ -85,7 +85,7 @@ C_MeshGroup::draw(void)
       /// If mesh has texture enable it
       if(mesh->texture && shader->textureUniformLocation_0 >= 0) {
          glActiveTexture(GL_TEXTURE0);
-         glBindTexture(GL_TEXTURE_2D, mesh->texture->texID);
+         glBindTexture(GL_TEXTURE_2D, mesh->texture->getGLtextureID());
 //         glUniform1i(shader->textureUniformLocation_0, 0);
          shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_0, 0);
       } else {

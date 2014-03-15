@@ -5,7 +5,11 @@
 
 class C_Texture
 {
-public:
+private:
+   int LoadUncompressedTGA(const char *, FILE *);  // Load an Uncompressed file
+   int LoadCompressedTGA(const char *, FILE *);    // Load a Compressed file
+   int LoadTGA(const char *filename);
+
    unsigned char  *imageData;    // Image Data (Up To 32 Bits)
    unsigned int   bpp;           // Image Color Depth In Bits Per Pixel
    unsigned int   width;         // Image Width
@@ -13,13 +17,11 @@ public:
    unsigned int   texID;         // Texture ID Used To Select A Texture
    unsigned int   type;          // Image Type (GL_RGB, GL_RGBA)
 
-   C_Texture(void) {};
+public:
+   C_Texture(void) { imageData = NULL; };
    ~C_Texture(void);
    bool loadGLTexture(const char *filename);
+   inline unsigned int getGLtextureID(void) { return texID; }
 };
-
-int LoadUncompressedTGA(C_Texture *, const char *, FILE *); // Load an Uncompressed file
-int LoadCompressedTGA(C_Texture *, const char *, FILE *);      // Load a Compressed file
-int LoadTGA(C_Texture * texture, const char *filename);
 
 #endif

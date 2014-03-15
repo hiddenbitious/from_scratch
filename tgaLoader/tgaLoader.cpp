@@ -1,29 +1,29 @@
-/********************************************************************************
-/Name:      TGA.cpp                                               *
-/Header: tga.h                                              *
-/Purpose:   Load Compressed and Uncompressed TGA files                     *
-/Functions: LoadTGA(Texture * texture, char * filename)                    *
-/        LoadCompressedTGA(Texture * texture, char * filename, FILE * fTGA)   *
-/        LoadUncompressedTGA(Texture * texture, char * filename, FILE * fTGA)*
-/*******************************************************************************/
+/**
+ * Name:       TGA.cpp
+ * Header:     tga.h
+ * Purpose:    Load Compressed and Uncompressed TGA files
+ * Functions:  LoadTGA(Texture * texture, char * filename)
+ *             LoadCompressedTGA(Texture * texture, char * filename, FILE * fTGA)
+ *             LoadUncompressedTGA(Texture * texture, char * filename, FILE * fTGA)
+ */
 
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <GLES2/gl2.h>
 #include <GL/gl.h>
 
 #include "tga.h"
 
-/********************************************************************************
-/name :     LoadTGA(Texture * texture, char * filename)                    *
-/function:  Open and test the file to make sure it is a valid TGA file        *
-/parems: texture, pointer to a Texture structure                        *
-/        filename, string pointing to file to open                   *
-/********************************************************************************/
+/**
+ * name:       LoadTGA(Texture * texture, char * filename)
+ * function:   Open and test the file to make sure it is a valid TGA file
+ * parems:     texture, pointer to a Texture structure
+ *             filename, string pointing to file to open
+ */
 
-int LoadTGA(C_Texture* texture, const char *filename)          // Load a TGA file
+int
+C_Texture::LoadTGA(const char *filename)          // Load a TGA file
 {
    FILE * fTGA;                                    // File pointer to texture file
    fTGA = fopen(filename, "rb");                      // Open file for reading
@@ -43,10 +43,10 @@ int LoadTGA(C_Texture* texture, const char *filename)          // Load a TGA fil
 
    if(memcmp(uTGAcompare, &tgaheader, sizeof(tgaheader)) == 0) {        // See if header matches the predefined header of
       // an Uncompressed TGA image
-      LoadUncompressedTGA(texture, filename, fTGA);                  // If so, jump to Uncompressed TGA loading code
+      LoadUncompressedTGA(filename, fTGA);                  // If so, jump to Uncompressed TGA loading code
    } else if(memcmp(cTGAcompare, &tgaheader, sizeof(tgaheader)) == 0) { // See if header matches the predefined header of
       // an RLE compressed TGA image
-      LoadCompressedTGA(texture, filename, fTGA);                    // If so, jump to Compressed TGA loading code
+      LoadCompressedTGA(filename, fTGA);                    // If so, jump to Compressed TGA loading code
    } else {                                              // If header matches neither type
       //MessageBox(NULL, "TGA file be type 2 or type 10 ", "Invalid Image", MB_OK); // Display an error
       fclose(fTGA);
@@ -55,7 +55,8 @@ int LoadTGA(C_Texture* texture, const char *filename)          // Load a TGA fil
    return 1;                                             // All went well, continue on
 }
 
-int LoadUncompressedTGA(C_Texture * texture, const char *filename, FILE *fTGA)   // Load an uncompressed TGA (note, much of this code is based on NeHe's
+int
+C_Texture::LoadUncompressedTGA(const char *filename, FILE *fTGA)   // Load an uncompressed TGA (note, much of this code is based on NeHe's
 {
    // TGA Loading code nehe.gamedev.net)
    if(fread(tga.header, sizeof(tga.header), 1, fTGA) == 0) {            // Read TGA header
@@ -66,14 +67,14 @@ int LoadUncompressedTGA(C_Texture * texture, const char *filename, FILE *fTGA)  
       return 0;                                          // Return failular
    }
 
-   texture->width  = tga.header[1] * 256 + tga.header[0];               // Determine The TGA Width (highbyte*256+lowbyte)
-   texture->height = tga.header[3] * 256 + tga.header[2];               // Determine The TGA Height   (highbyte*256+lowbyte)
-   texture->bpp   = tga.header[4];                             // Determine the bits per pixel
-   tga.Width      = texture->width;                            // Copy width into local structure
-   tga.Height     = texture->height;                              // Copy height into local structure
-   tga.Bpp        = texture->bpp;                                 // Copy BPP into local structure
+   width  = tga.header[1] * 256 + tga.header[0];               // Determine The TGA Width (highbyte*256+lowbyte)
+   height = tga.header[3] * 256 + tga.header[2];               // Determine The TGA Height   (highbyte*256+lowbyte)
+   bpp   = tga.header[4];                             // Determine the bits per pixel
+   tga.Width      = width;                            // Copy width into local structure
+   tga.Height     = height;                              // Copy height into local structure
+   tga.Bpp        = bpp;                                 // Copy BPP into local structure
 
-   if((texture->width <= 0) || (texture->height <= 0) || ((texture->bpp != 24) && (texture->bpp != 32))) { // Make sure all information is valid
+   if((width <= 0) || (height <= 0) || ((bpp != 24) && (bpp != 32))) { // Make sure all information is valid
       //MessageBox(NULL, "Invalid texture information", "ERROR", MB_OK);   // Display Error
       if(fTGA != NULL) {                                    // Check if file is still open
          fclose(fTGA);                                      // If so, close it
@@ -81,26 +82,26 @@ int LoadUncompressedTGA(C_Texture * texture, const char *filename, FILE *fTGA)  
       return 0;                                          // Return failed
    }
 
-   if(texture->bpp == 24)                                      // If the BPP of the image is 24...
-      texture->type  = GL_RGB;                                 // Set Image type to GL_RGB
+   if(bpp == 24)                                      // If the BPP of the image is 24...
+      type  = GL_RGB;                                 // Set Image type to GL_RGB
    else                                                  // Else if its 32 BPP
-      texture->type  = GL_RGBA;                                // Set image type to GL_RGBA
+      type  = GL_RGBA;                                // Set image type to GL_RGBA
 
    tga.bytesPerPixel = (tga.Bpp / 8);                          // Compute the number of BYTES per pixel
    tga.imageSize     = (tga.bytesPerPixel * tga.Width * tga.Height);    // Compute the total amout ofmemory needed to store data
-// texture->imageData   = (GLubyte *)malloc(tga.imageSize);             // Allocate that much memory
-   texture->imageData   = new GLubyte[tga.imageSize];             // Allocate that much memory
+// imageData   = (GLubyte *)malloc(tga.imageSize);             // Allocate that much memory
+   imageData   = new GLubyte[tga.imageSize];             // Allocate that much memory
 
-   if(texture->imageData == NULL) {                               // If no space was allocated
+   if(imageData == NULL) {                               // If no space was allocated
       //MessageBox(NULL, "Could not allocate memory for image", "ERROR", MB_OK); // Display Error
       fclose(fTGA);                                         // Close the file
       return 0;                                          // Return failed
    }
 
-   if(fread(texture->imageData, 1, tga.imageSize, fTGA) != tga.imageSize) { // Attempt to read image data
+   if(fread(imageData, 1, tga.imageSize, fTGA) != tga.imageSize) { // Attempt to read image data
       //MessageBox(NULL, "Could not read image data", "ERROR", MB_OK);     // Display Error
-      if(texture->imageData != NULL) {                            // If imagedata has data in it
-         free(texture->imageData);                             // Delete data from memory
+      if(imageData != NULL) {                            // If imagedata has data in it
+         free(imageData);                             // Delete data from memory
       }
       fclose(fTGA);                                         // Close file
       return 0;                                          // Return failed
@@ -108,15 +109,16 @@ int LoadUncompressedTGA(C_Texture * texture, const char *filename, FILE *fTGA)  
 
    // Byte Swapping Optimized By Steve Thomas
    for(GLuint cswap = 0; cswap < (int)tga.imageSize; cswap += tga.bytesPerPixel) {
-      texture->imageData[cswap] ^= texture->imageData[cswap + 2] ^=
-                                      texture->imageData[cswap] ^= texture->imageData[cswap + 2];
+      imageData[cswap] ^= imageData[cswap + 2] ^=
+                                      imageData[cswap] ^= imageData[cswap + 2];
    }
 
    fclose(fTGA);                                            // Close file
    return 1;                                             // Return success
 }
 
-int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)    // Load COMPRESSED TGAs
+int
+C_Texture::LoadCompressedTGA(const char *filename, FILE * fTGA)    // Load COMPRESSED TGAs
 {
    if(fread(tga.header, sizeof(tga.header), 1, fTGA) == 0) {            // Attempt to read header
       //MessageBox(NULL, "Could not read info header", "ERROR", MB_OK);    // Display Error
@@ -126,14 +128,14 @@ int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)   
       return 0;                                          // Return failed
    }
 
-   texture->width  = tga.header[1] * 256 + tga.header[0];               // Determine The TGA Width (highbyte*256+lowbyte)
-   texture->height = tga.header[3] * 256 + tga.header[2];               // Determine The TGA Height   (highbyte*256+lowbyte)
-   texture->bpp   = tga.header[4];                             // Determine Bits Per Pixel
-   tga.Width      = texture->width;                            // Copy width to local structure
-   tga.Height     = texture->height;                              // Copy width to local structure
-   tga.Bpp        = texture->bpp;                                 // Copy width to local structure
+   width  = tga.header[1] * 256 + tga.header[0];               // Determine The TGA Width (highbyte*256+lowbyte)
+   height = tga.header[3] * 256 + tga.header[2];               // Determine The TGA Height   (highbyte*256+lowbyte)
+   bpp   = tga.header[4];                             // Determine Bits Per Pixel
+   tga.Width      = width;                            // Copy width to local structure
+   tga.Height     = height;                              // Copy width to local structure
+   tga.Bpp        = bpp;                                 // Copy width to local structure
 
-   if((texture->width <= 0) || (texture->height <= 0) || ((texture->bpp != 24) && (texture->bpp != 32))) { //Make sure all texture info is ok
+   if((width <= 0) || (height <= 0) || ((bpp != 24) && (bpp != 32))) { //Make sure all texture info is ok
       //MessageBox(NULL, "Invalid texture information", "ERROR", MB_OK);   // If it isnt...Display error
       if(fTGA != NULL) {                                    // Check if file is open
          fclose(fTGA);                                      // Ifit is, close it
@@ -141,16 +143,16 @@ int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)   
       return 0;                                          // Return failed
    }
 
-   if(texture->bpp == 24)                                      // If the BPP of the image is 24...
-      texture->type  = GL_RGB;                                 // Set Image type to GL_RGB
+   if(bpp == 24)                                      // If the BPP of the image is 24...
+      type  = GL_RGB;                                 // Set Image type to GL_RGB
    else                                                  // Else if its 32 BPP
-      texture->type  = GL_RGBA;                                // Set image type to GL_RGBA
+      type  = GL_RGBA;                                // Set image type to GL_RGBA
 
    tga.bytesPerPixel = (tga.Bpp / 8);                          // Compute BYTES per pixel
    tga.imageSize     = (tga.bytesPerPixel * tga.Width * tga.Height);    // Compute amout of memory needed to store image
-// texture->imageData   = (GLubyte *)malloc(tga.imageSize);             // Allocate that much memory
-   texture->imageData   = new GLubyte[tga.imageSize];
-   if(texture->imageData == NULL) {                               // If it wasnt allocated correctly..
+// imageData   = (GLubyte *)malloc(tga.imageSize);             // Allocate that much memory
+   imageData   = new GLubyte[tga.imageSize];
+   if(imageData == NULL) {                               // If it wasnt allocated correctly..
       //MessageBox(NULL, "Could not allocate memory for image", "ERROR", MB_OK); // Display Error
       fclose(fTGA);                                         // Close file
       return 0;                                          // Return failed
@@ -169,8 +171,8 @@ int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)   
          if(fTGA != NULL) {                                 // If file is open
             fclose(fTGA);                                   // Close file
          }
-         if(texture->imageData != NULL) {                         // If there is stored image data
-            free(texture->imageData);                          // Delete image data
+         if(imageData != NULL) {                         // If there is stored image data
+            free(imageData);                          // Delete image data
          }
          return 0;                                       // Return failed
       }
@@ -190,19 +192,19 @@ int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)   
                   free(colorbuffer);                                    // If so, delete it
                }
 
-               if(texture->imageData != NULL) {                            // See if there is stored Image data
-                  free(texture->imageData);                             // If so, delete it too
+               if(imageData != NULL) {                            // See if there is stored Image data
+                  free(imageData);                             // If so, delete it too
                }
 
                return 0;                                          // Return failed
             }
             // write to memory
-            texture->imageData[currentbyte      ] = colorbuffer[2];               // Flip R and B vcolor values around in the process
-            texture->imageData[currentbyte + 1  ] = colorbuffer[1];
-            texture->imageData[currentbyte + 2  ] = colorbuffer[0];
+            imageData[currentbyte      ] = colorbuffer[2];               // Flip R and B vcolor values around in the process
+            imageData[currentbyte + 1  ] = colorbuffer[1];
+            imageData[currentbyte + 2  ] = colorbuffer[0];
 
             if(tga.bytesPerPixel == 4) {                                // if its a 32 bpp image
-               texture->imageData[currentbyte + 3] = colorbuffer[3];          // copy the 4th byte
+               imageData[currentbyte + 3] = colorbuffer[3];          // copy the 4th byte
             }
 
             currentbyte += tga.bytesPerPixel;                              // Increase thecurrent byte by the number of bytes per pixel
@@ -219,8 +221,8 @@ int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)   
                   free(colorbuffer);                                    // Delete it
                }
 
-               if(texture->imageData != NULL) {                            // If there is Image data
-                  free(texture->imageData);                             // delete it
+               if(imageData != NULL) {                            // If there is Image data
+                  free(imageData);                             // delete it
                }
 
                return 0;                                          // Return failed
@@ -239,8 +241,8 @@ int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)   
                free(colorbuffer);                                       // delete it
             }
 
-            if(texture->imageData != NULL) {                               // If thereis image data
-               free(texture->imageData);                                // delete it
+            if(imageData != NULL) {                               // If thereis image data
+               free(imageData);                                // delete it
             }
 
             return 0;                                             // return failed
@@ -248,12 +250,12 @@ int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)   
 
          for(short counter = 0; counter < chunkheader; counter++) {           // copy the color into the image data as many times as dictated
             // by the header
-            texture->imageData[currentbyte      ] = colorbuffer[2];              // switch R and B bytes areound while copying
-            texture->imageData[currentbyte + 1  ] = colorbuffer[1];
-            texture->imageData[currentbyte + 2  ] = colorbuffer[0];
+            imageData[currentbyte      ] = colorbuffer[2];              // switch R and B bytes areound while copying
+            imageData[currentbyte + 1  ] = colorbuffer[1];
+            imageData[currentbyte + 2  ] = colorbuffer[0];
 
             if(tga.bytesPerPixel == 4) {                                // If TGA images is 32 bpp
-               texture->imageData[currentbyte + 3] = colorbuffer[3];          // Copy 4th byte
+               imageData[currentbyte + 3] = colorbuffer[3];          // Copy 4th byte
             }
 
             currentbyte += tga.bytesPerPixel;                              // Increase current byte by the number of bytes per pixel
@@ -270,8 +272,8 @@ int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)   
                   free(colorbuffer);                                    // Delete it
                }
 
-               if(texture->imageData != NULL) {                            // If there is Image data
-                  free(texture->imageData);                             // delete it
+               if(imageData != NULL) {                            // If there is Image data
+                  free(imageData);                             // delete it
                }
 
                return 0;                                          // Return failed
@@ -288,7 +290,10 @@ int LoadCompressedTGA(C_Texture * texture, const char *filename, FILE * fTGA)   
 bool
 C_Texture::loadGLTexture(const char *filename)
 {
-   if(!LoadTGA(this, filename)) {
+   printf("-----------\n");
+   printf("Loading texture: \"%s\"...", filename);
+
+   if(!LoadTGA(filename)) {
       printf("Error loading texture %s.\n", filename);
       return false;
       assert(0);
@@ -302,18 +307,19 @@ C_Texture::loadGLTexture(const char *filename)
    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-   printf("Loaded texture %s:\n", filename);
+   printf(" done!\n");
    printf("\tbpp: %d\n", bpp);
    printf("\twidth: %d\n", width);
    printf("\theight: %d\n", height);
    printf("\ttexID: %d\n", texID);
    printf("\ttype: %d\n", type);
-
+   printf("-----------\n");
    return true;
 }
 
 C_Texture::~C_Texture()
 {
-   delete[] imageData;
+   if(imageData)
+      delete[] imageData;
    glDeleteTextures(1, &texID);
 }
