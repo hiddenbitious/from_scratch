@@ -21,6 +21,7 @@
 #include "bspNode.h"
 #include "vectors.h"
 #include "mesh.h"
+#include "map.h"
 #include "timer.h"
 #include "glsl/glsl.h"
 #include "metaballs/cubeGrid.h"
@@ -33,6 +34,7 @@ using namespace std;
 static C_BspTree *bspTest;
 int mapPolys;
 bool drawConnectedToo = false;
+static C_Map map;
 
 /// Global variables
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
@@ -115,6 +117,8 @@ Initializations(void)
 	camera.zFar = 1000.0f;
 	camera.zNear = 1.0f;
 
+   map.readMap("map.txt");
+
 	// Diabase tin geometria gia to bsp
 	bspTest = new C_BspTree(6);
 //	bspTest->ReadGeometryFile("properMap2.BSP");
@@ -174,7 +178,7 @@ Initializations(void)
 
    printf("--------------------------------------------------\n");
 
-   C_Mesh *mesh = group.meshes;
+//   C_Mesh *mesh = group.meshes;
 //   while(mesh) {
 //      assert(!(mesh->nVertices%3));
 //      for(int i = 0; i < mesh->nVertices / 3; i++) {

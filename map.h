@@ -3,15 +3,15 @@
 
 #include "tile.h"
 #include "bspTree.h"
+#include "globals.h"
 
 class C_Map {
 
 public:
-   C_Map(void) {};
+   C_Map(void) { bspTree = NULL; }
    ~C_Map(void) {};
 
    bool readMap(const char *filename);
-   bool readMapAreas(const char *filename);
    bool createMap(void);
 
    void draw(void);
