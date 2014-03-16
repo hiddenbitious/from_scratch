@@ -5,88 +5,93 @@
 #include "globals.h"
 #include "plane.h"
 #include "bspCommon.h"
+#include "mesh.h"
 
 
 class C_BspNode {
-		friend class C_BspTree;
+friend class C_BspTree;
 
-	public:
-		/// Node's ID
-		ULONG nodeID;
+private:
+   vector<C_MeshGroup *> objects;
+   void insertMesh(C_MeshGroup *mesh);
 
-		USHORT depth;
-		bool *visibleFrom;
-		bool *checkedVisibilityWith;
+public:
+   /// Node's ID
+   ULONG nodeID;
 
-		/// Plane used to classify the polygons
-		C_Plane partitionPlane;
+   USHORT depth;
+   bool *visibleFrom;
+   bool *checkedVisibilityWith;
 
-		/// If this node is leaf
-		bool isLeaf;
+   /// Plane used to classify the polygons
+   C_Plane partitionPlane;
 
-		/// Number of polys in node
-		int nPolys;
+   /// If this node is leaf
+   bool isLeaf;
 
-		/// Actual polygon data
-		poly_t** geometry;
+   /// Number of polys in node
+   int nPolys;
 
-		/// Same poly tesselated into tirangles
-		int nTriangles;
-		triangle_vn *triangles;
+   /// Actual polygon data
+   poly_t** geometry;
 
-		/// Children nodes
-		C_BspNode *frontNode;
-		C_BspNode *backNode;
-		C_BspNode *fatherNode;
-		C_BspTree *tree;
+   /// Same poly tesselated into tirangles
+   int nTriangles;
+   triangle_vn *triangles;
 
-		/// Node's bounding box.
-		C_BBox bbox;
+   /// Children nodes
+   C_BspNode *frontNode;
+   C_BspNode *backNode;
+   C_BspNode *fatherNode;
+   C_BspTree *tree;
 
-		/// Algorithm that chooses a polygon from a given geometry set and returns it as a splitting plane
-		static bool SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane);
-		/// Tests if polygon is in front, back, coincident or it spans the given plane
-		static int ClassifyPolygon(C_Plane* plane , poly_t* polygon);
-		/// Tests if a vertex against a plane
-		static int ClassifyVertex(C_Plane* plane , C_Vertex* vertex);
-		/// Splits the given polygon in two new polygon. The polygon must be spanning the plane given
-		static void SplitPolygon(C_Plane* plane , poly_t* polygon , poly_t** front , poly_t** back);
+   /// Node's bounding box.
+   C_BBox bbox;
 
-		static bool IsConvex(C_BspNode *node);
+   /// Algorithm that chooses a polygon from a given geometry set and returns it as a splitting plane
+   static bool SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane);
+   /// Tests if polygon is in front, back, coincident or it spans the given plane
+   static int ClassifyPolygon(C_Plane* plane , poly_t* polygon);
+   /// Tests if a vertex against a plane
+   static int ClassifyVertex(C_Plane* plane , C_Vertex* vertex);
+   /// Splits the given polygon in two new polygon. The polygon must be spanning the plane given
+   static void SplitPolygon(C_Plane* plane , poly_t* polygon , poly_t** front , poly_t** back);
 
-		C_BspNode();
-		C_BspNode(poly_t** geom , int nPolys);
-		~C_BspNode();
+   static bool IsConvex(C_BspNode *node);
 
-		/// Recursively builds the tree
-		static void BuildBspTree(C_BspNode* node , C_BspTree* tree);
+   C_BspNode();
+   C_BspNode(poly_t** geom , int nPolys);
+   ~C_BspNode();
 
-		/// Calculate node's bbox
-		void CalculateBBox(void);
+   /// Recursively builds the tree
+   static void BuildBspTree(C_BspNode* node , C_BspTree* tree);
 
-		void DistributePointsAlongPartitionPlane(void);
-		static void DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points);
-		static void CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool testWithBbox, bool testWithGeometry);
-		bool addNodeToPVS(C_BspNode *node);
+   /// Calculate node's bbox
+   void CalculateBBox(void);
 
-		vector<C_BspNode*> connectedLeaves;
-		vector<C_BspNode*> PVS;
-		bool drawn;
+   void DistributePointsAlongPartitionPlane(void);
+   static void DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points);
+   static void CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool testWithBbox, bool testWithGeometry);
+   bool addNodeToPVS(C_BspNode *node);
 
-		vector<C_Vertex> pointSet;
+   vector<C_BspNode*> connectedLeaves;
+   vector<C_BspNode*> PVS;
+   bool drawn;
 
-		void DrawPointSet(void);
+   vector<C_Vertex> pointSet;
+
+   void DrawPointSet(void);
 
 
-		static void Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, bool usePVS);
-//		static void Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
-		void Draw(void);
+   static void Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, bool usePVS);
+   //		static void Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
+   void Draw(void);
 
-		/// Brakes down CONVEX polygon of 4 or 5 vertices into triangles.
-		/// Also it frees any memory reserved for the previous polygons
-		/// (not the data itself but the pointers).
-		/// New pointers are stored at the triangles var.
-		static void TessellatePolygonsInLeaves(C_BspNode* node);
+   /// Brakes down CONVEX polygon of 4 or 5 vertices into triangles.
+   /// Also it frees any memory reserved for the previous polygons
+   /// (not the data itself but the pointers).
+   /// New pointers are stored at the triangles var.
+   static void TessellatePolygonsInLeaves(C_BspNode* node);
 };
 
 #endif
