@@ -56,6 +56,12 @@ C_Map::readMap(const char *filename)
 			fgets(buf, MAX_PARAMETER_LENGTH, fd);
 			tiles[_x][_y].setParameter(buf);
 		   /// One loop is lost everytime a parameter is read.
+         if(area == AREA_VOID) {
+            --nVoid;
+         } else if(area == AREA_WALKABLE) {
+            --nWalkable;
+         }
+
 			--i;
 			--sum;
          --counters[type];
@@ -69,7 +75,7 @@ C_Map::readMap(const char *filename)
 	   if(counters[i])
          printf("\tType %d: %d tiles\n", i, counters[i]);
 	}
-	printf("\t %d walkable and %d void tiles\n", nWalkable, nVoid);
+	printf("\t%d walkable and %d void tiles\n", nWalkable, nVoid);
 
 	printf("\tTotal %d tiles\n", sum);
 	printf("Done.\n");
