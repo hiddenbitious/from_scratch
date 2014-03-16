@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "mesh.h"
+#include "objreader/objfile.h"
 
 C_BaseMesh::C_BaseMesh(void)
 {
@@ -66,6 +67,83 @@ C_MeshGroup::addMesh(void)
 }
 
 void
+C_Mesh::applyTransformationOnVertices(const ESMatrix *mat)
+{
+   for (int i = 0; i < nVertices; i++)
+      vertices[i] = math::transformPoint(mat, &vertices[i]);
+}
+
+void
+C_MeshGroup::applyTransformationOnVertices(const ESMatrix *mat)
+{
+   C_Mesh *mesh = meshes;
+   while(mesh) {
+      mesh->applyTransformationOnVertices(mat);
+      mesh = mesh->next;
+   }
+}
+
+void
+C_Mesh::calculateBbox(void)
+{
+   float minX = GREATEST_FLOAT, minY = GREATEST_FLOAT, minZ = GREATEST_FLOAT;
+   float maxX = SMALLEST_FLOAT, maxY = SMALLEST_FLOAT, maxZ = SMALLEST_FLOAT;
+
+   for(unsigned int i = 0; i < nVertices; ++i) {
+      if(vertices[i].x > maxX) maxX = vertices[i].x;
+      if(vertices[i].y > maxY) maxY = vertices[i].y;
+      if(vertices[i].z > maxZ) maxZ = vertices[i].z;
+
+      if(vertices[i].x < minX) minX = vertices[i].x;
+      if(vertices[i].y < minY) minY = vertices[i].y;
+      if(vertices[i].z < minZ) minZ = vertices[i].z;
+   }
+
+   bbox.SetMax(maxX , maxY , maxZ);
+   bbox.SetMin(minX , minY , minZ);
+   bbox.SetVertices();
+}
+
+void
+C_MeshGroup::calculateBbox(void)
+{
+   float minX = GREATEST_FLOAT, minY = GREATEST_FLOAT, minZ = GREATEST_FLOAT;
+   float maxX = SMALLEST_FLOAT, maxY = SMALLEST_FLOAT, maxZ = SMALLEST_FLOAT;
+   C_Vertex min, max;
+
+   C_Mesh *mesh = meshes;
+   while(mesh) {
+      mesh->calculateBbox();
+
+      mesh->bbox.GetMax(&max);
+      mesh->bbox.GetMin(&min);
+
+      if(min.x < minX) minX = min.x;
+      if(min.y < minY) minY = min.y;
+      if(min.z < minZ) minZ = min.z;
+
+      if(max.x > maxX) maxX = max.x;
+      if(max.y > maxY) maxY = max.y;
+      if(max.z > maxZ) maxZ = max.z;
+
+      mesh = mesh->next;
+   }
+
+   bbox.SetMax(maxX , maxY , maxZ);
+   bbox.SetMin(minX , minY , minZ);
+   bbox.SetVertices();
+}
+
+bool
+C_MeshGroup::loadFromFile(const char *filename)
+{
+   glmReadOBJ(filename, this);
+   calculateBbox();
+
+   return true;
+}
+
+void
 C_MeshGroup::draw(void)
 {
 //   vertex_t *mesh_transformedVerts, *tmpVerts;
@@ -105,6 +183,8 @@ C_MeshGroup::draw(void)
 
       mesh = mesh->next;
    }
+
+   bbox.Draw();
 
    if(shader->verticesAttribLocation >= 0)   glDisableVertexAttribArray(shader->verticesAttribLocation);
    if(shader->colorsAttribLocation >= 0)     glDisableVertexAttribArray(shader->colorsAttribLocation);

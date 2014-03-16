@@ -39,6 +39,7 @@ namespace math {
    void Normalize(float* x , float* y , float* z);
    float Magnitude(float x , float y , float z);
    float PointToPointDistance(C_Vertex *p1 , C_Vertex *p2);
+   C_Vertex transformPoint(const ESMatrix *matrix, const C_Vertex *point);
 }
 
 /// Code ripped from "OpenGL ES 2.0 Programming Guide"

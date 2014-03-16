@@ -8,20 +8,19 @@
 class C_Map {
 
 public:
-   C_Map(void) { bspTree = NULL; }
+   C_Map(void);
    ~C_Map(void) {};
 
-   bool readMap(const char *filename);
-   bool createMap(void);
+   bool createMap(const char *filename);
 
    void draw(void);
 
 private:
    C_BspTree *bspTree;
-
    /// All map tiles
    tile tiles[TILES_ON_X][TILES_ON_Y];
 
+   bool readMap(const char *filename);
 };
 
 #endif

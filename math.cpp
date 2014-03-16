@@ -38,6 +38,18 @@ float math::PointToPointDistance(C_Vertex *p1 , C_Vertex *p2)
 	return sqrt((p2->x - p1->x) * (p2->x - p1->x) + (p2->y - p1->y) * (p2->y - p1->y) + (p2->z - p1->z) * (p2->z - p1->z));
 }
 
+C_Vertex math::transformPoint(const ESMatrix *matrix, const C_Vertex *point)
+{
+   C_Vertex transformedPoint;
+
+   transformedPoint.x = point->x * matrix->m[0][0] + point->y * matrix->m[1][0] + point->z * matrix->m[2][0] + matrix->m[3][0];
+   transformedPoint.y = point->x * matrix->m[0][1] + point->y * matrix->m[1][1] + point->z * matrix->m[2][1] + matrix->m[3][1];
+   transformedPoint.z = point->x * matrix->m[0][2] + point->y * matrix->m[1][2] + point->z * matrix->m[2][2] + matrix->m[3][2];
+//   transformedPoint.w = point->x * matrix->m[0][3] + point->y * matrix->m[1][3] + point->z * matrix->m[2][3] + matrix->m[3][3];
+
+   return transformedPoint;
+}
+
 /// **************************************************************
 /// Book:      OpenGL(R) ES 2.0 Programming Guide
 /// Authors:   Aaftab Munshi, Dan Ginsburg, Dave Shreiner

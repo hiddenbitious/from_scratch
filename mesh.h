@@ -4,6 +4,7 @@
 #include "tgaLoader/texture.h"
 #include "globals.h"
 #include "bbox.h"
+#include "math.h"
 
 class C_BaseMesh {
 public:
@@ -12,9 +13,12 @@ public:
    C_Vertex position;
    C_BBox bbox;
 
+   virtual ~C_BaseMesh(void) {};
    C_BaseMesh(void);
-//   virtual draw(void) = 0;
 
+   virtual void calculateBbox(void) = 0;
+   virtual void applyTransformationOnVertices(const ESMatrix *mat) = 0;
+//   void drawbbox(void) { bbox.Draw(); };
 };
 
 class C_Mesh : public C_BaseMesh {
@@ -29,9 +33,10 @@ public:
 
    C_Mesh(void);
    ~C_Mesh(void);
-   void calculateBbox(void);
 
    void draw(C_GLShader *shader);
+   void calculateBbox(void);
+   void applyTransformationOnVertices(const ESMatrix *mat);
 };
 
 class C_MeshGroup : public C_BaseMesh  {
@@ -48,11 +53,9 @@ public:
    C_Mesh *addMesh(void);        /// Creates a new mesh, adds it in the linked list and returns
                                  /// a pointer to it
    void draw(void);
+   void calculateBbox(void);
+   void applyTransformationOnVertices(const ESMatrix *mat);
+   bool loadFromFile(const char *filename);
 };
-
-//mesh_t *addMesh(meshGroup_t *meshGroup);
-//void deleteGroup(meshGroup_t *group);
-//void drawGroup(const meshGroup_t *meshGroup, int attr0, int attr1, int attr2, int uniform0);
-//void drawMesh(const mesh_t *mesh, int attr0, int attr1, int attr2);
 
 #endif

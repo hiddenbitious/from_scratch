@@ -26,7 +26,6 @@
 #include "glsl/glsl.h"
 #include "metaballs/cubeGrid.h"
 #include "metaballs/metaball.h"
-#include "objreader/objfile.h"
 
 using namespace std;
 
@@ -117,7 +116,7 @@ Initializations(void)
 	camera.zFar = 1000.0f;
 	camera.zNear = 1.0f;
 
-   map.readMap("map.txt");
+   map.createMap("map.txt");
 
 	// Diabase tin geometria gia to bsp
 	bspTest = new C_BspTree(6);
@@ -173,7 +172,7 @@ Initializations(void)
    assert(wallShader->textureUniformLocation_0 >= 0);
    assert(wallShader->textureUniformLocation_1 == -1);
 
-   glmReadOBJ("objmodels/fence.obj", &group);
+   group.loadFromFile("objmodels/fence.obj");
    group.shader = wallShader;
 
    printf("--------------------------------------------------\n");

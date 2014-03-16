@@ -1,6 +1,42 @@
 #include <stdio.h>
 #include "map.h"
 
+C_Map::C_Map(void)
+{
+   bspTree = NULL;
+
+   for(int x = 0; x < TILES_ON_X; x++) {
+		for(int y = 0; y < TILES_ON_Y; y++) {
+		   tiles[x][y].setCoordX(x);
+		   tiles[x][y].setCoordY(y);
+		   tiles[x][y].setArea(AREA_NAN);
+		   tiles[x][y].hasParameter = false;
+		}
+	}
+}
+
+bool
+C_Map::createMap(const char *filename)
+{
+   bool ret;
+
+   printf("Creating map...\n");
+
+   ret = readMap(filename);
+   if(!ret) {
+      assert(0);
+      return false;
+   }
+
+//   bspTree = new C_BspTree(6);
+//
+//   bspTree->ReadGeometryFile("mapGeometry.bsp");
+//   bspTree->BuildBspTree();
+//   bspTree->BuildPVS();
+
+   return true;
+}
+
 bool
 C_Map::readMap(const char *filename)
 {
@@ -55,6 +91,7 @@ C_Map::readMap(const char *filename)
 		   /// fgets doesn't stop at white spaces but it stops at '\n'
 			fgets(buf, MAX_PARAMETER_LENGTH, fd);
 			tiles[_x][_y].setParameter(buf);
+
 		   /// One loop is lost everytime a parameter is read.
          if(area == AREA_VOID) {
             --nVoid;
