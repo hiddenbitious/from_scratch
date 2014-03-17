@@ -55,31 +55,10 @@ C_Camera::C_Camera(void)
 
 void C_Camera::Look(void)
 {
-//	_UpdateCamera(&position , &lookAt , &up);
-
-//	C_Quaternion revQ;
-//	rotationQuaternion.GetReverseQuat(&revQ);
-//	revQ.QuaternionToMatrix16(rotMatrix);
 	rotationQuaternion.QuaternionToMatrix16(&ESrotMatrix);
-
-	if(rotation) rotation = false;
-	if(translation) translation = false;
-
-	//Rotate and then translate.
-//	glLoadIdentity();
-//	glMultMatrixf (rotMatrix);
-//	glTranslatef(-position.x, -position.y, -position.z);
 
 	esMatrixMultiply(&globalModelviewMatrix, &ESrotMatrix, &globalModelviewMatrix);
 	esTranslate(&globalModelviewMatrix, -position.x, -position.y, -position.z);
-
-	/*
-		//glMultMatrixf ( rotMatrix );
-		rotMatrix[12] = -position.x;
-		rotMatrix[13] = -position.y;
-		rotMatrix[14] = -position.z;
-		glLoadMatrixf ( rotMatrix );
-	*/
 
 	if(updateFrustum) {
 		frustum->calculateFrustum();
@@ -110,6 +89,8 @@ void C_Camera::Move(const float x , const float y , const float z)
 {
 	position.Translate(x , y , z);
 	lookAt.Translate(x , y , z);
+
+	printf("camera position: %f %f %f\n", position.x, position.y, position.z);
 
 	updateFrustum = true;
 	translation = true;

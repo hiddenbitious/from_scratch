@@ -144,8 +144,12 @@ C_MeshGroup::loadFromFile(const char *filename)
 }
 
 void
-C_MeshGroup::draw(void)
+C_MeshGroup::draw(C_Camera *camera)
 {
+   if(camera && !camera->frustum->cubeInFrustum(&bbox)) {
+      return;
+   }
+
 //   vertex_t *mesh_transformedVerts, *tmpVerts;
 	shaderManager->pushShader(shader);
    ESMatrix mat = globalModelviewMatrix;

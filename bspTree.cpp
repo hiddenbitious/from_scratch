@@ -213,7 +213,7 @@ C_BspTree::BuildPVS(void)
 
 	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-//	pvsFileFound = this->ReadPVSFile("map_pvs6_perfect.txt");
+	pvsFileFound = this->ReadPVSFile("map_pvs6_perfect.txt");
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points... " << flush;
@@ -600,7 +600,7 @@ C_BspTree::Draw2(C_Vector3* cameraPosition)
 
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
-      C_BspNode::Draw(cameraPosition, headNode, this, false);
+//      C_BspNode::Draw(cameraPosition, headNode, this, false);
 //      glFlush();
 	shaderManager->popShader();
 
@@ -639,7 +639,7 @@ C_BspTree::Draw3(void)
 }
 
 int
-C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
+C_BspTree::Draw_PVS(C_Camera *camera)
 {
 	polyCount = 0;
 	leavesDrawn = 0;
@@ -661,7 +661,7 @@ C_BspTree::Draw_PVS(C_Vector3* cameraPosition)
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
-      C_BspNode::Draw(cameraPosition, headNode, this, true);
+      C_BspNode::Draw(camera, headNode, this, true);
    }
    shaderManager->popShader();
 

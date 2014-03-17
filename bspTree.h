@@ -57,7 +57,7 @@ public:
    void Draw(void);
    int Draw2(C_Vector3* cameraPosition);
    void Draw3(void);
-   int Draw_PVS(C_Vector3* cameraPosition);
+   int Draw_PVS(C_Camera *camera);
 
    /// Max depth allowed
    USHORT maxDepth;

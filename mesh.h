@@ -4,6 +4,7 @@
 #include "tgaLoader/texture.h"
 #include "globals.h"
 #include "bbox.h"
+#include "camera.h"
 #include "math.h"
 
 class C_BaseMesh {
@@ -52,7 +53,7 @@ public:
 
    C_Mesh *addMesh(void);        /// Creates a new mesh, adds it in the linked list and returns
                                  /// a pointer to it
-   void draw(void);
+   void draw(C_Camera *camera);
    void calculateBbox(void);
    void applyTransformationOnVertices(const ESMatrix *mat);
    bool loadFromFile(const char *filename);

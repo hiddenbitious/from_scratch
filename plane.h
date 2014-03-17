@@ -51,10 +51,10 @@ class C_Plane {
 
 		// These two functions works for normalized plane equations (so that a*a + b*b + c*c == 1)
 		// Dot product + d
-		inline float distanceFromPoint(const C_Vector3* point)
+		inline float distanceFromPoint(const C_Vector3* point) const
 		{ return (a * point->x + b * point->y + c * point->z + d); }
 
-		inline float distanceFromPoint(const C_Vertex* point)
+		inline float distanceFromPoint(const C_Vertex* point) const
 		{ return (a * point->x + b * point->y + c * point->z + d); }
 
 };

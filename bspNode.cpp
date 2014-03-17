@@ -402,20 +402,22 @@ C_BspNode::SplitPolygon(C_Plane *plane , poly_t *polygon , poly_t **front , poly
 }
 
 void
-C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, bool usePVS)
+C_BspNode::Draw(C_Camera *camera, C_BspNode* node, C_BspTree* tree, bool usePVS)
 {
+   C_Vector3 cameraPosition = camera->GetPosition();
+
    static int lastNode = -1;
    if(!node->isLeaf) {
-      float side = node->partitionPlane.distanceFromPoint(cameraPosition);
+      float side = node->partitionPlane.distanceFromPoint(&cameraPosition);
 
       if(side > 0.0f) {
          if(!usePVS)
-            C_BspNode::Draw(cameraPosition, node->backNode, tree, usePVS);
-         C_BspNode::Draw(cameraPosition, node->frontNode, tree, usePVS);
+            C_BspNode::Draw(camera, node->backNode, tree, usePVS);
+         C_BspNode::Draw(camera, node->frontNode, tree, usePVS);
       } else {
          if(!usePVS)
-            C_BspNode::Draw(cameraPosition, node->frontNode, tree, usePVS);
-         C_BspNode::Draw(cameraPosition, node->backNode, tree, usePVS);
+            C_BspNode::Draw(camera, node->frontNode, tree, usePVS);
+         C_BspNode::Draw(camera, node->backNode, tree, usePVS);
       }
    } else {
       if(node->drawn) {
@@ -446,6 +448,11 @@ C_BspNode::Draw(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree, b
 
       if(usePVS) {
          for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
+            if(!camera->frustum->cubeInFrustum(&node->PVS[i]->bbox)) {
+               printf("node: %lu out of camera\n", node->PVS[i]->nodeID);
+               continue;
+            }
+
             if(node->PVS[i]->drawn) {
                continue;
             }

@@ -1,19 +1,3 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
@@ -23,51 +7,51 @@
 #include "frustum.h"
 
 class C_Camera {
-	private:
+private:
 //		float rotMatrix[16];
-		ESMatrix ESrotMatrix;
+   ESMatrix ESrotMatrix;
 
-		//Where camera is looking at
-		C_Vector3 lookAt;
-		//Up vector
-		C_Vector3 up;
+   //Where camera is looking at
+   C_Vector3 lookAt;
 
-		//Holds the camera's rotation.
-		C_Quaternion rotationQuaternion;
-		C_Vector3 xVec;
+   //Up vector
+   C_Vector3 up;
 
-		//Set true when the frustun needs to be updated
-		bool updateFrustum;
+   //Holds the camera's rotation.
+   C_Quaternion rotationQuaternion;
+   C_Vector3 xVec;
 
-		bool rotation , translation;
+   //Set true when the frustun needs to be updated
+   bool updateFrustum;
 
-		int w , h;
+   bool rotation , translation;
 
-	public:
-		C_Frustum* frustum;
+   int w , h;
 
-		//Camera coordinates
-		C_Vector3 position;
+public:
+   C_Frustum* frustum;
 
-		C_Camera(void);
+   //Camera coordinates
+   C_Vector3 position;
 
-		float zNear , zFar , fov;
+   C_Camera(void);
 
-		void Look(void);
-		void setProjection(int w , int h);
+   float zNear , zFar , fov;
 
-		void Rotate(const float x , const float y);
-		void Move(const float speed);
-		void Move(const float x , const float y , const float z);
-		void MoveUp(const float speed);
-		void MoveDown(const float speed);
-		void StrafeLeft(const float speed);
-		void StrafeRight(const float speed);
+   void Look(void);
+   void setProjection(int w , int h);
 
-		void PrintText(int x , int y , float r , float g , float b , float a , const char *text  , ...);
+   void Rotate(const float x , const float y);
+   void Move(const float speed);
+   void Move(const float x , const float y , const float z);
+   void MoveUp(const float speed);
+   void MoveDown(const float speed);
+   void StrafeLeft(const float speed);
+   void StrafeRight(const float speed);
 
-		inline C_Vector3 GetPosition(void) const { return position; }
+   void PrintText(int x , int y , float r , float g , float b , float a , const char *text  , ...);
 
+   inline C_Vector3 GetPosition(void) const { return position; }
 };
 
 #endif

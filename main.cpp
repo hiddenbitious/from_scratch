@@ -243,14 +243,14 @@ Draw(void)
 //   grid->Update(metaball , 3 , NULL);
 //   grid->Draw(NULL);
 
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	group.draw();
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	group.draw(&camera);
 
 	switch(bspRenderingType) {
 		case 0:
 		   /// Draw tree using PVS
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			mapPolys = bspTest->Draw_PVS(&cameraPosition);
+			mapPolys = bspTest->Draw_PVS(&camera);
 			break;
 
       case 1:
@@ -262,7 +262,7 @@ Draw(void)
 		case 2:
 		   /// Draw PVS in wireframe mode
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			mapPolys = bspTest->Draw_PVS(&cameraPosition);
+			mapPolys = bspTest->Draw_PVS(&camera);
 			break;
 
       case 3:
