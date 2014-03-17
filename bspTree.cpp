@@ -578,13 +578,13 @@ C_BspTree::BuildBspTree(void)
 }
 
 int
-C_BspTree::Draw2(C_Vector3* cameraPosition)
+C_BspTree::Draw2(C_Camera *camera)
 {
 	polyCount = 0;
 	leavesDrawn = 0;
 	nodesDrawn = 0;
 
-	/// Set all leaves as non drawn
+	/// Set all leaves as not drawn
 	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
 		leaves[i]->drawn = false;
 	}
@@ -600,8 +600,7 @@ C_BspTree::Draw2(C_Vector3* cameraPosition)
 
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
-//      C_BspNode::Draw(cameraPosition, headNode, this, false);
-//      glFlush();
+      C_BspNode::Draw(camera, headNode, this, false);
 	shaderManager->popShader();
 
 	return polyCount;

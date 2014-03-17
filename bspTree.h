@@ -55,7 +55,7 @@ public:
    void TessellatePolygons(void);
 
    void Draw(void);
-   int Draw2(C_Vector3* cameraPosition);
+   int Draw2(C_Camera *camera);
    void Draw3(void);
    int Draw_PVS(C_Camera *camera);
 

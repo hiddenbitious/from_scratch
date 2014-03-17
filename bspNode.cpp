@@ -406,7 +406,6 @@ C_BspNode::Draw(C_Camera *camera, C_BspNode* node, C_BspTree* tree, bool usePVS)
 {
    C_Vector3 cameraPosition = camera->GetPosition();
 
-   static int lastNode = -1;
    if(!node->isLeaf) {
       float side = node->partitionPlane.distanceFromPoint(&cameraPosition);
 
@@ -423,35 +422,22 @@ C_BspNode::Draw(C_Camera *camera, C_BspNode* node, C_BspTree* tree, bool usePVS)
       if(node->drawn) {
          return;
       }
-
-      if(lastNode != node->nodeID) {
-         lastNode = node->nodeID;
-         printf("Entered leaf: %d\n", lastNode);
-////         printf("partition plane:\n");
-//         printf("\t(%f %f %f) - (%f %f %f) (%f %f %f)\n",
-//         node->partitionPlane.points[0].x, node->partitionPlane.points[0].y, node->partitionPlane.points[0].z,
-//         node->partitionPlane.points[1].x, node->partitionPlane.points[1].y, node->partitionPlane.points[1].z,
-//         node->partitionPlane.points[2].x, node->partitionPlane.points[2].y, node->partitionPlane.points[2].z);
-         C_Vertex min, max;
-         node->bbox.GetMax(&max);
-         node->bbox.GetMin(&min);
-         printf("leaf's bbox:\n");
-         printf("\t(%G %G %G) -- (%G %G %G)\n", min.x, min.y, min.z, max.x, max.y, max.z);
-      }
+      node->drawn = true;
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      node->drawn = true;
       node->Draw();
       node->DrawPointSet();
       polyCount += node->nPolys;
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
       if(usePVS) {
+//         int totalLeavesDrawn = 0;
          for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
             if(!camera->frustum->cubeInFrustum(&node->PVS[i]->bbox)) {
-               printf("node: %lu out of camera\n", node->PVS[i]->nodeID);
                continue;
             }
+
+//            ++totalLeavesDrawn;
 
             if(node->PVS[i]->drawn) {
                continue;
@@ -459,12 +445,11 @@ C_BspNode::Draw(C_Camera *camera, C_BspNode* node, C_BspTree* tree, bool usePVS)
 
             node->PVS[i]->drawn = true;
             node->PVS[i]->Draw();
-
             node->PVS[i]->bbox.Draw();
-   //			node->PVS[i]->DrawPointSet();
-
             polyCount += node->PVS[i]->nPolys;
          }
+
+//         printf("drawn %d out of %lu leaves\n", totalLeavesDrawn, node->PVS.size());
       }
    }
 }

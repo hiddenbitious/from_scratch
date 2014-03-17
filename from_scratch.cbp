@@ -67,7 +67,6 @@
 		<Unit filename="math.h" />
 		<Unit filename="mesh.cpp" />
 		<Unit filename="mesh.h" />
-		<Unit filename="meshgroup.h" />
 		<Unit filename="metaballs/cubeGrid.cpp" />
 		<Unit filename="metaballs/cubeGrid.h" />
 		<Unit filename="metaballs/metaball.h" />
@@ -99,8 +98,6 @@
 		<Unit filename="tgaLoader/tgaLoader.cpp" />
 		<Unit filename="timer.cpp" />
 		<Unit filename="timer.h" />
-		<Unit filename="trimesh.cpp" />
-		<Unit filename="trimesh.h" />
 		<Unit filename="vectors.cpp" />
 		<Unit filename="vectors.h" />
 		<Extensions>

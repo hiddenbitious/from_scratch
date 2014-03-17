@@ -31,7 +31,7 @@ private:
 public:
    C_Frustum* frustum;
 
-   //Camera coordinates
+   /// Camera position
    C_Vector3 position;
 
    C_Camera(void);

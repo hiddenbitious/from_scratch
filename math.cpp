@@ -211,14 +211,14 @@ void esMatrixMultiply(ESMatrix *result, ESMatrix *srcA, ESMatrix *srcB)
 
 	for (i=0; i<4; i++) {
 		tmp.m[i][0] =	(srcA->m[i][0] * srcB->m[0][0]) +
-						(srcA->m[i][1] * srcB->m[1][0]) +
-						(srcA->m[i][2] * srcB->m[2][0]) +
-						(srcA->m[i][3] * srcB->m[3][0]) ;
+                     (srcA->m[i][1] * srcB->m[1][0]) +
+                     (srcA->m[i][2] * srcB->m[2][0]) +
+                     (srcA->m[i][3] * srcB->m[3][0]) ;
 
 		tmp.m[i][1] =	(srcA->m[i][0] * srcB->m[0][1]) +
-						(srcA->m[i][1] * srcB->m[1][1]) +
-						(srcA->m[i][2] * srcB->m[2][1]) +
-						(srcA->m[i][3] * srcB->m[3][1]) ;
+                     (srcA->m[i][1] * srcB->m[1][1]) +
+                     (srcA->m[i][2] * srcB->m[2][1]) +
+                     (srcA->m[i][3] * srcB->m[3][1]) ;
 
 		tmp.m[i][2] =	(srcA->m[i][0] * srcB->m[0][2]) +
 						(srcA->m[i][1] * srcB->m[1][2]) +

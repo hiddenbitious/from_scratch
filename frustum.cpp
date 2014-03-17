@@ -43,110 +43,63 @@ void C_Frustum::calculateFrustum(void)
                   clip[11] - clip[ 8],
                   clip[15] - clip[12]);
 
-   left.setPlane(clip[ 3] + clip[ 0] ,
-                 clip[ 7] + clip[ 4] ,
-                 clip[11] + clip[ 8] ,
-                 clip[15] + clip[12]
-                );
+   left.setPlane(clip[ 3] + clip[ 0],
+                 clip[ 7] + clip[ 4],
+                 clip[11] + clip[ 8],
+                 clip[15] + clip[12]);
 
-   bottom.setPlane
-   (
-      clip[ 3] + clip[ 1] ,
-      clip[ 7] + clip[ 5] ,
-      clip[11] + clip[ 9] ,
-      clip[15] + clip[13]
-   );
+   bottom.setPlane(clip[ 3] + clip[ 1],
+                   clip[ 7] + clip[ 5],
+                   clip[11] + clip[ 9],
+                   clip[15] + clip[13]);
 
-   top.setPlane
-   (
-      clip[ 3] - clip[ 1] ,
-      clip[ 7] - clip[ 5] ,
-      clip[11] - clip[ 9] ,
-      clip[15] - clip[13]
-   );
+   top.setPlane(clip[ 3] - clip[ 1],
+                clip[ 7] - clip[ 5],
+                clip[11] - clip[ 9],
+                clip[15] - clip[13]);
 
-   back.setPlane
-   (
-      clip[ 3] - clip[ 2] ,
-      clip[ 7] - clip[ 6] ,
-      clip[11] - clip[10] ,
-      clip[15] - clip[14]
-   );
+   back.setPlane(clip[ 3] - clip[ 2],
+                 clip[ 7] - clip[ 6],
+                 clip[11] - clip[10],
+                 clip[15] - clip[14]);
 
-   front.setPlane
-   (
-      clip[ 3] + clip[ 2] ,
-      clip[ 7] + clip[ 6] ,
-      clip[11] + clip[10] ,
-      clip[15] + clip[14]
-   );
+   front.setPlane(clip[ 3] + clip[ 2],
+                  clip[ 7] + clip[ 6],
+                  clip[11] + clip[10],
+                  clip[15] + clip[14]);
 
-   right.normalizePlane();
-   left.normalizePlane();
-   bottom.normalizePlane();
-   top.normalizePlane();
-   back.normalizePlane();
-   front.normalizePlane();
+/// normilizing the planes is not needed unless we want to calculate exact distances from the planes
+/// (aka test with bounding spheres)
+//   right.normalizePlane();
+//   left.normalizePlane();
+//   bottom.normalizePlane();
+//   top.normalizePlane();
+//   back.normalizePlane();
+//   front.normalizePlane();
 }
 
-
-bool C_Frustum::pointInFrustum(const C_Vector3* point)
-const
+bool
+C_Frustum::pointInFrustum(const C_Vector3* point) const
 {
-   if(left.distanceFromPoint(point) <= 0) {
-      return false;
-   }
-
-   if(right.distanceFromPoint(point) <= 0) {
-      return false;
-   }
-
-   if(bottom.distanceFromPoint(point) <= 0) {
-      return false;
-   }
-
-   if(top.distanceFromPoint(point) <= 0) {
-      return false;
-   }
-
-   if(back.distanceFromPoint(point) <= 0) {
-      return false;
-   }
-
-   if(front.distanceFromPoint(point) <= 0) {
-      return false;
-   }
+   if(left.distanceFromPoint(point) <= 0) return false;
+   if(right.distanceFromPoint(point) <= 0) return false;
+   if(bottom.distanceFromPoint(point) <= 0) return false;
+   if(top.distanceFromPoint(point) <= 0) return false;
+   if(back.distanceFromPoint(point) <= 0) return false;
+   if(front.distanceFromPoint(point) <= 0) return false;
 
    return true;
 }
 
-
-bool C_Frustum::sphereInFrustum(C_Vector3* point , const float radius)
-const
+bool
+C_Frustum::sphereInFrustum(C_Vector3* point , const float radius) const
 {
-   if(back.distanceFromPoint(point) <= -radius) {
-      return false;
-   }
-
-   if(bottom.distanceFromPoint(point) <= -radius) {
-      return false;
-   }
-
-   if(front.distanceFromPoint(point) <= -radius) {
-      return false;
-   }
-
-   if(left.distanceFromPoint(point) <= -radius) {
-      return false;
-   }
-
-   if(right.distanceFromPoint(point) <= -radius) {
-      return false;
-   }
-
-   if(top.distanceFromPoint(point) <= -radius) {
-      return false;
-   }
+   if(back.distanceFromPoint(point) <= -radius) return false;
+   if(bottom.distanceFromPoint(point) <= -radius) return false;
+   if(front.distanceFromPoint(point) <= -radius) return false;
+   if(left.distanceFromPoint(point) <= -radius) return false;
+   if(right.distanceFromPoint(point) <= -radius) return false;
+   if(top.distanceFromPoint(point) <= -radius) return false;
 
    return true;
 }
@@ -155,35 +108,14 @@ const
 bool C_Frustum::sphereInFrustum(C_BSphere* sphere)
 const
 {
-   if(sphere == NULL) {
-      return true;
-   }
-
    C_Vector3 spherePosition = sphere->GetPosition();
 
-   if(back.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) {
-      return false;
-   }
-
-   if(bottom.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) {
-      return false;
-   }
-
-   if(front.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) {
-      return false;
-   }
-
-   if(left.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) {
-      return false;
-   }
-
-   if(right.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) {
-      return false;
-   }
-
-   if(top.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) {
-      return false;
-   }
+   if(back.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) return false;
+   if(bottom.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) return false;
+   if(front.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) return false;
+   if(left.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) return false;
+   if(right.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) return false;
+   if(top.distanceFromPoint(&spherePosition) <= -sphere->GetRadius()) return false;
 
    return true;
 }
@@ -220,38 +152,14 @@ bool C_Frustum::cubeInFrustum(const C_BBox* box) const
    box->GetVertices(vertices);
 
    for(int i = 0 ; i < 6 ; i++) {
-      if(frustumPlanes[i]->distanceFromPoint(&vertices[0]) > 0) {
-         continue;
-      }
-
-      if(frustumPlanes[i]->distanceFromPoint(&vertices[1]) > 0) {
-         continue;
-      }
-
-      if(frustumPlanes[i]->distanceFromPoint(&vertices[2]) > 0) {
-         continue;
-      }
-
-      if(frustumPlanes[i]->distanceFromPoint(&vertices[3]) > 0) {
-         continue;
-      }
-
-      if(frustumPlanes[i]->distanceFromPoint(&vertices[4]) > 0) {
-         continue;
-      }
-
-      if(frustumPlanes[i]->distanceFromPoint(&vertices[5]) > 0) {
-         continue;
-      }
-
-      if(frustumPlanes[i]->distanceFromPoint(&vertices[6]) > 0) {
-         continue;
-      }
-
-      if(frustumPlanes[i]->distanceFromPoint(&vertices[7]) > 0) {
-         continue;
-      }
-
+      if(frustumPlanes[i]->distanceFromPoint(&vertices[0]) >= 0) continue;
+      if(frustumPlanes[i]->distanceFromPoint(&vertices[1]) >= 0) continue;
+      if(frustumPlanes[i]->distanceFromPoint(&vertices[2]) >= 0) continue;
+      if(frustumPlanes[i]->distanceFromPoint(&vertices[3]) >= 0) continue;
+      if(frustumPlanes[i]->distanceFromPoint(&vertices[4]) >= 0) continue;
+      if(frustumPlanes[i]->distanceFromPoint(&vertices[5]) >= 0) continue;
+      if(frustumPlanes[i]->distanceFromPoint(&vertices[6]) >= 0) continue;
+      if(frustumPlanes[i]->distanceFromPoint(&vertices[7]) >= 0) continue;
       return false;
    }
 

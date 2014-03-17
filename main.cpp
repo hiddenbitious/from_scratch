@@ -256,7 +256,7 @@ Draw(void)
       case 1:
          /// Draw the whole tree without PVS
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			mapPolys = bspTest->Draw2(&cameraPosition);
+			mapPolys = bspTest->Draw2(&camera);
 			break;
 
 		case 2:
