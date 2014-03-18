@@ -28,13 +28,55 @@ C_Map::createMap(const char *filename)
       return false;
    }
 
-//   bspTree = new C_BspTree(6);
-//
-//   bspTree->ReadGeometryFile("mapGeometry.bsp");
-//   bspTree->BuildBspTree();
-//   bspTree->BuildPVS();
+   /// Load 3d meshes
+   load3DdObjects();
+
+   /// Position the walls
+   placeObjects();
+
+   bspTree = new C_BspTree(6);
+
+   bspTree->ReadGeometryFile("mapGeometry.bsp");
+   bspTree->BuildBspTree();
+   bspTree->BuildPVS();
 
    return true;
+}
+
+bool
+C_Map::placeObjects(void)
+{
+   C_MeshGroup copyOfWall;
+   copyOfWall = wallMesh;
+
+   return true;
+}
+
+bool
+C_Map::load3DdObjects(void)
+{
+   /// This is supposed to check every tile in the map
+   /// and load the needed 3d mesh from disk
+
+   /// Obiously an mesh manager will be needed to avoid loading
+   /// the same mesh more than once
+
+   wallMesh.loadFromFile("objmodels/fence.obj");
+   wallMesh.shader = wallShader;
+return true;
+}
+
+void
+C_Map::draw(C_Camera *camera)
+{
+   int mapPolys;
+
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+   wallMesh.draw(camera);
+
+   mapPolys = bspTree->Draw_PVS(camera);
+
 }
 
 bool
@@ -53,18 +95,18 @@ C_Map::readMap(const char *filename)
 	if((fd = fopen(filename, "r")) == NULL)
 		return false;
 
-	fscanf(fd, "%d", &_xTiles);		/// Read size on x.
-	fscanf(fd, "%d", &_yTiles);		/// Read size on y.
-	fscanf(fd, "%d", &nTiles);		   /// Read number of tiles stored in file.
+	c = fscanf(fd, "%d", &_xTiles);		/// Read size on x.
+	c = fscanf(fd, "%d", &_yTiles);		/// Read size on y.
+	c = fscanf(fd, "%d", &nTiles);		   /// Read number of tiles stored in file.
 
    assert(_xTiles == TILES_ON_X);
    assert(_yTiles == TILES_ON_Y);
    assert(nTiles == TILES_ON_X * TILES_ON_Y);
 
 	for(i = 0; i < nTiles; i++) {
-		fscanf(fd, "%d", &_x);			/// Read x coords
-		fscanf(fd, "%d", &_y);			/// Read y coords
-		fscanf(fd, "%d", &type);	   /// Read tile type
+		c = fscanf(fd, "%d", &_x);			/// Read x coords
+		c = fscanf(fd, "%d", &_y);			/// Read y coords
+		c = fscanf(fd, "%d", &type);	   /// Read tile type
 		c = fscanf(fd, "%d", &area);	/// Read tile area
 
 		assert(_x < TILES_ON_X);

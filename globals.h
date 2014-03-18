@@ -121,5 +121,6 @@ extern C_GLShader *wallShader;
 
 extern bool drawConnectedToo;
 extern char MAX_THREADS;
+extern int totalLeaves;
 
 #endif

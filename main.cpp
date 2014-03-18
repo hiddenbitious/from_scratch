@@ -35,10 +35,12 @@ int mapPolys;
 bool drawConnectedToo = false;
 static C_Map map;
 
+
 /// Global variables
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
 C_GLShaderManager *shaderManager = NULL;
 char MAX_THREADS = 0;
+int totalLeaves;
 
 C_GLShader *bspShader = NULL;
 C_GLShader *basicShader = NULL;
@@ -58,8 +60,6 @@ static int windowPositionY = 200;
 
 /// movement vars
 static float speed = 7.0f;
-static float angle = 0.5f;
-static float angle2 = 0.5f;
 
 static int metaballPolys = 0;
 static bool frustumCulling = true;
@@ -78,8 +78,6 @@ static C_CubeGrid *grid;
 static C_Metaball metaball[3];
 
 static void CountFPS (void);
-
-C_MeshGroup group;
 
 static void
 Initializations(void)
@@ -115,19 +113,6 @@ Initializations(void)
 	camera.fov = 70.0f;
 	camera.zFar = 1000.0f;
 	camera.zNear = 1.0f;
-
-   map.createMap("map.txt");
-
-	// Diabase tin geometria gia to bsp
-	bspTest = new C_BspTree(6);
-//	bspTest->ReadGeometryFile("properMap2.BSP");
-
-	bspTest->ReadGeometryFile("mapGeometry.bsp");
-
-	// Kataskeuase bsp kai pvs
-	bspTest->BuildBspTree();
-	bspTest->BuildPVS();
-//	bspTest->dumpSamplePoints("samplePoints.txt");
 
 	/// metaballs initialization
 	grid = new C_CubeGrid();
@@ -172,40 +157,7 @@ Initializations(void)
    assert(wallShader->textureUniformLocation_0 >= 0);
    assert(wallShader->textureUniformLocation_1 == -1);
 
-   group.loadFromFile("objmodels/fence.obj");
-   group.shader = wallShader;
-
-   printf("--------------------------------------------------\n");
-
-//   C_Mesh *mesh = group.meshes;
-//   while(mesh) {
-//      assert(!(mesh->nVertices%3));
-//      for(int i = 0; i < mesh->nVertices / 3; i++) {
-//         printf("v%d(%f %f %f) -- ", i, mesh->vertices[3 * i    ].x,
-//                                        mesh->vertices[3 * i    ].y,
-//                                        mesh->vertices[3 * i    ].z);
-//
-//         printf("(%f %f %f) -- ", mesh->vertices[3 * i + 1].x,
-//                                  mesh->vertices[3 * i + 1].y,
-//                                  mesh->vertices[3 * i + 1].z);
-//
-//         printf("(%f %f %f)\n",   mesh->vertices[3 * i + 2].x,
-//                                  mesh->vertices[3 * i + 2].y,
-//                                  mesh->vertices[3 * i + 2].z);
-//
-//         if(mesh->textCoords) {
-//            printf("t%d(%f %f) -- ", i, mesh->textCoords[3 * i    ].u,
-//                                        mesh->textCoords[3 * i    ].v);
-//
-//            printf("(%f %f) -- ", mesh->textCoords[3 * i + 1].u,
-//                                  mesh->textCoords[3 * i + 1].v);
-//
-//            printf("(%f %f)\n\n", mesh->textCoords[3 * i + 2].u,
-//                                  mesh->textCoords[3 * i + 2].v);
-//         }
-//      }
-//      mesh = mesh->next;
-//   }
+   map.createMap("map.txt");
 
 	/// timer initialization
 	timer.Initialize ();
@@ -216,62 +168,13 @@ Draw(void)
 {
 	C_Vector3 cameraPosition = camera.GetPosition();
 
-	/// Make the angle rotation independant of the cpu speed
-	angle += .2f * timeElapsed;
-	if(angle >= 360.0f) { angle = 0.0f; }
-
-	angle2 += .05f * timeElapsed;
-	if(angle2 >= 360.0f) { angle2 = 0.0f; }
-
 	/// Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	esMatrixLoadIdentity(&globalModelviewMatrix);
 	camera.Look();
-	metaballPolys = 0;
 
-	/// Draw metaballs
-//	metaball[0].position.y = 20.0f + 5 * cos(angle2);
-//	metaball[0].position.x = 20.0f + 10 * cos(angle2);
-//
-//	metaball[1].position.x = 20.0f + 8.0f * cos(angle);
-//	metaball[1].position.z = 20.0f + 5.0f * cos(angle);
-//
-//	metaball[2].position.z = 15.0f + 10.0f * cos(angle);
-
-
-//   grid->Update(metaball , 3 , NULL);
-//   grid->Draw(NULL);
-
-   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	group.draw(&camera);
-
-	switch(bspRenderingType) {
-		case 0:
-		   /// Draw tree using PVS
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			mapPolys = bspTest->Draw_PVS(&camera);
-			break;
-
-      case 1:
-         /// Draw the whole tree without PVS
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			mapPolys = bspTest->Draw2(&camera);
-			break;
-
-		case 2:
-		   /// Draw PVS in wireframe mode
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			mapPolys = bspTest->Draw_PVS(&camera);
-			break;
-
-      case 3:
-//  			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//         mapPolys = bspTest->Draw2(&cameraPosition);
-         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			bspTest->Draw3();
-			break;
-	}
+   map.draw(&camera);
 
 #ifndef JNI_COMPATIBLE
 	/// Print text on screem
@@ -282,10 +185,10 @@ Draw(void)
 					 "FPS: %d" , (int)fps);
 	camera.PrintText(0, lineHeight * line++,
 					 1.0f, 1.0f, 0.0f, 0.6f,
-					 "bsp polys: %d" , mapPolys);
-   camera.PrintText(0, lineHeight * line++,
-					 1.0f, 1.0f, 0.0f, 0.6f,
-					 "bsp rendering method: %d", bspRenderingType);
+					 "PVS size: %d. Drawn: %d" , totalLeaves, leavesDrawn);
+//   camera.PrintText(0, lineHeight * line++,
+//					 1.0f, 1.0f, 0.0f, 0.6f,
+//					 "leaves drawn: %d", leavesDrawn);
 
 	/// Update timer
 	timer.Update ();

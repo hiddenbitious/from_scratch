@@ -424,6 +424,8 @@ C_BspNode::Draw(C_Camera *camera, C_BspNode* node, C_BspTree* tree, bool usePVS)
       }
       node->drawn = true;
 
+      totalLeaves = node->PVS.size();
+
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       node->Draw();
       node->DrawPointSet();
@@ -431,25 +433,18 @@ C_BspNode::Draw(C_Camera *camera, C_BspNode* node, C_BspTree* tree, bool usePVS)
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
       if(usePVS) {
-//         int totalLeavesDrawn = 0;
          for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
-            if(!camera->frustum->cubeInFrustum(&node->PVS[i]->bbox)) {
+            if(!camera->frustum->cubeInFrustum(&node->PVS[i]->bbox) || node->PVS[i]->drawn) {
                continue;
             }
 
-//            ++totalLeavesDrawn;
-
-            if(node->PVS[i]->drawn) {
-               continue;
-            }
+            ++leavesDrawn;
 
             node->PVS[i]->drawn = true;
             node->PVS[i]->Draw();
             node->PVS[i]->bbox.Draw();
             polyCount += node->PVS[i]->nPolys;
          }
-
-//         printf("drawn %d out of %lu leaves\n", totalLeavesDrawn, node->PVS.size());
       }
    }
 }
@@ -554,6 +549,10 @@ C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
          curTri->normal2.x = node->geometry[i]->pNorms[0].x; curTri->normal2.y = node->geometry[i]->pNorms[0].y; curTri->normal2.z = node->geometry[i]->pNorms[0].z;
 
          currentTriangle++;
+         break;
+
+      default:
+         assert(0);
          break;
       }
    }

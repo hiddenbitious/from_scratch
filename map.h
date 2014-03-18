@@ -13,14 +13,19 @@ public:
 
    bool createMap(const char *filename);
 
-   void draw(void);
+   void draw(C_Camera *camera);
 
 private:
    C_BspTree *bspTree;
+   C_MeshGroup wallMesh;
+
+
    /// All map tiles
    tile tiles[TILES_ON_X][TILES_ON_Y];
 
    bool readMap(const char *filename);
+   bool load3DdObjects(void);
+   bool placeObjects(void);
 };
 
 #endif

@@ -230,9 +230,9 @@ C_BspTree::BuildPVS(void)
 	cout << "Done!" << endl << endl;
 
 	/// Write PVS into a file
-//	if(!pvsFileFound) {
-//		WritePVSFile("map_pvs6_perfect.txt");
-//	}
+	if(!pvsFileFound) {
+		WritePVSFile("map_pvs6_perfect.txt");
+	}
 }
 
 typedef struct {
@@ -265,54 +265,6 @@ void *TraceVisibility_Thread(void *data_)
 
       cout << "\n\t\t0%|---------50---------|100%\n\t   ";
    }
-
-//   for(unsigned int l1 = start; l1 < end; l1++) {
-//	   leaf1 = leaves[l1];
-//      for(unsigned int l2 = 0; l2 < leaves.size(); l2++) {
-//         leaf2 = leaves[l2];
-//
-//         assert(leaf1->isLeaf);
-//         assert(leaf2->isLeaf);
-//
-//         if(leaf1->nodeID == leaf2->nodeID) {
-//            continue;
-//         }
-//
-//         pthread_mutex_lock(&mutex);
-//         assert(leaf1->checkedVisibilityWith[leaf2->nodeID] == leaf2->checkedVisibilityWith[leaf1->nodeID]);
-//         assert(leaf1->visibleFrom[leaf2->nodeID] == leaf2->visibleFrom[leaf1->nodeID]);
-//         if(leaf1->visibleFrom[leaf2->nodeID] || leaf1->checkedVisibilityWith[leaf2->nodeID]) {
-//            pthread_mutex_unlock(&mutex);
-//            continue;
-//         }
-//         pthread_mutex_unlock(&mutex);
-//
-//         res = tree->CheckVisibility(leaf1, leaf2);
-//
-//         pthread_mutex_lock(&mutex);
-//         if(res) {
-//            leaf1->PVS.push_back(leaf2);
-//            leaf1->visibleFrom[leaf2->nodeID] = true;
-//
-//            leaf2->PVS.push_back(leaf1);
-//            leaf2->visibleFrom[leaf1->nodeID] = true;
-//         }
-//
-//         leaf1->checkedVisibilityWith[leaf2->nodeID] = true;
-//         leaf2->checkedVisibilityWith[leaf1->nodeID] = true;
-//         pthread_mutex_unlock(&mutex);
-//      }
-//
-//      pthread_mutex_lock(&mutex);
-//  		progress += step;
-//  		pthread_mutex_unlock(&mutex);
-//
-//  		if(!tid) {
-//         cout << "\r\t\t   ";
-//         for(int k = 0 ; k < (int)progress ; k++)
-//            cout << "*" << flush;
-//      }
-//   }
 
 	for(unsigned int l1 = start; l1 < end; l1++) {
 	   leaf1 = leaves[l1];
@@ -582,7 +534,8 @@ C_BspTree::Draw2(C_Camera *camera)
 {
 	polyCount = 0;
 	leavesDrawn = 0;
-	nodesDrawn = 0;
+	nodesDrawn = 1;
+	totalLeaves = 0;
 
 	/// Set all leaves as not drawn
 	for(unsigned int i = 0 ; i < leaves.size() ; i++) {

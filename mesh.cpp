@@ -25,6 +25,39 @@ C_Mesh::C_Mesh(void)
    nTriangles = 0;
 }
 
+C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
+{
+   if(this != &mesh) {
+      if(mesh.vertices) {
+         vertices = new C_Vertex[mesh.nVertices];
+         memcpy(vertices, mesh.vertices, mesh.nVertices * sizeof(C_Vertex));
+      }
+
+      if(mesh.normals) {
+         normals = new C_Normal[mesh.nVertices];
+         memcpy(normals, mesh.normals, mesh.nVertices* sizeof(C_Normal));
+      }
+
+      if(mesh.textCoords) {
+         textCoords = new C_TexCoord[mesh.nVertices];
+         memcpy(textCoords, mesh.textCoords, mesh.nVertices * sizeof(C_TexCoord));
+      }
+
+      if(mesh.colors) {
+         colors = new C_Color[mesh.nVertices];
+         memcpy(colors, mesh.colors, mesh.nVertices * sizeof(C_Color));
+      }
+
+      assert(!indices);
+
+      bbox = mesh.bbox;
+      position.x = mesh.position.x;
+      position.y = mesh.position.y;
+      position.z = mesh.position.z;
+   }
+   return *this;
+}
+
 C_Mesh::~C_Mesh(void)
 {
    if(colors)     delete[] colors;
@@ -55,6 +88,32 @@ C_MeshGroup::~C_MeshGroup(void)
    meshes = NULL;
 }
 
+C_MeshGroup &C_MeshGroup::operator= (const C_MeshGroup &group)
+{
+   if(this != &group){
+      C_Mesh *mesh = group.meshes;
+      C_Mesh *newMesh;
+
+      while(mesh) {
+         printf("meshes: %p\n", meshes);
+
+         newMesh = addMesh();
+
+         printf("newMesh->next: %p\n", newMesh->next);
+         printf("meshes: %p\n", meshes);
+
+         *newMesh = *mesh;
+
+         printf("newMesh->next: %p\n", newMesh->next);
+         printf("meshes: %p\n", meshes);
+
+         mesh = mesh->next;
+      }
+   }
+
+   return *this;
+}
+
 C_Mesh *
 C_MeshGroup::addMesh(void)
 {
@@ -81,6 +140,9 @@ C_MeshGroup::applyTransformationOnVertices(const ESMatrix *mat)
       mesh->applyTransformationOnVertices(mat);
       mesh = mesh->next;
    }
+
+   /// Update bboxes
+   calculateBbox();
 }
 
 void
@@ -147,6 +209,7 @@ void
 C_MeshGroup::draw(C_Camera *camera)
 {
    if(camera && !camera->frustum->cubeInFrustum(&bbox)) {
+//      printf("obj out of frustum\n");
       return;
    }
 

@@ -13,60 +13,60 @@ C_Frustum::C_Frustum(void)
 
 void C_Frustum::calculateFrustum(void)
 {
-   float clip[16];   // This will hold the clipping space matrix
+   float mvp[16];   /// This will hold the ModelviewProjection matrix (Projection * Modelview)
 
    float *modl = (float *)&globalModelviewMatrix.m[0][0];
    float *proj = (float *)&globalProjectionMatrix.m[0][0];
 
-   clip[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];
-   clip[ 1] = modl[ 0] * proj[ 1] + modl[ 1] * proj[ 5] + modl[ 2] * proj[ 9] + modl[ 3] * proj[13];
-   clip[ 2] = modl[ 0] * proj[ 2] + modl[ 1] * proj[ 6] + modl[ 2] * proj[10] + modl[ 3] * proj[14];
-   clip[ 3] = modl[ 0] * proj[ 3] + modl[ 1] * proj[ 7] + modl[ 2] * proj[11] + modl[ 3] * proj[15];
+   mvp[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];
+   mvp[ 1] = modl[ 0] * proj[ 1] + modl[ 1] * proj[ 5] + modl[ 2] * proj[ 9] + modl[ 3] * proj[13];
+   mvp[ 2] = modl[ 0] * proj[ 2] + modl[ 1] * proj[ 6] + modl[ 2] * proj[10] + modl[ 3] * proj[14];
+   mvp[ 3] = modl[ 0] * proj[ 3] + modl[ 1] * proj[ 7] + modl[ 2] * proj[11] + modl[ 3] * proj[15];
 
-   clip[ 4] = modl[ 4] * proj[ 0] + modl[ 5] * proj[ 4] + modl[ 6] * proj[ 8] + modl[ 7] * proj[12];
-   clip[ 5] = modl[ 4] * proj[ 1] + modl[ 5] * proj[ 5] + modl[ 6] * proj[ 9] + modl[ 7] * proj[13];
-   clip[ 6] = modl[ 4] * proj[ 2] + modl[ 5] * proj[ 6] + modl[ 6] * proj[10] + modl[ 7] * proj[14];
-   clip[ 7] = modl[ 4] * proj[ 3] + modl[ 5] * proj[ 7] + modl[ 6] * proj[11] + modl[ 7] * proj[15];
+   mvp[ 4] = modl[ 4] * proj[ 0] + modl[ 5] * proj[ 4] + modl[ 6] * proj[ 8] + modl[ 7] * proj[12];
+   mvp[ 5] = modl[ 4] * proj[ 1] + modl[ 5] * proj[ 5] + modl[ 6] * proj[ 9] + modl[ 7] * proj[13];
+   mvp[ 6] = modl[ 4] * proj[ 2] + modl[ 5] * proj[ 6] + modl[ 6] * proj[10] + modl[ 7] * proj[14];
+   mvp[ 7] = modl[ 4] * proj[ 3] + modl[ 5] * proj[ 7] + modl[ 6] * proj[11] + modl[ 7] * proj[15];
 
-   clip[ 8] = modl[ 8] * proj[ 0] + modl[ 9] * proj[ 4] + modl[10] * proj[ 8] + modl[11] * proj[12];
-   clip[ 9] = modl[ 8] * proj[ 1] + modl[ 9] * proj[ 5] + modl[10] * proj[ 9] + modl[11] * proj[13];
-   clip[10] = modl[ 8] * proj[ 2] + modl[ 9] * proj[ 6] + modl[10] * proj[10] + modl[11] * proj[14];
-   clip[11] = modl[ 8] * proj[ 3] + modl[ 9] * proj[ 7] + modl[10] * proj[11] + modl[11] * proj[15];
+   mvp[ 8] = modl[ 8] * proj[ 0] + modl[ 9] * proj[ 4] + modl[10] * proj[ 8] + modl[11] * proj[12];
+   mvp[ 9] = modl[ 8] * proj[ 1] + modl[ 9] * proj[ 5] + modl[10] * proj[ 9] + modl[11] * proj[13];
+   mvp[10] = modl[ 8] * proj[ 2] + modl[ 9] * proj[ 6] + modl[10] * proj[10] + modl[11] * proj[14];
+   mvp[11] = modl[ 8] * proj[ 3] + modl[ 9] * proj[ 7] + modl[10] * proj[11] + modl[11] * proj[15];
 
-   clip[12] = modl[12] * proj[ 0] + modl[13] * proj[ 4] + modl[14] * proj[ 8] + modl[15] * proj[12];
-   clip[13] = modl[12] * proj[ 1] + modl[13] * proj[ 5] + modl[14] * proj[ 9] + modl[15] * proj[13];
-   clip[14] = modl[12] * proj[ 2] + modl[13] * proj[ 6] + modl[14] * proj[10] + modl[15] * proj[14];
-   clip[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
+   mvp[12] = modl[12] * proj[ 0] + modl[13] * proj[ 4] + modl[14] * proj[ 8] + modl[15] * proj[12];
+   mvp[13] = modl[12] * proj[ 1] + modl[13] * proj[ 5] + modl[14] * proj[ 9] + modl[15] * proj[13];
+   mvp[14] = modl[12] * proj[ 2] + modl[13] * proj[ 6] + modl[14] * proj[10] + modl[15] * proj[14];
+   mvp[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
 
-   right.setPlane(clip[ 3] - clip[ 0],
-                  clip[ 7] - clip[ 4],
-                  clip[11] - clip[ 8],
-                  clip[15] - clip[12]);
+   right.setPlane(mvp[ 3] - mvp[ 0],
+                  mvp[ 7] - mvp[ 4],
+                  mvp[11] - mvp[ 8],
+                  mvp[15] - mvp[12]);
 
-   left.setPlane(clip[ 3] + clip[ 0],
-                 clip[ 7] + clip[ 4],
-                 clip[11] + clip[ 8],
-                 clip[15] + clip[12]);
+   left.setPlane(mvp[ 3] + mvp[ 0],
+                 mvp[ 7] + mvp[ 4],
+                 mvp[11] + mvp[ 8],
+                 mvp[15] + mvp[12]);
 
-   bottom.setPlane(clip[ 3] + clip[ 1],
-                   clip[ 7] + clip[ 5],
-                   clip[11] + clip[ 9],
-                   clip[15] + clip[13]);
+   bottom.setPlane(mvp[ 3] + mvp[ 1],
+                   mvp[ 7] + mvp[ 5],
+                   mvp[11] + mvp[ 9],
+                   mvp[15] + mvp[13]);
 
-   top.setPlane(clip[ 3] - clip[ 1],
-                clip[ 7] - clip[ 5],
-                clip[11] - clip[ 9],
-                clip[15] - clip[13]);
+   top.setPlane(mvp[ 3] - mvp[ 1],
+                mvp[ 7] - mvp[ 5],
+                mvp[11] - mvp[ 9],
+                mvp[15] - mvp[13]);
 
-   back.setPlane(clip[ 3] - clip[ 2],
-                 clip[ 7] - clip[ 6],
-                 clip[11] - clip[10],
-                 clip[15] - clip[14]);
+   back.setPlane(mvp[ 3] - mvp[ 2],
+                 mvp[ 7] - mvp[ 6],
+                 mvp[11] - mvp[10],
+                 mvp[15] - mvp[14]);
 
-   front.setPlane(clip[ 3] + clip[ 2],
-                  clip[ 7] + clip[ 6],
-                  clip[11] + clip[10],
-                  clip[15] + clip[14]);
+   front.setPlane(mvp[ 3] + mvp[ 2],
+                  mvp[ 7] + mvp[ 6],
+                  mvp[11] + mvp[10],
+                  mvp[15] + mvp[14]);
 
 /// normilizing the planes is not needed unless we want to calculate exact distances from the planes
 /// (aka test with bounding spheres)

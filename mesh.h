@@ -19,13 +19,12 @@ public:
 
    virtual void calculateBbox(void) = 0;
    virtual void applyTransformationOnVertices(const ESMatrix *mat) = 0;
-//   void drawbbox(void) { bbox.Draw(); };
 };
 
 class C_Mesh : public C_BaseMesh {
 public:
    C_Vertex       *vertices;     /// vertices
-   C_Vertex       *colors;       /// colors
+   C_Color        *colors;       /// colors
    C_TexCoord     *textCoords;   /// texture coordinates
    C_Normal       *normals;      /// normals
    int            *indices;      /// Vertex indices
@@ -34,6 +33,8 @@ public:
 
    C_Mesh(void);
    ~C_Mesh(void);
+
+   C_Mesh &operator= (const C_Mesh &mesh);
 
    void draw(C_GLShader *shader);
    void calculateBbox(void);
@@ -50,6 +51,8 @@ public:
 
    C_MeshGroup(void);
    ~C_MeshGroup(void);
+
+   C_MeshGroup &operator= (const C_MeshGroup &group);
 
    C_Mesh *addMesh(void);        /// Creates a new mesh, adds it in the linked list and returns
                                  /// a pointer to it
