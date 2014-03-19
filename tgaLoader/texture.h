@@ -17,11 +17,14 @@ private:
    unsigned int   height;        /// Image Height
    unsigned int   texID;         /// Texture ID Used To Select A Texture
    unsigned int   type;          /// Image Type (GL_RGB, GL_RGBA)
+   unsigned int   refCounter;    /// Reference counter
 
 public:
-   C_Texture(void) { imageData = NULL; imageSize = 0; };
+   C_Texture(void) { imageData = NULL; imageSize = 0; refCounter = 1; }
    ~C_Texture(void);
    C_Texture &operator= (const C_Texture &texture);
+   C_Texture *refTexture(void);
+   unsigned int unrefTexture(void);
 
    bool loadGLTexture(const char *filename);
    inline unsigned int getGLtextureID(void) { return texID; }

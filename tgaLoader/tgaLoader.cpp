@@ -291,22 +291,34 @@ C_Texture::LoadCompressedTGA(const char *filename, FILE * fTGA)    // Load COMPR
 
 C_Texture::~C_Texture()
 {
+   assert(!refCounter);
+
    if(imageData) {
       assert(imageSize);
       delete[] imageData;
+
+      glDeleteTextures(1, &texID);
    }
-   glDeleteTextures(1, &texID);
+}
+
+C_Texture *
+C_Texture::refTexture(void)
+{
+    ++refCounter;
+    return this;
+}
+
+unsigned int
+C_Texture::unrefTexture(void)
+{
+   return --refCounter;
 }
 
 C_Texture &C_Texture::operator= (const C_Texture &texture)
 {
-   if(this != &texture) {
-//      if(texture.imageData) {
-//         assert(texture.imageSize);
-//         imageSize = texture.imageSize;
-//         imageData   = new GLubyte[texture.imageSize];
-//      }
+   assert(0 && "You are copying a texture... Are you sure?");
 
+   if(this != &texture) {
       bpp = texture.bpp;
       width = texture.width;
       height = texture.height;

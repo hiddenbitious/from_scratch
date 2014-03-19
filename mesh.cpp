@@ -52,8 +52,8 @@ C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
       nVertices = mesh.nVertices;
       nTriangles = mesh.nTriangles;
       if(mesh.texture) {
-         texture = new C_Texture;
-         *texture = *mesh.texture;
+//         texture = new C_Texture;
+         texture = mesh.texture->refTexture();
       }
    }
    return *this;
@@ -61,12 +61,12 @@ C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
 
 C_Mesh::~C_Mesh(void)
 {
-   if(colors)     delete[] colors;
-   if(vertices)   delete[] vertices;
-   if(textCoords) delete[] textCoords;
-   if(normals)    delete[] normals;
-   if(indices)    delete[] indices;
-   if(texture)    delete texture;
+   if(colors)                       delete[] colors;
+   if(vertices)                     delete[] vertices;
+   if(textCoords)                   delete[] textCoords;
+   if(normals)                      delete[] normals;
+   if(indices)                      delete[] indices;
+   if(!texture->unrefTexture())     delete texture;
 }
 
 C_MeshGroup::C_MeshGroup(void)

@@ -71,12 +71,12 @@ C_Map::draw(C_Camera *camera)
 {
    int mapPolys;
 
-//   C_MeshGroup copyOfWall;
-//   copyOfWall = wallMesh;
+   C_MeshGroup copyOfWall;
+   copyOfWall = wallMesh;
 
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-   wallMesh.draw(camera);
+   copyOfWall.draw(camera);
 
    mapPolys = bspTree->Draw_PVS(camera);
 }
