@@ -266,7 +266,7 @@ void *TraceVisibility_Thread(void *data_)
       cout << "\n\t\t0%|---------50---------|100%\n\t   ";
    }
 
-	for(unsigned int l1 = start; l1 < end; l1++) {
+	for(int l1 = start; l1 < end; l1++) {
 	   leaf1 = leaves[l1];
 		for(unsigned int l2 = 0; l2 < leaf1->PVS.size(); l2++) {
 		   leaf2 = leaf1->PVS[l2];
@@ -393,7 +393,7 @@ C_BspTree::TraceVisibility(void)
    for(i = 0; i < nLeaves; i++) {
       leaf = leaves[i];
 //      C_BspNode::CleanUpPointSet(leaf, leaf->pointSet, false, true);
-      for(j = 0; j < leaf->PVS.size(); j++) {
+      for(j = 0; j < (int)leaf->PVS.size(); j++) {
          C_BspNode::CleanUpPointSet(leaf->PVS[j], leaf->pointSet, false, true);
       }
    }
@@ -740,7 +740,7 @@ C_BspTree::closeLeafHoles(void)
       leaf1->bbox.GetMin(&leaf1Min);
       leaf1->bbox.GetMax(&leaf1Max);
       /// Init node's data
-      memset(cNode->bestNodeToConnect, NULL, sizeof(C_BspNode *) * TOTAL_FACES);
+      memset(cNode->bestNodeToConnect, 0, sizeof(C_BspNode *) * TOTAL_FACES);
       for(i = 0; i < TOTAL_FACES; i++) cNode->bestNodeDistances[i] = GREATEST_FLOAT;
 
       /// Take into consideration that a leaf might be at the boundary of the tree

@@ -63,7 +63,6 @@ static int windowPositionY = 200;
 /// movement vars
 static float speed = 7.0f;
 
-static int metaballPolys = 0;
 static bool frustumCulling = true;
 static int bspRenderingType = 0;
 
@@ -171,8 +170,6 @@ Initializations(void)
 static void
 Draw(void)
 {
-	C_Vector3 cameraPosition = camera.GetPosition();
-
 	/// Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

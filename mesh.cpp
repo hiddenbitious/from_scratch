@@ -148,7 +148,7 @@ C_Mesh::calculateBbox(void)
    float minX = GREATEST_FLOAT, minY = GREATEST_FLOAT, minZ = GREATEST_FLOAT;
    float maxX = SMALLEST_FLOAT, maxY = SMALLEST_FLOAT, maxZ = SMALLEST_FLOAT;
 
-   for(unsigned int i = 0; i < nVertices; ++i) {
+   for(int i = 0; i < nVertices; ++i) {
       if(vertices[i].x > maxX) maxX = vertices[i].x;
       if(vertices[i].y > maxY) maxY = vertices[i].y;
       if(vertices[i].z > maxZ) maxZ = vertices[i].z;

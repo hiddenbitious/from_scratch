@@ -27,7 +27,7 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 {
 	GLMmodel* model;
 	FILE*     file;
-	int i, index;
+	int index;
    size_t size = 0;
 
    printf("Reading \"%s\" file... \n", filename);
@@ -110,7 +110,7 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       totalVertices += mesh->nVertices;
       totalTriangles += mesh->nTriangles;
 
-      for(i = 0; i < group->numtriangles; i++) {
+      for(unsigned int i = 0; i < group->numtriangles; i++) {
          /// Copy vertices
          index = 3 * model->triangles[group->triangles[i]].vindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
          mesh->vertices[3 * i    ].x = model->vertices[index    ];

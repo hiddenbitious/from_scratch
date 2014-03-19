@@ -209,7 +209,7 @@ C_GLShader::C_GLShader(void)
 C_GLShader::~C_GLShader(void)
 {
 	if(glslAvailable) {
-		for(unsigned int i = 0 ; i < nShaders ; i++) {
+		for(int i = 0; i < nShaders; i++) {
 			glDetachShader(programObject , shaderList[i]->shaderObject);
 			delete shaderList[i];
 		}
@@ -669,6 +669,10 @@ C_GLShaderManager::C_GLShaderManager(void)
 
 C_GLShaderManager::~C_GLShaderManager(void)
 {
+   for(unsigned int i = 0; i < shaderList.size(); ++i) {
+      delete shaderList[i];
+   }
+   shaderList.clear();
 }
 
 C_GLShaderManager *C_GLShaderManager::getSingleton(void)
@@ -686,7 +690,7 @@ C_GLShaderObject *C_GLShaderManager::shaderObjectExists(const C_GLShaderObject *
 {
    C_GLShaderObject *currentShader;
 
-   for(int i = 0; i < shaderList.size(); i++) {
+   for(unsigned int i = 0; i < shaderList.size(); i++) {
       for(int j = 0; j < shaderList[i]->nShaders; j++) {
          currentShader = shaderList[i]->shaderList[j];
          if(type != currentShader->type)
@@ -703,7 +707,7 @@ C_GLShaderObject *C_GLShaderManager::shaderObjectExists(const C_GLShaderObject *
 
 C_GLShader *C_GLShaderManager::shaderExists(const C_GLShaderObject *shaderObject1, const C_GLShaderObject *shaderObject2)
 {
-   for(int i = 0; i < shaderList.size(); i++) {
+   for(unsigned int i = 0; i < shaderList.size(); i++) {
       if(shaderList[i]->nShaders == 1) {
          if(shaderList[i]->shaderList[0] == shaderObject1)
             return shaderList[i];

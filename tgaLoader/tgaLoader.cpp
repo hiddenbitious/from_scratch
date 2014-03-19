@@ -114,8 +114,7 @@ C_Texture::LoadUncompressedTGA(const char *filename, FILE *fTGA)   // Load an un
 
    // Byte Swapping Optimized By Steve Thomas
    for(GLuint cswap = 0; cswap < (int)tga.imageSize; cswap += tga.bytesPerPixel) {
-      imageData[cswap] ^= imageData[cswap + 2] ^=
-                                      imageData[cswap] ^= imageData[cswap + 2];
+      imageData[cswap] ^= imageData[cswap + 2] ^= imageData[cswap] ^= imageData[cswap + 2];
    }
 
    fclose(fTGA);                                            // Close file
@@ -304,10 +303,10 @@ C_TextureManager *C_TextureManager::getSingleton(void)
 
 C_TextureManager::~C_TextureManager(void)
 {
-   for(unsigned int i = textures.size() - 1; i <= 0; ++i) {
+   for(unsigned int i = 0; i <= textures.size(); ++i) {
       delete textures[i];
-      textures.pop_back();
    }
+   textures.clear();
 }
 
 C_Texture *
