@@ -91,6 +91,7 @@ C_Texture::LoadUncompressedTGA(const char *filename, FILE *fTGA)   // Load an un
    tga.imageSize     = (tga.bytesPerPixel * tga.Width * tga.Height);    // Compute the total amout ofmemory needed to store data
 // imageData   = (GLubyte *)malloc(tga.imageSize);             // Allocate that much memory
    imageData   = new GLubyte[tga.imageSize];             // Allocate that much memory
+   imageSize   = tga.imageSize;
 
    if(imageData == NULL) {                               // If no space was allocated
       //MessageBox(NULL, "Could not allocate memory for image", "ERROR", MB_OK); // Display Error
@@ -152,6 +153,7 @@ C_Texture::LoadCompressedTGA(const char *filename, FILE * fTGA)    // Load COMPR
    tga.imageSize     = (tga.bytesPerPixel * tga.Width * tga.Height);    // Compute amout of memory needed to store image
 // imageData   = (GLubyte *)malloc(tga.imageSize);             // Allocate that much memory
    imageData   = new GLubyte[tga.imageSize];
+   imageSize = tga.imageSize;
    if(imageData == NULL) {                               // If it wasnt allocated correctly..
       //MessageBox(NULL, "Could not allocate memory for image", "ERROR", MB_OK); // Display Error
       fclose(fTGA);                                         // Close file
@@ -287,6 +289,34 @@ C_Texture::LoadCompressedTGA(const char *filename, FILE * fTGA)    // Load COMPR
    return 1;                                                      // return success
 }
 
+C_Texture::~C_Texture()
+{
+   if(imageData) {
+      assert(imageSize);
+      delete[] imageData;
+   }
+   glDeleteTextures(1, &texID);
+}
+
+C_Texture &C_Texture::operator= (const C_Texture &texture)
+{
+   if(this != &texture) {
+//      if(texture.imageData) {
+//         assert(texture.imageSize);
+//         imageSize = texture.imageSize;
+//         imageData   = new GLubyte[texture.imageSize];
+//      }
+
+      bpp = texture.bpp;
+      width = texture.width;
+      height = texture.height;
+      texID = texture.texID;
+      type = texture.type;
+      imageData = NULL;
+   }
+   return *this;
+}
+
 bool
 C_Texture::loadGLTexture(const char *filename)
 {
@@ -315,11 +345,4 @@ C_Texture::loadGLTexture(const char *filename)
    printf("\ttype: %d\n", type);
    printf("-----------\n");
    return true;
-}
-
-C_Texture::~C_Texture()
-{
-   if(imageData)
-      delete[] imageData;
-   glDeleteTextures(1, &texID);
 }

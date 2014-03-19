@@ -46,8 +46,8 @@ C_Map::createMap(const char *filename)
 bool
 C_Map::placeObjects(void)
 {
-   C_MeshGroup copyOfWall;
-   copyOfWall = wallMesh;
+//   C_MeshGroup copyOfWall;
+//   copyOfWall = wallMesh;
 
    return true;
 }
@@ -71,12 +71,14 @@ C_Map::draw(C_Camera *camera)
 {
    int mapPolys;
 
+//   C_MeshGroup copyOfWall;
+//   copyOfWall = wallMesh;
+
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
    wallMesh.draw(camera);
 
    mapPolys = bspTree->Draw_PVS(camera);
-
 }
 
 bool

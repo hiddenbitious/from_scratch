@@ -20,9 +20,6 @@ C_Mesh::C_Mesh(void)
    indices = NULL;
    next = NULL;
    texture = NULL;
-
-   nVertices = 0;
-   nTriangles = 0;
 }
 
 C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
@@ -51,9 +48,13 @@ C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
       assert(!indices);
 
       bbox = mesh.bbox;
-      position.x = mesh.position.x;
-      position.y = mesh.position.y;
-      position.z = mesh.position.z;
+      position = mesh.position;
+      nVertices = mesh.nVertices;
+      nTriangles = mesh.nTriangles;
+      if(mesh.texture) {
+         texture = new C_Texture;
+         *texture = *mesh.texture;
+      }
    }
    return *this;
 }
@@ -95,22 +96,18 @@ C_MeshGroup &C_MeshGroup::operator= (const C_MeshGroup &group)
       C_Mesh *newMesh;
 
       while(mesh) {
-         printf("meshes: %p\n", meshes);
-
          newMesh = addMesh();
-
-         printf("newMesh->next: %p\n", newMesh->next);
-         printf("meshes: %p\n", meshes);
-
          *newMesh = *mesh;
-
-         printf("newMesh->next: %p\n", newMesh->next);
-         printf("meshes: %p\n", meshes);
-
          mesh = mesh->next;
       }
-   }
 
+      nMeshes = group.nMeshes;
+      nTriangles = group.nTriangles;
+      nVertices = group.nVertices;
+      shader = group.shader;
+      bbox = group.bbox;
+      position = group.position;
+   }
    return *this;
 }
 
