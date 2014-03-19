@@ -18,7 +18,9 @@
 #	include <limits>
 #	include <assert.h>
 #	include <GL/glew.h>
+
 using namespace std;
+
 #endif
 
 typedef unsigned long ULONG;
@@ -109,11 +111,12 @@ class C_Quaternion;
 class vector2;
 class C_Vector3;
 class C_GLShaderManager;
+class C_TextureManager;
 class C_GLShader;
 
 extern ESMatrix globalModelviewMatrix, globalProjectionMatrix;
 extern C_GLShaderManager *shaderManager;
-
+extern C_TextureManager *textureManager;
 extern C_GLShader *bspShader;
 extern C_GLShader *basicShader;
 extern C_GLShader *pointShader;

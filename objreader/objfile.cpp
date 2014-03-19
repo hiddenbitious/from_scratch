@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "objfile.h"
+#include "../tgaLoader/texture.h"
 
 void glmFirstPass(GLMmodel* model, FILE* file);
 void glmSecondPass(GLMmodel* model, FILE* file);
@@ -165,8 +166,7 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 
       /// Copy material
 //      printf("material: %d", group->material);
-      mesh->texture = new C_Texture();
-      mesh->texture->loadGLTexture(model->materials[group->material].texture);
+      mesh->texture = textureManager->loadTexture(model->materials[group->material].texture);
 
       size += mesh->nVertices * sizeof(C_Vertex);
       if(group->properties & HAS_TEXCOORDS)

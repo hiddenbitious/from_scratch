@@ -39,6 +39,8 @@ static C_Map map;
 /// Global variables
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
 C_GLShaderManager *shaderManager = NULL;
+C_TextureManager *textureManager = NULL;
+
 char MAX_THREADS = 0;
 int totalLeaves;
 
@@ -156,6 +158,9 @@ Initializations(void)
    assert(wallShader->normalsAttribLocation == -1);
    assert(wallShader->textureUniformLocation_0 >= 0);
    assert(wallShader->textureUniformLocation_1 == -1);
+
+   /// Texture manager
+   textureManager = C_TextureManager::getSingleton();
 
    map.createMap("map.txt");
 

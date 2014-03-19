@@ -15,6 +15,9 @@
 
 #include "tga.h"
 
+using namespace std;
+
+C_TextureManager *C_TextureManager::classInstance = NULL;
 /**
  * name:       LoadTGA(Texture * texture, char * filename)
  * function:   Open and test the file to make sure it is a valid TGA file
@@ -289,6 +292,51 @@ C_Texture::LoadCompressedTGA(const char *filename, FILE * fTGA)    // Load COMPR
    return 1;                                                      // return success
 }
 
+C_TextureManager *C_TextureManager::getSingleton(void)
+{
+   if(!classInstance) {
+      classInstance = new C_TextureManager();
+   }
+
+   return classInstance;
+}
+
+C_TextureManager::~C_TextureManager(void)
+{
+   for(unsigned int i = textures.size() - 1; i <= 0; ++i) {
+      delete textures[i];
+      textures.pop_back();
+   }
+}
+
+C_Texture *
+C_TextureManager::loadTexture(const char *filename)
+{
+   /// Search if texture with that filename already exists
+   for(unsigned int i = 0; i < textures.size(); ++i) {
+      if(!strcmp(filename, textures[i]->getTextureFilename())) {
+         return textures[i]->refTexture();
+      }
+   }
+
+   /// If it does not exist, create it, load it from disk and return it
+   C_Texture *texture = new C_Texture;
+   if(texture->loadGLTexture(filename))
+      return texture;
+   else {
+      delete texture;
+      return NULL;
+   }
+}
+
+C_Texture::C_Texture(void)
+{
+   imageData = NULL;
+   imageSize = 0;
+   refCounter = 1;
+   memset(filename, 0, FILENAME_LEN * sizeof(char));
+}
+
 C_Texture::~C_Texture()
 {
    assert(!refCounter);
@@ -337,8 +385,8 @@ C_Texture::loadGLTexture(const char *filename)
 
    if(!LoadTGA(filename)) {
       printf("Error loading texture %s.\n", filename);
-      return false;
       assert(0);
+      return false;
    }
 
    glGenTextures(1, &texID);
@@ -348,6 +396,8 @@ C_Texture::loadGLTexture(const char *filename)
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+   memcpy(this->filename, filename, strlen(filename) * sizeof(char));
 
    printf(" done!\n");
    printf("\tbpp: %d\n", bpp);
