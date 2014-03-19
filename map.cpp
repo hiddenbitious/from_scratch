@@ -29,7 +29,7 @@ C_Map::createMap(const char *filename)
    }
 
    /// Load 3d meshes
-   load3DdObjects();
+   load3DObjects();
 
    /// Position the walls
    placeObjects();
@@ -46,14 +46,32 @@ C_Map::createMap(const char *filename)
 bool
 C_Map::placeObjects(void)
 {
-//   C_MeshGroup copyOfWall;
-//   copyOfWall = wallMesh;
+   ESMatrix mat;
+   esMatrixLoadIdentity(&mat);
+   esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
+
+   C_MeshGroup copiesOfWall[3];
+   copiesOfWall[0] = wallMesh;
+   copiesOfWall[0].applyTransformationOnVertices(&mat);
+
+   copiesOfWall[1] = copiesOfWall[0];
+   copiesOfWall[1].applyTransformationOnVertices(&mat);
+
+   copiesOfWall[2] = copiesOfWall[1];
+   copiesOfWall[2].applyTransformationOnVertices(&mat);
+
+   /// Position the walls into the bsp tree!
+   for(int x = 0; x < TILES_ON_X; x++) {
+      for(int y = 0; y < TILES_ON_Y; y++) {
+
+      }
+   }
 
    return true;
 }
 
 bool
-C_Map::load3DdObjects(void)
+C_Map::load3DObjects(void)
 {
    /// This is supposed to check every tile in the map
    /// and load the needed 3d mesh from disk
@@ -73,6 +91,10 @@ C_Map::draw(C_Camera *camera)
 
    C_MeshGroup copyOfWall;
    copyOfWall = wallMesh;
+   ESMatrix mat;
+   esMatrixLoadIdentity(&mat);
+   esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
+   copyOfWall.applyTransformationOnVertices(&mat);
 
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

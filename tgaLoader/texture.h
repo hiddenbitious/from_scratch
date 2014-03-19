@@ -6,8 +6,12 @@
 
 #define FILENAME_LEN    128
 
+class C_TextureManager;
+
 class C_Texture
 {
+friend class C_TextureManager;
+
 private:
    int LoadUncompressedTGA(const char *, FILE *);  // Load an Uncompressed file
    int LoadCompressedTGA(const char *, FILE *);    // Load a Compressed file
@@ -23,6 +27,8 @@ private:
    unsigned int   refCounter;             /// Reference counter
    char           filename[FILENAME_LEN]; /// Texture's filename on disk
 
+   bool loadGLTexture(const char *filename);
+
 public:
    C_Texture(void);
    ~C_Texture(void);
@@ -30,7 +36,6 @@ public:
    C_Texture *refTexture(void);
    unsigned int unrefTexture(void);
 
-   bool loadGLTexture(const char *filename);
    inline unsigned int getGLtextureID(void) { return texID; }
    inline char *getTextureFilename(void) { return filename; }
 };
@@ -48,6 +53,5 @@ public:
    ~C_TextureManager(void);
    static C_TextureManager *getSingleton(void);
 };
-
 
 #endif

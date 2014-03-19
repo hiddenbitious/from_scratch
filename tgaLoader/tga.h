@@ -1,8 +1,6 @@
 #ifndef __TGA_H__
 #define __TGA_H__
 
-#include "texture.h"
-
 typedef struct {
    unsigned char Header[12];         // TGA File Header
 } TGAHeader;

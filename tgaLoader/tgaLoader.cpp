@@ -13,6 +13,7 @@
 #include <string.h>
 #include <GL/gl.h>
 
+#include "texture.h"
 #include "tga.h"
 
 using namespace std;

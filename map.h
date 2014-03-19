@@ -24,7 +24,7 @@ private:
    tile tiles[TILES_ON_X][TILES_ON_Y];
 
    bool readMap(const char *filename);
-   bool load3DdObjects(void);
+   bool load3DObjects(void);
    bool placeObjects(void);
 };
 
