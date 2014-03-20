@@ -42,6 +42,8 @@ namespace math {
    C_Vertex transformPoint(const ESMatrix *matrix, const C_Vertex *point);
 }
 
+extern const ESMatrix Identity;
+
 /// Code ripped from "OpenGL ES 2.0 Programming Guide"
 void esScale(ESMatrix *result, GLfloat sx, GLfloat sy, GLfloat sz);
 void esTranslate(ESMatrix *result, GLfloat tx, GLfloat ty, GLfloat tz);

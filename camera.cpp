@@ -99,6 +99,8 @@ void C_Camera::MoveUp(const float speed)
 {
 	position.y += speed;
 	lookAt.y += speed;
+
+	updateFrustum = true;
 }
 
 
@@ -106,6 +108,8 @@ void C_Camera::MoveDown(const float speed)
 {
 	position.y -= speed;
 	lookAt.y -= speed;
+
+	updateFrustum = true;
 }
 
 

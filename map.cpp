@@ -48,17 +48,6 @@ C_Map::placeObjects(void)
 {
    ESMatrix mat;
    esMatrixLoadIdentity(&mat);
-   esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
-
-   C_MeshGroup copiesOfWall[3];
-   copiesOfWall[0] = wallMesh;
-   copiesOfWall[0].applyTransformationOnVertices(&mat);
-
-   copiesOfWall[1] = copiesOfWall[0];
-   copiesOfWall[1].applyTransformationOnVertices(&mat);
-
-   copiesOfWall[2] = copiesOfWall[1];
-   copiesOfWall[2].applyTransformationOnVertices(&mat);
 
    /// Position the walls into the bsp tree!
    for(int x = 0; x < TILES_ON_X; x++) {
@@ -81,7 +70,8 @@ C_Map::load3DObjects(void)
 
    wallMesh.loadFromFile("objmodels/fence.obj");
    wallMesh.shader = wallShader;
-return true;
+
+   return true;
 }
 
 void
