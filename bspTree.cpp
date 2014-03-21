@@ -213,11 +213,11 @@ C_BspTree::BuildPVS(void)
 
 	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-	pvsFileFound = this->ReadPVSFile("map_pvs6_perfect.txt");
+//	pvsFileFound = this->ReadPVSFile("map_pvs6_perfect.txt");
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points... " << flush;
-	C_BspNode::DistributeSamplePoints(headNode , headNode->pointSet);
+	headNode->DistributeSamplePoints(headNode->pointSet);
 	cout << "Done!" << endl;
 
 	if(pvsFileFound) {
@@ -230,9 +230,9 @@ C_BspTree::BuildPVS(void)
 	cout << "Done!" << endl << endl;
 
 	/// Write PVS into a file
-	if(!pvsFileFound) {
-		WritePVSFile("map_pvs6_perfect.txt");
-	}
+//	if(!pvsFileFound) {
+//		WritePVSFile("map_pvs6_perfect.txt");
+//	}
 }
 
 typedef struct {
@@ -394,7 +394,7 @@ C_BspTree::TraceVisibility(void)
       leaf = leaves[i];
 //      C_BspNode::CleanUpPointSet(leaf, leaf->pointSet, false, true);
       for(j = 0; j < (int)leaf->PVS.size(); j++) {
-         C_BspNode::CleanUpPointSet(leaf->PVS[j], leaf->pointSet, false, true);
+         leaf->PVS[j]->CleanUpPointSet(leaf->pointSet, false, true);
       }
    }
    printf("Done!\n");
@@ -462,8 +462,8 @@ C_BspTree::RayIntersectsSomethingInTree(C_BspNode *node, C_Vertex *start, C_Vert
 		return NULL;
 	}
 
-	int startSide = C_BspNode::ClassifyVertex(&node->partitionPlane, start);
-	int endSide = C_BspNode::ClassifyVertex(&node->partitionPlane, end);
+	int startSide = ClassifyVertex(&node->partitionPlane, start);
+	int endSide = ClassifyVertex(&node->partitionPlane, end);
 
    /// If the ray spans the node's partition plane, then send the ray down both sides of node
 	if((startSide == COINCIDENT && endSide == COINCIDENT) ||
@@ -502,7 +502,7 @@ C_BspTree::BuildBspTree(void)
 	cout << "Building bsp tree... ";
 
 	headNode = new C_BspNode(pRawPolys , nPolys);
-	C_BspNode::BuildBspTree(headNode , this);
+	headNode->BuildBspTree(this);
 
    /// Close possible space holes between the tree's leaves
    printf("\n\tDetecting and closing space holes... ");
@@ -623,7 +623,7 @@ C_BspTree::Draw_PVS(C_Camera *camera)
 void
 C_BspTree::TessellatePolygons(void)
 {
-	C_BspNode::TessellatePolygonsInLeaves(headNode);
+	headNode->TessellatePolygonsInLeaves();
 }
 
 void

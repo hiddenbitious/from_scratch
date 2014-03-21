@@ -231,7 +231,7 @@ esMatrixMultiply(ESMatrix *result, ESMatrix *srcA, ESMatrix *srcB)
    memcpy(result, &tmp, sizeof(ESMatrix));
 }
 
-inline void
+void
 esMatrixLoadIdentity(ESMatrix *result)
 {
    memcpy(result, (void *)&Identity, sizeof(ESMatrix));

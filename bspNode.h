@@ -49,29 +49,23 @@ public:
    C_BBox bbox;
 
    /// Algorithm that chooses a polygon from a given geometry set and returns it as a splitting plane
-   static bool SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane);
-   /// Tests if polygon is in front, back, coincident or it spans the given plane
-   static int ClassifyPolygon(C_Plane* plane , poly_t* polygon);
-   /// Tests if a vertex against a plane
-   static int ClassifyVertex(C_Plane* plane , C_Vertex* vertex);
-   /// Splits the given polygon in two new polygon. The polygon must be spanning the plane given
-   static void SplitPolygon(C_Plane* plane , poly_t* polygon , poly_t** front , poly_t** back);
+   bool SelectPartitionfromList(C_Plane* finalPlane);
 
-   static bool IsConvex(C_BspNode *node);
+   bool IsConvex(void);
 
    C_BspNode();
    C_BspNode(poly_t** geom , int nPolys);
    ~C_BspNode();
 
    /// Recursively builds the tree
-   static void BuildBspTree(C_BspNode* node , C_BspTree* tree);
+   void BuildBspTree(C_BspTree* tree);
 
    /// Calculate node's bbox
    void CalculateBBox(void);
 
    void DistributePointsAlongPartitionPlane(void);
-   static void DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points);
-   static void CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool testWithBbox, bool testWithGeometry);
+   void DistributeSamplePoints(vector<C_Vertex>& points);
+   void CleanUpPointSet(vector<C_Vertex>& points, bool testWithBbox, bool testWithGeometry);
    bool addNodeToPVS(C_BspNode *node);
 
    vector<C_BspNode*> connectedLeaves;
@@ -91,7 +85,7 @@ public:
    /// Also it frees any memory reserved for the previous polygons
    /// (not the data itself but the pointers).
    /// New pointers are stored at the triangles var.
-   static void TessellatePolygonsInLeaves(C_BspNode* node);
+   void TessellatePolygonsInLeaves(void);
 };
 
 #endif

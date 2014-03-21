@@ -57,51 +57,10 @@ C_BspNode::~C_BspNode()
    }
 }
 
-int
-C_BspNode::ClassifyVertex(C_Plane *plane , C_Vertex *vertex)
-{
-   float dist = plane->distanceFromPoint(vertex);
-
-   if(FLOAT_EQ(dist, 0.0f)) {
-      return COINCIDENT;
-   } else if(dist > EPSILON) {
-      return FRONT;
-   } else {
-      return BACK;
-   }
-}
-
-int
-C_BspNode::ClassifyPolygon(C_Plane *plane, poly_t *polygon)
-{
-   int front = 0, back = 0;
-
-   for(int i = 0; i < polygon->nVertices; i++) {
-      int whereIs = ClassifyVertex(plane , &(polygon->pVertices[i]));
-
-      if(whereIs == FRONT) {
-         front++;
-      } else if(whereIs == BACK) {
-         back++;
-      }
-   }
-
-   if(front && !back) {
-      return FRONT;
-   } else if(!front && back) {
-      return BACK;
-   } else if(!front && !back) {
-      return COINCIDENT;
-   } else {
-      return INTERSECTS;
-   }
-}
-
 bool
-C_BspNode::IsConvex(C_BspNode *node)
+C_BspNode::IsConvex(void)
 {
-   poly_t** polys = node->geometry;
-   int nPolys = node->nPolys;
+   poly_t** polys = geometry;
 
    for(int i = 0; i < nPolys; i++) {
       C_Plane plane = C_Plane(&polys[i]->pVertices[0] , &polys[i]->pVertices[1] , &polys[i]->pVertices[2]);
@@ -119,59 +78,58 @@ C_BspNode::IsConvex(C_BspNode *node)
 }
 
 void
-C_BspNode::BuildBspTree(C_BspNode* node, C_BspTree *tree)
+C_BspNode::BuildBspTree(C_BspTree *tree)
 {
    static int ID = 0;
    bool isConvex;
-   node->tree = tree;
+   this->tree = tree;
    C_Plane tempPlane;
 
-   assert(node);
    assert(tree);
-   assert(node->depth <= tree->maxDepth);
+   assert(depth <= tree->maxDepth);
 
    /// An i geometria dimiourgei kleisto horo
    /// i an ehei ftasei arketa bathia sto dendro
    /// tote einai katalili gia filo sto dentro
-   if((isConvex = C_BspNode::IsConvex(node)) || node->depth == tree->maxDepth) {
+   if((isConvex = IsConvex()) || depth == tree->maxDepth) {
       tree->nConvexRooms += (int)isConvex;
-      node->isLeaf = true;
+      isLeaf = true;
       tree->nLeaves++;
-      tree->leaves.push_back(node);
+      tree->leaves.push_back(this);
 
-      if(node->depth > tree->depthReached) {
-         tree->depthReached = node->depth;
+      if(depth > tree->depthReached) {
+         tree->depthReached = depth;
       }
 
-      if(node->nPolys < tree->lessPolysInNodeFound) {
-         tree->lessPolysInNodeFound = node->nPolys;
+      if(nPolys < tree->lessPolysInNodeFound) {
+         tree->lessPolysInNodeFound = nPolys;
       }
 
       /// Calculate leaf's bbox
-      node->CalculateBBox();
+      CalculateBBox();
       return;
    }
 
    /// Diaforetika prepei na psaksoume gia epipedo diahorismou
-   SelectPartitionfromList(node, &tempPlane);
+   SelectPartitionfromList(&tempPlane);
 
-   node->partitionPlane.setPlane(&tempPlane);
-   node->frontNode = new C_BspNode();
-   node->frontNode->depth = node->depth + 1;
-   node->frontNode->fatherNode = node;
-   node->frontNode->partitionPlane.setPlane(&tempPlane);
+   partitionPlane.setPlane(&tempPlane);
+   frontNode = new C_BspNode();
+   frontNode->depth = depth + 1;
+   frontNode->fatherNode = this;
+   frontNode->partitionPlane.setPlane(&tempPlane);
 
-   node->backNode = new C_BspNode();
-   node->backNode->depth = node->depth + 1;
-   node->backNode->fatherNode = node;
-   node->backNode->partitionPlane.setPlane(&tempPlane);
+   backNode = new C_BspNode();
+   backNode->depth = depth + 1;
+   backNode->fatherNode = this;
+   backNode->partitionPlane.setPlane(&tempPlane);
 
    int result, nFront, nBack, i;
    nFront = nBack = 0;
 
    /// Classify all polygons in this node
-   for(i = 0; i < node->nPolys; i++) {
-      result = C_BspNode::ClassifyPolygon(&node->partitionPlane , node->geometry[i]);
+   for(i = 0; i < nPolys; i++) {
+      result = ClassifyPolygon(&partitionPlane, geometry[i]);
 
       if(result == FRONT) {
          ++nFront;
@@ -185,70 +143,70 @@ C_BspNode::BuildBspTree(C_BspNode* node, C_BspTree *tree)
       }
    }
 
-   node->nodeID = ID++;
+   nodeID = ID++;
 
    /// Allocate memory
-   node->backNode->geometry = nBack ? new poly_t *[nBack] : NULL;
-   node->backNode->nPolys = nBack;
-   node->backNode->nodeID = ID++;
+   backNode->geometry = nBack ? new poly_t *[nBack] : NULL;
+   backNode->nPolys = nBack;
+   backNode->nodeID = ID++;
 
-   node->frontNode->geometry = nFront ? new poly_t *[nFront] : NULL;
-   node->frontNode->nPolys = nFront;
-   node->frontNode->nodeID = ID++;
+   frontNode->geometry = nFront ? new poly_t *[nFront] : NULL;
+   frontNode->nPolys = nFront;
+   frontNode->nodeID = ID++;
 
    nFront = nBack = 0;
    tree->nNodes = ID;
 
    /// Distribute the geometry to the two new nodes
-   for(i = 0; i < node->nPolys; i++) {
-      result = C_BspNode::ClassifyPolygon(&node->partitionPlane, node->geometry[i]);
+   for(i = 0; i < nPolys; i++) {
+      result = ClassifyPolygon(&partitionPlane, geometry[i]);
 
       if(result == FRONT) {
-         node->frontNode->geometry[nFront] = node->geometry[i];
+         frontNode->geometry[nFront] = geometry[i];
          ++nFront;
       } else if(result == BACK) {
-         node->backNode->geometry[nBack] = node->geometry[i];
+         backNode->geometry[nBack] = geometry[i];
          ++nBack;
       } else if(result == INTERSECTS) {
-         C_BspNode::SplitPolygon(&node->partitionPlane , node->geometry[i] , &node->frontNode->geometry[nFront] , &node->backNode->geometry[nBack]);
+         SplitPolygon(&partitionPlane , geometry[i] , &frontNode->geometry[nFront] , &backNode->geometry[nBack]);
          tree->nSplits++;
          ++nFront;
          ++nBack;
       } else if(result == COINCIDENT) {
-         node->frontNode->geometry[nFront] = node->geometry[i];
+         frontNode->geometry[nFront] = geometry[i];
          ++nFront;
       }
    }
 
    /// Calculate node's bbox
-   node->CalculateBBox();
+   CalculateBBox();
 
    if(nFront) {
-      C_BspNode::BuildBspTree(node->frontNode, tree);
+      frontNode->BuildBspTree(tree);
 
-      if(node->frontNode->isLeaf == false) {
-         delete[] node->frontNode->geometry;
-         node->frontNode->geometry = NULL;
+      if(frontNode->isLeaf == false) {
+         delete[] frontNode->geometry;
+         frontNode->geometry = NULL;
       }
    }
    if(nBack) {
-      C_BspNode::BuildBspTree(node->backNode, tree);
+      backNode->BuildBspTree(tree);
 
-      if(node->backNode->isLeaf == false) {
-         delete[] node->backNode->geometry;
-         node->backNode->geometry = NULL;
+      if(backNode->isLeaf == false) {
+         delete[] backNode->geometry;
+         backNode->geometry = NULL;
       }
    }
 }
 
 bool
-C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
+C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
 {
    unsigned int nFront, nBack, nSplits, bestPlane = 0, bestSplits = INT_MAX;
    C_Plane tempPlane;
    bool found = false;
-   poly_t **geometry = node->geometry;
-   int nPolys = node->nPolys;
+//   poly_t **geometry = node->geometry;
+//   int nPolys = node->nPolys;
 
    float relation, bestRelation, minRelation;
    bestRelation = 0.0f;
@@ -275,7 +233,7 @@ C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
             if(i == currentPlane)
                continue;
 
-            int result = C_BspNode::ClassifyPolygon(&tempPlane , geometry[i]);
+            int result = ClassifyPolygon(&tempPlane , geometry[i]);
 
             if(result == FRONT) {
                nFront++;
@@ -319,86 +277,6 @@ C_BspNode::SelectPartitionfromList(C_BspNode *node, C_Plane* finalPlane)
 //   debug.push_back(finalPlane->points[2]);
 
    return found;
-}
-
-void
-C_BspNode::SplitPolygon(C_Plane *plane , poly_t *polygon , poly_t **front , poly_t **back)
-{
-   vector<C_Vertex> newFront;
-   vector<C_Vertex> newBack;
-   C_Vertex intersectionPoint;
-
-   C_Vertex ptA , ptB;
-   float sideA , sideB;
-
-   int i;
-   int count = polygon->nVertices;
-
-   ptA = polygon->pVertices[count - 1];
-   sideA = plane->distanceFromPoint(&ptA);
-
-   for(i = 0; i < count; i++) {
-      ptB = polygon->pVertices[i];
-      sideB = plane->distanceFromPoint(&ptB);
-
-      if(sideB > 0.0f) {
-         if(sideA < 0.0f) {
-            intersectionPoint = FindIntersectionPoint(&ptA , &ptB , plane);
-
-            newFront.push_back(intersectionPoint);
-            newBack.push_back(intersectionPoint);
-         }
-         newFront.push_back(ptB);
-      } else if(sideB < 0.0f) {
-         if(sideA > 0.0f) {
-            intersectionPoint = FindIntersectionPoint(&ptA , &ptB , plane);
-
-            newFront.push_back(intersectionPoint);
-            newBack.push_back(intersectionPoint);
-         }
-         newBack.push_back(ptB);
-      } else {
-         newFront.push_back(ptB);
-         newBack.push_back(ptB);
-      }
-
-      ptA = ptB;
-      sideA = sideB;
-   }
-
-   *front = new poly_t();
-   (*front)->nVertices = newFront.size();
-   (*front)->pNorms = new C_Vertex[(*front)->nVertices];
-   (*front)->pVertices = new C_Vertex[(*front)->nVertices];
-   (*front)->usedAsDivider = polygon->usedAsDivider;
-
-   for(i = 0 ; i < (*front)->nVertices ; i++) {
-      (*front)->pVertices[i].x = newFront[i].x;
-      (*front)->pVertices[i].y = newFront[i].y;
-      (*front)->pVertices[i].z = newFront[i].z;
-
-      (*front)->pNorms[i].x = polygon->pNorms[0].x;
-      (*front)->pNorms[i].y = polygon->pNorms[0].y;
-      (*front)->pNorms[i].z = polygon->pNorms[0].z;
-   }
-
-   *back = new poly_t();
-   (*back)->nVertices = newBack.size();
-   (*back)->pNorms = new C_Vertex[(*back)->nVertices];
-   (*back)->pVertices = new C_Vertex[(*back)->nVertices];
-   (*back)->usedAsDivider = polygon->usedAsDivider;
-
-   for(i = 0 ; i < (*back)->nVertices ; i++) {
-      (*back)->pVertices[i].x = newBack[i].x;
-      (*back)->pVertices[i].y = newBack[i].y;
-      (*back)->pVertices[i].z = newBack[i].z;
-
-      (*back)->pNorms[i].x = polygon->pNorms[0].x;
-      (*back)->pNorms[i].y = polygon->pNorms[0].y;
-      (*back)->pNorms[i].z = polygon->pNorms[0].z;
-   }
-
-   return;
 }
 
 void
@@ -489,64 +367,64 @@ C_BspNode::CalculateBBox(void)
 }
 
 void
-C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
+C_BspNode::TessellatePolygonsInLeaves(void)
 {
-   if(!node->isLeaf) {
-      TessellatePolygonsInLeaves(node->backNode);
-      TessellatePolygonsInLeaves(node->frontNode);
+   if(!isLeaf) {
+      backNode->TessellatePolygonsInLeaves();
+      frontNode->TessellatePolygonsInLeaves();
 
       return;
    }
 
    int i;
 
-   node->nTriangles = 0;
-   for(i = 0 ; i < node->nPolys ; i++) {
-      node->nTriangles += node->geometry[i]->nVertices - 2;
+   nTriangles = 0;
+   for(i = 0 ; i < nPolys ; i++) {
+      nTriangles += geometry[i]->nVertices - 2;
    }
-   assert(node->nTriangles == 2 * node->nPolys);
+   assert(nTriangles == 2 * nPolys);
 
-   node->triangles = new triangle_vn[node->nTriangles];
+   triangles = new triangle_vn[nTriangles];
 
    int currentTriangle = 0;
-   for(i = 0 ; i < node->nPolys ; i++) {
-      triangle_vn *curTri = &node->triangles[currentTriangle];
+   for(i = 0 ; i < nPolys ; i++) {
+      triangle_vn *curTri = &triangles[currentTriangle];
 
-      switch(node->geometry[i]->nVertices) {
+      switch(geometry[i]->nVertices) {
       case 3:
          assert(0);
-         curTri->vertex0.x = node->geometry[i]->pVertices[0].x; curTri->vertex0.y = node->geometry[i]->pVertices[0].y; curTri->vertex0.z = node->geometry[i]->pVertices[0].z;
-         curTri->vertex1.x = node->geometry[i]->pVertices[1].x; curTri->vertex1.y = node->geometry[i]->pVertices[1].y; curTri->vertex1.z = node->geometry[i]->pVertices[1].z;
-         curTri->vertex2.x = node->geometry[i]->pVertices[2].x; curTri->vertex2.y = node->geometry[i]->pVertices[2].y; curTri->vertex2.z = node->geometry[i]->pVertices[2].z;
+         curTri->vertex0.x = geometry[i]->pVertices[0].x; curTri->vertex0.y = geometry[i]->pVertices[0].y; curTri->vertex0.z = geometry[i]->pVertices[0].z;
+         curTri->vertex1.x = geometry[i]->pVertices[1].x; curTri->vertex1.y = geometry[i]->pVertices[1].y; curTri->vertex1.z = geometry[i]->pVertices[1].z;
+         curTri->vertex2.x = geometry[i]->pVertices[2].x; curTri->vertex2.y = geometry[i]->pVertices[2].y; curTri->vertex2.z = geometry[i]->pVertices[2].z;
 
-         curTri->normal0.x = node->geometry[i]->pNorms[0].x; curTri->normal0.y = node->geometry[i]->pNorms[0].y; curTri->normal0.z = node->geometry[i]->pNorms[0].z;
-         curTri->normal1.x = node->geometry[i]->pNorms[1].x; curTri->normal1.y = node->geometry[i]->pNorms[1].y; curTri->normal1.z = node->geometry[i]->pNorms[1].z;
-         curTri->normal2.x = node->geometry[i]->pNorms[2].x; curTri->normal2.y = node->geometry[i]->pNorms[2].y; curTri->normal2.z = node->geometry[i]->pNorms[2].z;
+         curTri->normal0.x = geometry[i]->pNorms[0].x; curTri->normal0.y = geometry[i]->pNorms[0].y; curTri->normal0.z = geometry[i]->pNorms[0].z;
+         curTri->normal1.x = geometry[i]->pNorms[1].x; curTri->normal1.y = geometry[i]->pNorms[1].y; curTri->normal1.z = geometry[i]->pNorms[1].z;
+         curTri->normal2.x = geometry[i]->pNorms[2].x; curTri->normal2.y = geometry[i]->pNorms[2].y; curTri->normal2.z = geometry[i]->pNorms[2].z;
 
          currentTriangle++;
          break;
 
       case 4:
          /// Triangle 1
-         curTri->vertex0.x = node->geometry[i]->pVertices[0].x; curTri->vertex0.y = node->geometry[i]->pVertices[0].y; curTri->vertex0.z = node->geometry[i]->pVertices[0].z;
-         curTri->vertex1.x = node->geometry[i]->pVertices[1].x; curTri->vertex1.y = node->geometry[i]->pVertices[1].y; curTri->vertex1.z = node->geometry[i]->pVertices[1].z;
-         curTri->vertex2.x = node->geometry[i]->pVertices[2].x; curTri->vertex2.y = node->geometry[i]->pVertices[2].y; curTri->vertex2.z = node->geometry[i]->pVertices[2].z;
+         curTri->vertex0.x = geometry[i]->pVertices[0].x; curTri->vertex0.y = geometry[i]->pVertices[0].y; curTri->vertex0.z = geometry[i]->pVertices[0].z;
+         curTri->vertex1.x = geometry[i]->pVertices[1].x; curTri->vertex1.y = geometry[i]->pVertices[1].y; curTri->vertex1.z = geometry[i]->pVertices[1].z;
+         curTri->vertex2.x = geometry[i]->pVertices[2].x; curTri->vertex2.y = geometry[i]->pVertices[2].y; curTri->vertex2.z = geometry[i]->pVertices[2].z;
 
-         curTri->normal0.x = node->geometry[i]->pNorms[0].x; curTri->normal0.y = node->geometry[i]->pNorms[0].y; curTri->normal0.z = node->geometry[i]->pNorms[0].z;
-         curTri->normal1.x = node->geometry[i]->pNorms[1].x; curTri->normal1.y = node->geometry[i]->pNorms[1].y; curTri->normal1.z = node->geometry[i]->pNorms[1].z;
-         curTri->normal2.x = node->geometry[i]->pNorms[2].x; curTri->normal2.y = node->geometry[i]->pNorms[2].y; curTri->normal2.z = node->geometry[i]->pNorms[2].z;
+         curTri->normal0.x = geometry[i]->pNorms[0].x; curTri->normal0.y = geometry[i]->pNorms[0].y; curTri->normal0.z = geometry[i]->pNorms[0].z;
+         curTri->normal1.x = geometry[i]->pNorms[1].x; curTri->normal1.y = geometry[i]->pNorms[1].y; curTri->normal1.z = geometry[i]->pNorms[1].z;
+         curTri->normal2.x = geometry[i]->pNorms[2].x; curTri->normal2.y = geometry[i]->pNorms[2].y; curTri->normal2.z = geometry[i]->pNorms[2].z;
 
          currentTriangle++;
-         curTri = &node->triangles[currentTriangle];
+         curTri = &triangles[currentTriangle];
 
          /// Triangle 2
-         curTri->vertex0.x = node->geometry[i]->pVertices[2].x; curTri->vertex0.y = node->geometry[i]->pVertices[2].y; curTri->vertex0.z = node->geometry[i]->pVertices[2].z;
-         curTri->vertex1.x = node->geometry[i]->pVertices[3].x; curTri->vertex1.y = node->geometry[i]->pVertices[3].y; curTri->vertex1.z = node->geometry[i]->pVertices[3].z;
-         curTri->vertex2.x = node->geometry[i]->pVertices[0].x; curTri->vertex2.y = node->geometry[i]->pVertices[0].y; curTri->vertex2.z = node->geometry[i]->pVertices[0].z;
+         curTri->vertex0.x = geometry[i]->pVertices[2].x; curTri->vertex0.y = geometry[i]->pVertices[2].y; curTri->vertex0.z = geometry[i]->pVertices[2].z;
+         curTri->vertex1.x = geometry[i]->pVertices[3].x; curTri->vertex1.y = geometry[i]->pVertices[3].y; curTri->vertex1.z = geometry[i]->pVertices[3].z;
+         curTri->vertex2.x = geometry[i]->pVertices[0].x; curTri->vertex2.y = geometry[i]->pVertices[0].y; curTri->vertex2.z = geometry[i]->pVertices[0].z;
 
-         curTri->normal0.x = node->geometry[i]->pNorms[2].x; curTri->normal0.y = node->geometry[i]->pNorms[2].y; curTri->normal0.z = node->geometry[i]->pNorms[2].z;
-         curTri->normal1.x = node->geometry[i]->pNorms[3].x; curTri->normal1.y = node->geometry[i]->pNorms[3].y; curTri->normal1.z = node->geometry[i]->pNorms[3].z;
-         curTri->normal2.x = node->geometry[i]->pNorms[0].x; curTri->normal2.y = node->geometry[i]->pNorms[0].y; curTri->normal2.z = node->geometry[i]->pNorms[0].z;
+         curTri->normal0.x = geometry[i]->pNorms[2].x; curTri->normal0.y = geometry[i]->pNorms[2].y; curTri->normal0.z = geometry[i]->pNorms[2].z;
+         curTri->normal1.x = geometry[i]->pNorms[3].x; curTri->normal1.y = geometry[i]->pNorms[3].y; curTri->normal1.z = geometry[i]->pNorms[3].z;
+         curTri->normal2.x = geometry[i]->pNorms[0].x; curTri->normal2.y = geometry[i]->pNorms[0].y; curTri->normal2.z = geometry[i]->pNorms[0].z;
 
          currentTriangle++;
          break;
@@ -557,21 +435,21 @@ C_BspNode::TessellatePolygonsInLeaves(C_BspNode* node)
       }
    }
 
-   assert(node->nTriangles == currentTriangle);
+   assert(nTriangles == currentTriangle);
 
-   delete[] node->geometry;
-   node->geometry = NULL;
+   delete[] geometry;
+   geometry = NULL;
 }
 
 void
-C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool testWithBbox, bool testWithGeometry)
+C_BspNode::CleanUpPointSet(vector<C_Vertex>& points, bool testWithBbox, bool testWithGeometry)
 {
    unsigned int cPoint = 0;
 
    /// Remove points outside the bbox
    if(testWithBbox) {
       while(cPoint < points.size()) {
-         if(!node->bbox.IsInside(&points[cPoint])) {
+         if(!bbox.IsInside(&points[cPoint])) {
             points.erase(points.begin() + cPoint);
             cPoint--;
          }
@@ -582,10 +460,10 @@ C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool test
    /// Remove points coinciding with the triangles of the given node
    /// NOTE: VERY BRUTE FORCE WAY. MUST FIND SOMETHING FASTER.
    if(testWithGeometry) {
-      for(int cTri = 0 ; cTri < node->nTriangles ; cTri++) {
+      for(int cTri = 0 ; cTri < nTriangles ; cTri++) {
          cPoint = 0;
          while(cPoint < points.size()) {
-            if(PointInTriangle(&points[cPoint], &node->triangles[cTri])) {
+            if(PointInTriangle(&points[cPoint], &triangles[cTri])) {
                points.erase(points.begin() + cPoint);
                cPoint--;
             }
@@ -597,24 +475,24 @@ C_BspNode::CleanUpPointSet(C_BspNode* node , vector<C_Vertex>& points, bool test
 }
 
 void
-C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points)
+C_BspNode::DistributeSamplePoints(vector<C_Vertex>& points)
 {
    /// CLEAN UP POINTS
-   CleanUpPointSet(node, points, true, true);
+   CleanUpPointSet(points, true, true);
 
-   if(node->isLeaf) {
-      node->pointSet = points;
+   if(isLeaf) {
+      pointSet = points;
    } else {
       float dist;
       vector<C_Vertex> frontPoints, backPoints;
 
       /// Fill in node's pointset
-      node->DistributePointsAlongPartitionPlane();
-      frontPoints = node->pointSet;
-      backPoints = node->pointSet;
+      DistributePointsAlongPartitionPlane();
+      frontPoints = pointSet;
+      backPoints = pointSet;
 
       for(unsigned int i = 0 ; i < points.size() ; i++) {
-         dist = node->partitionPlane.distanceFromPoint(&points[i]);
+         dist = partitionPlane.distanceFromPoint(&points[i]);
 
          if(dist > 0.0f) {
             frontPoints.push_back(points[i]);
@@ -623,8 +501,8 @@ C_BspNode::DistributeSamplePoints(C_BspNode* node , vector<C_Vertex>& points)
          }
       }
 
-      C_BspNode::DistributeSamplePoints(node->backNode , backPoints);
-      C_BspNode::DistributeSamplePoints(node->frontNode , frontPoints);
+      backNode->DistributeSamplePoints(backPoints);
+      frontNode->DistributeSamplePoints(frontPoints);
    }
 }
 
