@@ -78,6 +78,29 @@ C_BspNode::IsConvex(void)
 }
 
 void
+C_BspNode::insertStaticObject(staticTreeObject_t *staticMesh, C_Vertex *point)
+{
+   if(!isLeaf) {
+      float side = partitionPlane.distanceFromPoint(point);
+
+      if(side > 0.0f) {
+         frontNode->insertStaticObject(staticMesh, point);
+      } else {
+         backNode->insertStaticObject(staticMesh, point);
+      }
+   } else {
+      for(unsigned int i = 0; i < staticObjects.size(); ++i) {
+         if(staticObjects[i]->meshID == staticMesh->meshID) {
+            delete staticMesh;
+            return;
+         }
+      }
+
+      staticObjects.push_back(staticMesh);
+   }
+}
+
+void
 C_BspNode::BuildBspTree(C_BspTree *tree)
 {
    static int ID = 0;
@@ -282,9 +305,9 @@ C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
 void
 C_BspNode::Draw(C_Camera *camera, C_BspNode* node, C_BspTree* tree, bool usePVS)
 {
-   C_Vector3 cameraPosition = camera->GetPosition();
 
    if(!node->isLeaf) {
+      C_Vector3 cameraPosition = camera->GetPosition();
       float side = node->partitionPlane.distanceFromPoint(&cameraPosition);
 
       if(side > 0.0f) {

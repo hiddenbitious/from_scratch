@@ -77,6 +77,8 @@ public:
 
    void Rotate(const float anglex , const float angley , const float anglez , const C_Vector3* rotPoint);
 
+   void ApplyTransformation(ESMatrix *matrix);
+
    bool IsInside(const C_Vertex* point);
 };
 

@@ -29,8 +29,6 @@
 
 using namespace std;
 
-// BSP
-static C_BspTree *bspTest;
 int mapPolys;
 bool drawConnectedToo = false;
 static C_Map map;
@@ -263,34 +261,6 @@ hande_simple_keys(unsigned char key , int x , int y)
 			bspRenderingType = (bspRenderingType + 1) % 4;
 			printf("bspRenderingType: %d\n", bspRenderingType);
 			break;
-
-		case 'q' : case 'Q' :{
-			bspTest->IncreaseLeavesDrawn();
-
-			printf("Drawing leaf: %d (%lu)\n", bspTest->leafToDraw, bspTest->leaves[bspTest->leafToDraw]->nodeID);
-			int nleaves = bspTest->leaves[bspTest->leafToDraw]->connectedLeaves.size();
-			printf("Connected leaves: %d\n", nleaves);
-			for(int i = 0; i < nleaves; i++) {
-   			printf("%lu, ", bspTest->leaves[bspTest->leafToDraw]->connectedLeaves[i]->nodeID);
-         }
-         printf("\n\n");
-
-			break;
-			}
-
-		case 'w' : case 'W' :{
-			bspTest->DecreaseLeavesDrawn();
-
-			printf("Drawing leaf: %d (%lu)\n", bspTest->leafToDraw, bspTest->leaves[bspTest->leafToDraw]->nodeID);
-			int nleaves = bspTest->leaves[bspTest->leafToDraw]->connectedLeaves.size();
-			printf("Connected leaves: %d\n", nleaves);
-			for(int i = 0; i < nleaves; i++) {
-   			printf("%ld, ", bspTest->leaves[bspTest->leafToDraw]->connectedLeaves[i]->nodeID);
-         }
-         printf("\n\n");
-
-			break;
-			}
 
       case 'e': {
          drawConnectedToo = !drawConnectedToo;

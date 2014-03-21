@@ -253,6 +253,22 @@ void C_BBox::Rotate(const float anglex , const float angley , const float anglez
 	min.z = MinOfEight(vertices[0].z , vertices[1].z , vertices[2].z , vertices[3].z , vertices[4].z , vertices[5].z , vertices[6].z , vertices[7].z);
 }
 
+void
+C_BBox::ApplyTransformation(ESMatrix *matrix)
+{
+   for(int i = 0; i < 8; ++i) {
+      vertices[i] = math::transformPoint(matrix, &vertices[i]);
+   }
+
+   max.x = MaxOfEight(vertices[0].x , vertices[1].x , vertices[2].x , vertices[3].x , vertices[4].x , vertices[5].x , vertices[6].x , vertices[7].x);
+	max.y = MaxOfEight(vertices[0].y , vertices[1].y , vertices[2].y , vertices[3].y , vertices[4].y , vertices[5].y , vertices[6].y , vertices[7].y);
+	max.z = MaxOfEight(vertices[0].z , vertices[1].z , vertices[2].z , vertices[3].z , vertices[4].z , vertices[5].z , vertices[6].z , vertices[7].z);
+
+	min.x = MinOfEight(vertices[0].x , vertices[1].x , vertices[2].x , vertices[3].x , vertices[4].x , vertices[5].x , vertices[6].x , vertices[7].x);
+	min.y = MinOfEight(vertices[0].y , vertices[1].y , vertices[2].y , vertices[3].y , vertices[4].y , vertices[5].y , vertices[6].y , vertices[7].y);
+	min.z = MinOfEight(vertices[0].z , vertices[1].z , vertices[2].z , vertices[3].z , vertices[4].z , vertices[5].z , vertices[6].z , vertices[7].z);
+}
+
 float C_BBox::MaxOfEight(float n1 , float n2 , float n3 , float n4 , float n5 , float n6 , float n7 , float n8)
 {
 	float max = n1;

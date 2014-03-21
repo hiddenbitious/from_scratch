@@ -1,23 +1,26 @@
 #ifndef _C_BSPNODE_H_
 #define _C_BSPNODE_H_
 
-#include "bbox.h"
-#include "globals.h"
-#include "plane.h"
 #include "bspCommon.h"
-#include "mesh.h"
-
 
 class C_BspNode {
 friend class C_BspTree;
 
-private:
-   vector<C_MeshGroup *> objects;
-   void insertMesh(C_MeshGroup *mesh);
+protected:
+
+   vector<C_Vertex> pointSet;
+   vector<C_BspNode*> connectedLeaves;
+   bool drawn;
+
+   vector<staticTreeObject_t *> staticObjects;
+   void insertStaticObject(staticTreeObject_t *mesh, C_Vertex *point);
 
 public:
    /// Node's ID
    ULONG nodeID;
+
+   vector<C_BspNode*> PVS;
+
 
    USHORT depth;
    bool *visibleFrom;
@@ -67,12 +70,6 @@ public:
    void DistributeSamplePoints(vector<C_Vertex>& points);
    void CleanUpPointSet(vector<C_Vertex>& points, bool testWithBbox, bool testWithGeometry);
    bool addNodeToPVS(C_BspNode *node);
-
-   vector<C_BspNode*> connectedLeaves;
-   vector<C_BspNode*> PVS;
-   bool drawn;
-
-   vector<C_Vertex> pointSet;
 
    void DrawPointSet(void);
 

@@ -207,13 +207,32 @@ C_BspTree::CalcNorms(void)
 }
 
 void
+C_BspTree::insertStaticObject(C_MeshGroup *staticMesh, ESMatrix *matrix)
+{
+   static unsigned int meshID = 0;
+   C_Vertex bboxVertices[8];
+   C_BBox bbox = staticMesh->bbox;
+
+   bbox.ApplyTransformation(matrix);
+   bbox.GetVertices(bboxVertices);
+
+   staticTreeObject_t *object = new staticTreeObject_t;
+   object->matrix = *matrix;
+   object->mesh = staticMesh;
+   object->meshID = meshID++;
+
+   for(int i = 0; i < 8; ++i)
+      headNode->insertStaticObject(object, &bboxVertices[i]);
+}
+
+void
 C_BspTree::BuildPVS(void)
 {
 	printf("%s\n", __FUNCTION__);
 
 	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-//	pvsFileFound = this->ReadPVSFile("map_pvs6_perfect.txt");
+	pvsFileFound = this->ReadPVSFile("map_pvs6_perfect.txt");
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points... " << flush;

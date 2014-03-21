@@ -1,14 +1,9 @@
 #ifndef _BSPTREE_H_
 #define _BSPTREE_H_
 
-#include "globals.h"
-#include "plane.h"
-#include "bbox.h"
-#include "bspCommon.h"
-#include "mesh.h"
-
-#include <vector>
 #include <iostream>
+
+#include "bspCommon.h"
 
 using namespace std;
 
@@ -51,6 +46,7 @@ public:
    void TraceVisibility(void);
    C_BspNode *CheckVisibility(C_BspNode *node1 , C_BspNode *node2);
    C_BspNode *RayIntersectsSomethingInTree(C_BspNode *node , C_Vertex *start , C_Vertex *end);
+   void insertStaticObject(C_MeshGroup *mesh, ESMatrix *matrix);
 
    void TessellatePolygons(void);
 
