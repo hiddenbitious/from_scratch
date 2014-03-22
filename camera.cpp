@@ -42,7 +42,6 @@ void C_Camera::Look(void)
 	rotationQuaternion.QuaternionToMatrix16(&ESrotMatrix);
 
 	esMatrixLoadIdentity(&globalModelviewMatrix);
-	esMatrixLoadIdentity(&globalModelMatrix);
 	esMatrixLoadIdentity(&globalViewMatrix);
 
 	esMatrixMultiply(&globalModelviewMatrix, &ESrotMatrix, &globalModelviewMatrix);

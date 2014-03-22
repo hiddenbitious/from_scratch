@@ -35,7 +35,7 @@ typedef struct {
    C_MeshGroup    mesh;
    unsigned int   meshID;
    bool           drawn;
-   C_BBox         bbox;
+//   C_BBox         bbox;
 } staticTreeObject_t;
 
 #endif

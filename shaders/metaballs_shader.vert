@@ -2,15 +2,18 @@
 attribute vec4 a_vertices;
 attribute vec4 a_normals;
 
-uniform mat4 u_modelviewMatrix;
+uniform mat4 u_modelMatrix;
+uniform mat4 u_viewMatrix;
 uniform mat4 u_projectionMatrix;
-//uniform mat4 u_mvpMatrix;
 
 void main ( void )
 {
 	// Multiply object-space position by MVP matrix
 //	gl_Position = a_vertices + a_normals;
-	mat4 mvpMatrix = u_projectionMatrix * u_modelviewMatrix;
+//	mat4 mvpMatrix = u_projectionMatrix * u_modelviewMatrix;
+   mat4 mv = u_viewMatrix * u_modelMatrix;
+   mat4 mvpMatrix = u_projectionMatrix * mv;
+
 	gl_Position = mvpMatrix * a_vertices;
 //	gl_Position = gl_ModelViewProjectionMatrix * a_vertices;
 //	gl_Position = ftransform ();

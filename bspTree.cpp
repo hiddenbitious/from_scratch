@@ -232,10 +232,9 @@ C_BspTree::insertStaticObject(C_MeshGroup *staticMesh, ESMatrix *matrix)
    object->mesh.matrix = *matrix;
    object->meshID = meshID++;
    object->drawn = false;
-   object->bbox = staticMesh->bbox;
 
-   object->bbox.ApplyTransformation(matrix);
-   object->bbox.GetVertices(bboxVertices);
+   object->mesh.bbox.ApplyTransformation(matrix);
+   object->mesh.bbox.GetVertices(bboxVertices);
 
    for(int i = 0; i < 8; ++i) {
       headNode->insertStaticObject(object, &bboxVertices[i]);
@@ -639,10 +638,11 @@ C_BspTree::Draw_PVS(C_Camera *camera)
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
 	shaderManager->pushShader(bspShader); {
-      ESMatrix mat = globalModelviewMatrix;
+      ESMatrix mat = Identity;
       esTranslate(&mat, position.x , position.y , position.z);
 
-      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
+      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODEL_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
       headNode->Draw(camera, this, true);

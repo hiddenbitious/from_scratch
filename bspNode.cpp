@@ -375,7 +375,7 @@ C_BspNode::Draw(C_Camera *camera)
       if(staticObjects[i]->drawn)
          continue;
 
-      if(!camera->frustum->cubeInFrustum(&staticObjects[i]->bbox))
+      if(!camera->frustum->cubeInFrustum(&staticObjects[i]->mesh.bbox))
          continue;
 
       staticObjects[i]->mesh.draw(camera);
