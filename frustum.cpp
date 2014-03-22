@@ -15,7 +15,7 @@ void C_Frustum::calculateFrustum(void)
 {
    float mvp[16];   /// This will hold the ModelviewProjection matrix (Projection * Modelview)
 
-   float *modl = (float *)&globalModelviewMatrix.m[0][0];
+   float *modl = (float *)&globalViewMatrix.m[0][0];
    float *proj = (float *)&globalProjectionMatrix.m[0][0];
 
    mvp[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];

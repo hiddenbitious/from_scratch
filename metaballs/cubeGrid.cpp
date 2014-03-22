@@ -259,7 +259,7 @@ int C_CubeGrid::Draw(C_Frustum *frustum)
 	/// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
 	shaderManager->pushShader(bspShader);
-	ESMatrix mat = globalModelviewMatrix;
+	ESMatrix mat = globalViewMatrix;
 	esTranslate(&mat, position.x , position.y , position.z);
 
 	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);

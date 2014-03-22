@@ -580,7 +580,7 @@ C_BspTree::Draw2(C_Camera *camera)
       glEnableVertexAttribArray(bspShader->verticesAttribLocation);
       glEnableVertexAttribArray(bspShader->normalsAttribLocation);
 
-      ESMatrix mat = globalModelviewMatrix;
+      ESMatrix mat = globalViewMatrix;
       esTranslate(&mat, position.x , position.y , position.z);
 
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
@@ -589,37 +589,6 @@ C_BspTree::Draw2(C_Camera *camera)
 	shaderManager->popShader();
 
 	return 0;
-}
-
-void
-C_BspTree::Draw3(void)
-{
-	shaderManager->pushShader(bspShader);
-   glEnableVertexAttribArray(bspShader->verticesAttribLocation);
-	glEnableVertexAttribArray(bspShader->normalsAttribLocation);
-
-	ESMatrix mat = globalModelviewMatrix;
-	esTranslate(&mat, position.x , position.y , position.z);
-
-	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-	bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
-
-	/// Set all leaves as non drawn
-	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
-		leaves[i]->drawn = false;
-	}
-
-	leaves[leafToDraw]->Draw(NULL, this, false);
-
-//   if(drawConnectedToo) {
-//      for(unsigned int j = 0 ; j < leaves[leafToDraw]->connectedLeaves.size() ; j++) {
-//         C_BspNode::Draw(NULL, leaves[leafToDraw]->connectedLeaves[j], this, false);
-//   //		leaves[leafToDraw]->connectedLeaves[j]->Draw(bspShader);
-//      }
-//   }
-
-	glFlush();
-	shaderManager->popShader();
 }
 
 int

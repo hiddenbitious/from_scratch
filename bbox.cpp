@@ -185,7 +185,7 @@ void C_BBox::Draw(float r , float g , float b)
 
       glEnableVertexAttribArray(basicShader->verticesAttribLocation);
 
-      basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
+      basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
       basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
       glEnableVertexAttribArray(basicShader->verticesAttribLocation);

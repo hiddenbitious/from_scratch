@@ -607,7 +607,7 @@ void C_BspNode::DrawPointSet(void)
    shaderManager->pushShader(pointShader);
       pointShader->setUniform4f("u_v4_color", 0.0f, 1.0f, 0.0f, 1.0f);
 
-      pointShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
+      pointShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
       pointShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
       glEnableVertexAttribArray(pointShader->verticesAttribLocation);
