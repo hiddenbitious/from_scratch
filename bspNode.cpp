@@ -334,9 +334,6 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
       DrawPointSet();
       polyCount += nPolys;
 
-   if(nodeID == 187)
-      printf("here\n");
-
       for(unsigned int i = 0; i < staticObjects.size(); ++i) {
          ESMatrix mat = globalModelviewMatrix;
          esMatrixMultiply(&globalModelviewMatrix, &staticObjects[i]->matrix, &globalModelviewMatrix);
