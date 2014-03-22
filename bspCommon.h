@@ -32,8 +32,7 @@ struct brush_t {
 };
 
 typedef struct {
-   C_MeshGroup    *mesh;
-   ESMatrix       matrix;
+   C_MeshGroup    mesh;
    unsigned int   meshID;
    bool           drawn;
    C_BBox         bbox;

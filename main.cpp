@@ -36,6 +36,8 @@ static C_Map map;
 
 /// Global variables
 ESMatrix globalModelviewMatrix, globalProjectionMatrix;
+ESMatrix globalModelMatrix, globalViewMatrix;
+
 C_GLShaderManager *shaderManager = NULL;
 C_TextureManager *textureManager = NULL;
 
@@ -170,7 +172,6 @@ Draw(void)
 	/// Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	esMatrixLoadIdentity(&globalModelviewMatrix);
 	camera.Look();
 
    map.draw(&camera);
@@ -241,6 +242,7 @@ hande_simple_keys(unsigned char key , int x , int y)
 {
 	switch(key) {
 		case 27 : case 13 :	//ESC
+		   map.~C_Map();
 			exit(0);
 			break;
 

@@ -30,11 +30,14 @@ public:
    int            *indices;      /// Vertex indices
    C_Mesh         *next;         /// Pointer to next mesh in meshGroup
    C_Texture      *texture;      /// Pointer to texture struct
+   int            refCounter;
 
    C_Mesh(void);
    ~C_Mesh(void);
 
    C_Mesh &operator= (const C_Mesh &mesh);
+   C_Mesh *refMesh(void);
+   int unRefMesh(void);
 
    void draw(C_GLShader *shader);
    void calculateBbox(void);
@@ -46,11 +49,13 @@ public:
    C_Mesh         *meshes;       /// Linked list of meshes in group
    int            nMeshes;       /// Number of meshes in group
    C_GLShader     *shader;
+   ESMatrix       matrix;
 
    C_MeshGroup(void);
    ~C_MeshGroup(void);
 
    C_MeshGroup &operator= (const C_MeshGroup &group);
+   void softCopy(const C_MeshGroup *group);
 
    C_Mesh *addMesh(void);        /// Creates a new mesh, adds it in the linked list and returns
                                  /// a pointer to it

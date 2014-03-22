@@ -6,6 +6,8 @@
 
 C_BaseMesh::C_BaseMesh(void)
 {
+   PRINT_FUNC_ENTRY;
+
    nVertices = 0;
    nTriangles = 0;
    position.x = position.y = position.z = 0.0f;
@@ -13,6 +15,8 @@ C_BaseMesh::C_BaseMesh(void)
 
 C_Mesh::C_Mesh(void)
 {
+   PRINT_FUNC_ENTRY;
+
    vertices = NULL;
    colors = NULL;
    textCoords = NULL;
@@ -20,10 +24,55 @@ C_Mesh::C_Mesh(void)
    indices = NULL;
    next = NULL;
    texture = NULL;
+   refCounter = 1;
+}
+
+C_Mesh *
+C_Mesh::refMesh(void)
+{
+   PRINT_FUNC_ENTRY;
+
+   ++refCounter;
+   return this;
+}
+
+int
+C_Mesh::unRefMesh(void)
+{
+   PRINT_FUNC_ENTRY;
+
+   assert(refCounter > 0);
+   return --refCounter;
+}
+
+void
+C_MeshGroup::softCopy(const C_MeshGroup *group)
+{
+   PRINT_FUNC_ENTRY;
+
+   if(this != group) {
+      /// Increase the ref counter of all the meshes
+      meshes = group->meshes->refMesh();
+      C_Mesh *meshList = meshes->next;
+      while(meshList) {
+         (void)meshList->refMesh();
+         meshList = meshList->next;
+      }
+
+      nMeshes = group->nMeshes;
+      nTriangles = group->nTriangles;
+      nVertices = group->nVertices;
+      shader = group->shader;
+      bbox = group->bbox;
+      position = group->position;
+      matrix = group->matrix;
+   }
 }
 
 C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
 {
+   PRINT_FUNC_ENTRY;
+
    if(this != &mesh) {
       if(mesh.vertices) {
          vertices = new C_Vertex[mesh.nVertices];
@@ -51,6 +100,7 @@ C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
       position = mesh.position;
       nVertices = mesh.nVertices;
       nTriangles = mesh.nTriangles;
+      refCounter = mesh.refCounter;
       if(mesh.texture) {
 //         texture = new C_Texture;
          texture = mesh.texture->refTexture();
@@ -61,6 +111,10 @@ C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
 
 C_Mesh::~C_Mesh(void)
 {
+   PRINT_FUNC_ENTRY;
+
+   assert(!refCounter);
+
    if(colors)                       delete[] colors;
    if(vertices)                     delete[] vertices;
    if(textCoords)                   delete[] textCoords;
@@ -71,18 +125,25 @@ C_Mesh::~C_Mesh(void)
 
 C_MeshGroup::C_MeshGroup(void)
 {
+   PRINT_FUNC_ENTRY;
+
    meshes = NULL;
    nMeshes = 0;
+   esMatrixLoadIdentity(&matrix);
 }
 
 C_MeshGroup::~C_MeshGroup(void)
 {
+   PRINT_FUNC_ENTRY;
+
    C_Mesh *oldMesh;
    C_Mesh *mesh = meshes;
    while(mesh) {
       oldMesh = mesh;
       mesh = mesh->next;
-      delete oldMesh;
+      if(!oldMesh->unRefMesh()) {
+         delete oldMesh;
+      }
    }
 
    nMeshes = 0;
@@ -91,6 +152,8 @@ C_MeshGroup::~C_MeshGroup(void)
 
 C_MeshGroup &C_MeshGroup::operator= (const C_MeshGroup &group)
 {
+   PRINT_FUNC_ENTRY;
+
    if(this != &group){
       C_Mesh *mesh = group.meshes;
       C_Mesh *newMesh;
@@ -107,6 +170,7 @@ C_MeshGroup &C_MeshGroup::operator= (const C_MeshGroup &group)
       shader = group.shader;
       bbox = group.bbox;
       position = group.position;
+      matrix = group.matrix;
    }
    return *this;
 }
@@ -114,6 +178,8 @@ C_MeshGroup &C_MeshGroup::operator= (const C_MeshGroup &group)
 C_Mesh *
 C_MeshGroup::addMesh(void)
 {
+   PRINT_FUNC_ENTRY;
+
    C_Mesh *newMesh = new C_Mesh();
    newMesh->next = meshes;
    meshes = newMesh;
@@ -211,6 +277,9 @@ C_MeshGroup::draw(C_Camera *camera)
 
 	shaderManager->pushShader(shader);
 
+   ESMatrix mat = globalModelviewMatrix;
+   esMatrixMultiply(&globalModelviewMatrix, &matrix, &globalModelviewMatrix);
+
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
@@ -235,6 +304,7 @@ C_MeshGroup::draw(C_Camera *camera)
    }
 
    bbox.Draw();
+   globalModelviewMatrix = mat;
 
    if(shader->verticesAttribLocation >= 0)   glDisableVertexAttribArray(shader->verticesAttribLocation);
    if(shader->colorsAttribLocation >= 0)     glDisableVertexAttribArray(shader->colorsAttribLocation);

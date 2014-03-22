@@ -41,8 +41,15 @@ void C_Camera::Look(void)
 {
 	rotationQuaternion.QuaternionToMatrix16(&ESrotMatrix);
 
+	esMatrixLoadIdentity(&globalModelviewMatrix);
+	esMatrixLoadIdentity(&globalModelMatrix);
+	esMatrixLoadIdentity(&globalViewMatrix);
+
 	esMatrixMultiply(&globalModelviewMatrix, &ESrotMatrix, &globalModelviewMatrix);
 	esTranslate(&globalModelviewMatrix, -position.x, -position.y, -position.z);
+
+	esMatrixMultiply(&globalViewMatrix, &ESrotMatrix, &globalViewMatrix);
+	esTranslate(&globalViewMatrix, -position.x, -position.y, -position.z);
 
 	if(updateFrustum) {
 		frustum->calculateFrustum();

@@ -46,15 +46,21 @@ C_BspNode::C_BspNode(poly_t** geometry , int nPolys)
 
 C_BspNode::~C_BspNode()
 {
+    PRINT_FUNC_ENTRY;
+
    delete frontNode;
    delete backNode;
 
    if(checkedVisibilityWith != NULL) {
       delete[] checkedVisibilityWith;
    }
+
    if(visibleFrom != NULL) {
       delete[] visibleFrom;
    }
+
+   /// Empty the vector
+   staticObjects.clear();
 }
 
 bool
@@ -351,8 +357,7 @@ C_BspNode::Draw(C_Camera *camera)
    tree->statistics.totalStaticObjects += staticObjects.size();
    tree->statistics.leavesDrawn++;
 
-
-
+   /// Draw bsp geometry
    glEnableVertexAttribArray(bspShader->verticesAttribLocation);
    glEnableVertexAttribArray(bspShader->normalsAttribLocation);
 
@@ -363,10 +368,9 @@ C_BspNode::Draw(C_Camera *camera)
    glDisableVertexAttribArray(bspShader->verticesAttribLocation);
    glDisableVertexAttribArray(bspShader->normalsAttribLocation);
 
-
-
+   /// Draw static meshes
    for(unsigned int i = 0; i < staticObjects.size(); ++i) {
-      tree->statistics.totalTriangles += staticObjects[i]->mesh->nTriangles;
+      tree->statistics.totalTriangles += staticObjects[i]->mesh.nTriangles;
 
       if(staticObjects[i]->drawn)
          continue;
@@ -374,15 +378,11 @@ C_BspNode::Draw(C_Camera *camera)
       if(!camera->frustum->cubeInFrustum(&staticObjects[i]->bbox))
          continue;
 
+      staticObjects[i]->mesh.draw(camera);
       staticObjects[i]->drawn = true;
 
-      ESMatrix mat = globalModelviewMatrix;
-      esMatrixMultiply(&globalModelviewMatrix, &staticObjects[i]->matrix, &globalModelviewMatrix);
-      staticObjects[i]->mesh->draw(camera);
-      globalModelviewMatrix = mat;
-
       tree->statistics.staticObjectsDrawn++;
-      tree->statistics.trianglesDrawn += staticObjects[i]->mesh->nTriangles;
+      tree->statistics.trianglesDrawn += staticObjects[i]->mesh.nTriangles;
    }
 }
 

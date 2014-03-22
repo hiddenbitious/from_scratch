@@ -53,6 +53,7 @@ public:
 
    treeDrawStatistics_t statistics;
    treeStatistics_t treeStats;
+   vector<staticTreeObject_t *> staticObjects;
 public:
    C_BspTree(USHORT depth);
    ~C_BspTree();

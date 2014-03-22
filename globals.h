@@ -13,6 +13,9 @@
 #	define  LOGI(...) 	fprintf(stdout, __VA_ARGS__)
 #	define  LOGE(...)		fprintf(stderr, __VA_ARGS__)
 
+//#define PRINT_FUNC_ENTRY   printf("%s\n", __FUNCTION__)
+#define PRINT_FUNC_ENTRY
+
 #	include <stdint.h>
 #	include <string>
 #	include <limits>
@@ -115,6 +118,7 @@ class C_TextureManager;
 class C_GLShader;
 
 extern ESMatrix globalModelviewMatrix, globalProjectionMatrix;
+extern ESMatrix globalModelMatrix, globalViewMatrix;
 extern C_GLShaderManager *shaderManager;
 extern C_TextureManager *textureManager;
 extern C_GLShader *bspShader;

@@ -15,6 +15,15 @@ C_Map::C_Map(void)
 	}
 }
 
+C_Map::~C_Map()
+{
+   PRINT_FUNC_ENTRY;
+   if(bspTree) {
+      delete bspTree;
+      bspTree = NULL;
+   }
+}
+
 bool
 C_Map::createMap(const char *filename)
 {

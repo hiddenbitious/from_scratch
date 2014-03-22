@@ -11,7 +11,7 @@ class C_Map {
 
 public:
    C_Map(void);
-   ~C_Map(void) {};
+   ~C_Map(void);
 
    bool createMap(const char *filename);
 

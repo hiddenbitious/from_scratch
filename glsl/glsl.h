@@ -27,6 +27,9 @@
 
 #define UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX     "u_modelviewMatrix"
 #define UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX    "u_projectionMatrix"
+#define UNIFORM_VARIABLE_NAME_MODEL_MATRIX         "u_modelMatrix"
+#define UNIFORM_VARIABLE_NAME_VIEW_MATRIX          "u_viewMatrix"
+
 #define UNIFORM_VARIABLE_NAME_TEXTURE_0            "u_texture_0"
 #define UNIFORM_VARIABLE_NAME_TEXTURE_1            "u_texture_1"
 #define UNIFORM_VARIABLE_NAME_TEXTURE_2            "u_texture_2"

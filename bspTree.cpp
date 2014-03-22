@@ -40,7 +40,9 @@ C_BspTree::C_BspTree(USHORT depth)
 
 C_BspTree::~C_BspTree(void)
 {
-	// Delete data
+   PRINT_FUNC_ENTRY;
+
+	/// Delete data
 	for(int i = 0 ; i < nBrushes ; i++) {
 		for(int j = 0 ; j < pBrushes[i].nPolys ; j++) {
 			delete[] pBrushes[i].pPolys[j].pVertices;
@@ -49,8 +51,16 @@ C_BspTree::~C_BspTree(void)
 		delete[] pBrushes[i].pPolys;
 	}
 
-	delete[] pBrushes;
-	delete[] pRawPolys;
+   delete[] pBrushes;
+   delete[] pRawPolys;
+
+
+	for(unsigned int i = 0; i < staticObjects.size(); ++i) {
+	   delete staticObjects[i];
+	}
+	staticObjects.clear();
+
+	delete headNode;
 }
 
 
@@ -206,6 +216,11 @@ C_BspTree::CalcNorms(void)
 	}
 }
 
+/**
+ * Insert a mesh into the tree as a static object.
+ * To determin to which node(s) the mesh belongs, all 8 bbox's vertices are
+ * "thrown" down the tree
+ */
 void
 C_BspTree::insertStaticObject(C_MeshGroup *staticMesh, ESMatrix *matrix)
 {
@@ -213,8 +228,8 @@ C_BspTree::insertStaticObject(C_MeshGroup *staticMesh, ESMatrix *matrix)
    C_Vertex bboxVertices[8];
 
    staticTreeObject_t *object = new staticTreeObject_t;
-   object->matrix = *matrix;
-   object->mesh = staticMesh;
+   object->mesh.softCopy(staticMesh);
+   object->mesh.matrix = *matrix;
    object->meshID = meshID++;
    object->drawn = false;
    object->bbox = staticMesh->bbox;
@@ -225,6 +240,8 @@ C_BspTree::insertStaticObject(C_MeshGroup *staticMesh, ESMatrix *matrix)
    for(int i = 0; i < 8; ++i) {
       headNode->insertStaticObject(object, &bboxVertices[i]);
    }
+
+   staticObjects.push_back(object);
 }
 
 void
