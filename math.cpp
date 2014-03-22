@@ -151,7 +151,8 @@ esRotate(ESMatrix *result, GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
       rotMat.m[3][3] = 1.0F;
 
       esMatrixMultiply( result, &rotMat, result );
-   }
+   } else
+      assert(0);
 }
 
 void

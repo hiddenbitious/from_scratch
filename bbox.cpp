@@ -185,16 +185,16 @@ void C_BBox::Draw(float r , float g , float b)
 	verts[23].x = max.x, verts[23].y = min.y, verts[23].z = min.z;
 
    shaderManager->pushShader(basicShader);
-   basicShader->setUniform4f("u_v4_color", r, g, b, 1.0f);
+      basicShader->setUniform4f("u_v4_color", r, g, b, 1.0f);
 
-   glEnableVertexAttribArray(basicShader->verticesAttribLocation);
+      glEnableVertexAttribArray(basicShader->verticesAttribLocation);
 
-	basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
- 	basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+      basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
+      basicShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
-   glEnableVertexAttribArray(basicShader->verticesAttribLocation);
-   glVertexAttribPointer(basicShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, verts);
-   glDrawArrays(GL_QUADS, 0, 24);
+      glEnableVertexAttribArray(basicShader->verticesAttribLocation);
+      glVertexAttribPointer(basicShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, verts);
+      glDrawArrays(GL_QUADS, 0, 24);
    shaderManager->popShader();
 
 	glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);

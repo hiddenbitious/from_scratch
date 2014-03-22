@@ -13,7 +13,7 @@ protected:
    bool drawn;
 
    vector<staticTreeObject_t *> staticObjects;
-   void insertStaticObject(staticTreeObject_t *mesh, C_Vertex *point);
+   bool insertStaticObject(staticTreeObject_t *mesh, C_Vertex *point);
 
 public:
    /// Node's ID
@@ -74,7 +74,7 @@ public:
    void DrawPointSet(void);
 
 
-   static void Draw(C_Camera *camera, C_BspNode* node , C_BspTree* tree, bool usePVS);
+   void Draw(C_Camera *camera, C_BspTree* tree, bool usePVS);
    //		static void Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
    void Draw(void);
 

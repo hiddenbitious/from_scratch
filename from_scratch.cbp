@@ -96,6 +96,8 @@
 		<Unit filename="tgaLoader/texture.h" />
 		<Unit filename="tgaLoader/tga.h" />
 		<Unit filename="tgaLoader/tgaLoader.cpp" />
+		<Unit filename="tile.cpp" />
+		<Unit filename="tile.h" />
 		<Unit filename="timer.cpp" />
 		<Unit filename="timer.h" />
 		<Unit filename="vectors.cpp" />

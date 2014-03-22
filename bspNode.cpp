@@ -77,26 +77,28 @@ C_BspNode::IsConvex(void)
    return true;
 }
 
-void
+bool
 C_BspNode::insertStaticObject(staticTreeObject_t *staticMesh, C_Vertex *point)
 {
    if(!isLeaf) {
       float side = partitionPlane.distanceFromPoint(point);
 
       if(side > 0.0f) {
-         frontNode->insertStaticObject(staticMesh, point);
+         return frontNode->insertStaticObject(staticMesh, point);
       } else {
-         backNode->insertStaticObject(staticMesh, point);
+         return backNode->insertStaticObject(staticMesh, point);
       }
    } else {
       for(unsigned int i = 0; i < staticObjects.size(); ++i) {
          if(staticObjects[i]->meshID == staticMesh->meshID) {
-            delete staticMesh;
-            return;
+//            delete staticMesh;
+            return false;
          }
       }
 
+      printf("Inserted in %lu\n", nodeID);
       staticObjects.push_back(staticMesh);
+      return true;
    }
 }
 
@@ -303,48 +305,59 @@ C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
 }
 
 void
-C_BspNode::Draw(C_Camera *camera, C_BspNode* node, C_BspTree* tree, bool usePVS)
+C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
 {
 
-   if(!node->isLeaf) {
+   if(!isLeaf) {
       C_Vector3 cameraPosition = camera->GetPosition();
-      float side = node->partitionPlane.distanceFromPoint(&cameraPosition);
+      float side = partitionPlane.distanceFromPoint(&cameraPosition);
 
       if(side > 0.0f) {
          if(!usePVS)
-            C_BspNode::Draw(camera, node->backNode, tree, usePVS);
-         C_BspNode::Draw(camera, node->frontNode, tree, usePVS);
+            backNode->Draw(camera, tree, usePVS);
+         frontNode->Draw(camera, tree, usePVS);
       } else {
          if(!usePVS)
-            C_BspNode::Draw(camera, node->frontNode, tree, usePVS);
-         C_BspNode::Draw(camera, node->backNode, tree, usePVS);
+            frontNode->Draw(camera, tree, usePVS);
+         backNode->Draw(camera, tree, usePVS);
       }
    } else {
-      if(node->drawn) {
+      if(drawn) {
          return;
       }
-      node->drawn = true;
+      drawn = true;
 
-      totalLeaves = node->PVS.size();
+      totalLeaves = PVS.size();
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      node->Draw();
-      node->DrawPointSet();
-      polyCount += node->nPolys;
+      Draw();
+      DrawPointSet();
+      polyCount += nPolys;
+
+   if(nodeID == 187)
+      printf("here\n");
+
+      for(unsigned int i = 0; i < staticObjects.size(); ++i) {
+         ESMatrix mat = globalModelviewMatrix;
+         esMatrixMultiply(&globalModelviewMatrix, &staticObjects[i]->matrix, &globalModelviewMatrix);
+        staticObjects[i]->mesh->draw(camera);
+          globalModelviewMatrix = mat;
+      }
+
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
       if(usePVS) {
-         for(unsigned int i = 0 ; i < node->PVS.size() ; i++) {
-            if(!camera->frustum->cubeInFrustum(&node->PVS[i]->bbox) || node->PVS[i]->drawn) {
+         for(unsigned int i = 0 ; i < PVS.size() ; i++) {
+            if(!camera->frustum->cubeInFrustum(&PVS[i]->bbox) || PVS[i]->drawn) {
                continue;
             }
 
             ++leavesDrawn;
 
-            node->PVS[i]->drawn = true;
-            node->PVS[i]->Draw();
-            node->PVS[i]->bbox.Draw();
-            polyCount += node->PVS[i]->nPolys;
+            PVS[i]->drawn = true;
+            PVS[i]->Draw();
+            PVS[i]->bbox.Draw();
+            polyCount += PVS[i]->nPolys;
          }
       }
    }
@@ -353,11 +366,8 @@ C_BspNode::Draw(C_Camera *camera, C_BspNode* node, C_BspTree* tree, bool usePVS)
 void
 C_BspNode::Draw()
 {
-   /// Vertices
 	glVertexAttribPointer(bspShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
-	/// Normals
 	glVertexAttribPointer(bspShader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)triangles + 3 * sizeof(float));
-
    glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
 }
 

@@ -221,8 +221,9 @@ C_BspTree::insertStaticObject(C_MeshGroup *staticMesh, ESMatrix *matrix)
    object->mesh = staticMesh;
    object->meshID = meshID++;
 
-   for(int i = 0; i < 8; ++i)
+   for(int i = 0; i < 8; ++i) {
       headNode->insertStaticObject(object, &bboxVertices[i]);
+   }
 }
 
 void
@@ -572,7 +573,7 @@ C_BspTree::Draw2(C_Camera *camera)
 
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
-      C_BspNode::Draw(camera, headNode, this, false);
+      headNode->Draw(camera, this, false);
 	shaderManager->popShader();
 
 	return polyCount;
@@ -596,7 +597,7 @@ C_BspTree::Draw3(void)
 		leaves[i]->drawn = false;
 	}
 
-	C_BspNode::Draw(NULL, leaves[leafToDraw], this, false);
+	leaves[leafToDraw]->Draw(NULL, this, false);
 
 //   if(drawConnectedToo) {
 //      for(unsigned int j = 0 ; j < leaves[leafToDraw]->connectedLeaves.size() ; j++) {
@@ -632,7 +633,7 @@ C_BspTree::Draw_PVS(C_Camera *camera)
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
-      C_BspNode::Draw(camera, headNode, this, true);
+      headNode->Draw(camera, this, true);
    }
    shaderManager->popShader();
 

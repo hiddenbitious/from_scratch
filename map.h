@@ -5,6 +5,8 @@
 #include "bspTree.h"
 #include "globals.h"
 
+#define TILE_SIZE 20.0f
+
 class C_Map {
 
 public:

@@ -28,17 +28,17 @@ C_Map::createMap(const char *filename)
       return false;
    }
 
-   /// Load 3d meshes
-   load3DObjects();
-
-   /// Position the walls
-   placeObjects();
-
    bspTree = new C_BspTree(6);
 
    bspTree->ReadGeometryFile("mapGeometry.bsp");
    bspTree->BuildBspTree();
    bspTree->BuildPVS();
+
+   /// Load 3d meshes
+   load3DObjects();
+
+   /// Position the walls
+   placeObjects();
 
    return true;
 }
@@ -47,12 +47,47 @@ bool
 C_Map::placeObjects(void)
 {
    ESMatrix mat;
-   esMatrixLoadIdentity(&mat);
-
    /// Position the walls into the bsp tree!
    for(int x = 0; x < TILES_ON_X; x++) {
       for(int y = 0; y < TILES_ON_Y; y++) {
 
+         if(tiles[x][y].getType() != TILE_WALL)
+            continue;
+//   int x = 2, y = 5;
+
+         /// Left wall
+         if(x > 0 && tiles[x-1][y].getArea() == AREA_WALKABLE) {
+            esMatrixLoadIdentity(&mat);
+
+            esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+            bspTree->insertStaticObject(&wallMesh, &mat);
+         }
+
+         /// Upper wall
+         if(y < TILES_ON_Y - 1 && tiles[x][y+1].getArea() == AREA_WALKABLE) {
+            esMatrixLoadIdentity(&mat);
+
+            esTranslate(&mat, (float)(y+1) * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+            esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
+            bspTree->insertStaticObject(&wallMesh, &mat);
+         }
+
+         /// Right wall
+         if(x < TILES_ON_X - 1 && tiles[x+1][y].getArea() == AREA_WALKABLE) {
+            esMatrixLoadIdentity(&mat);
+
+            esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)(x+1) * TILE_SIZE);
+            bspTree->insertStaticObject(&wallMesh, &mat);
+         }
+
+         /// Bottom wall
+         if(y > 0 && tiles[x][y-1].getArea() == AREA_WALKABLE) {
+            esMatrixLoadIdentity(&mat);
+
+            esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+            esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
+            bspTree->insertStaticObject(&wallMesh, &mat);
+         }
       }
    }
 
@@ -79,16 +114,18 @@ C_Map::draw(C_Camera *camera)
 {
    int mapPolys;
 
-   C_MeshGroup copyOfWall;
-   copyOfWall = wallMesh;
-   ESMatrix mat;
-   esMatrixLoadIdentity(&mat);
-   esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
-   copyOfWall.applyTransformationOnVertices(&mat);
+//   C_MeshGroup copyOfWall;
+//   copyOfWall = wallMesh;
+//   ESMatrix mat;
+//   esMatrixLoadIdentity(&mat);
+//   esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
+//   copyOfWall.applyTransformationOnVertices(&mat);
+
+//   bspTree->insertStaticObject(&copyOfWall, &mat);
 
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-   copyOfWall.draw(camera);
+//   copyOfWall.draw(camera);
 
    mapPolys = bspTree->Draw_PVS(camera);
 }

@@ -206,16 +206,15 @@ void
 C_MeshGroup::draw(C_Camera *camera)
 {
    if(camera && !camera->frustum->cubeInFrustum(&bbox)) {
-//      printf("obj out of frustum\n");
       return;
    }
 
 //   vertex_t *mesh_transformedVerts, *tmpVerts;
 	shaderManager->pushShader(shader);
-   ESMatrix mat = globalModelviewMatrix;
+//   ESMatrix mat = globalModelviewMatrix;
 //   esTranslate(&mat, position.x , position.y , position.z);
 
-   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
    if(shader->verticesAttribLocation >= 0)   glEnableVertexAttribArray(shader->verticesAttribLocation);
@@ -249,10 +248,10 @@ C_MeshGroup::draw(C_Camera *camera)
    }
 
    bbox.Draw();
-
-   if(shader->verticesAttribLocation >= 0)   glDisableVertexAttribArray(shader->verticesAttribLocation);
-   if(shader->colorsAttribLocation >= 0)     glDisableVertexAttribArray(shader->colorsAttribLocation);
-   if(shader->texCoordsAttribLocation >= 0)  glDisableVertexAttribArray(shader->texCoordsAttribLocation);
+//
+//   if(shader->verticesAttribLocation >= 0)   glDisableVertexAttribArray(shader->verticesAttribLocation);
+//   if(shader->colorsAttribLocation >= 0)     glDisableVertexAttribArray(shader->colorsAttribLocation);
+//   if(shader->texCoordsAttribLocation >= 0)  glDisableVertexAttribArray(shader->texCoordsAttribLocation);
 
    shaderManager->popShader();
 
