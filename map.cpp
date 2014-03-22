@@ -22,6 +22,7 @@ C_Map::createMap(const char *filename)
 
    printf("Creating map...\n");
 
+   /// Read the tile data
    ret = readMap(filename);
    if(!ret) {
       assert(0);
@@ -30,6 +31,7 @@ C_Map::createMap(const char *filename)
 
    bspTree = new C_BspTree(6);
 
+   /// Read bsp geometry and build the bsp tree
    bspTree->ReadGeometryFile("mapGeometry.bsp");
    bspTree->BuildBspTree();
    bspTree->BuildPVS();
@@ -43,11 +45,13 @@ C_Map::createMap(const char *filename)
    return true;
 }
 
+/**
+ * Position the walls into the bsp tree as static meshes
+ */
 bool
 C_Map::placeObjects(void)
 {
    ESMatrix mat;
-   /// Position the walls into the bsp tree!
    for(int x = 0; x < TILES_ON_X; x++) {
       for(int y = 0; y < TILES_ON_Y; y++) {
 
@@ -113,18 +117,7 @@ C_Map::draw(C_Camera *camera)
 {
    int mapPolys;
 
-//   C_MeshGroup copyOfWall;
-//   copyOfWall = wallMesh;
-//   ESMatrix mat;
-//   esMatrixLoadIdentity(&mat);
-//   esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
-//   copyOfWall.applyTransformationOnVertices(&mat);
-
-//   bspTree->insertStaticObject(&copyOfWall, &mat);
-
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-//   copyOfWall.draw(camera);
 
    mapPolys = bspTree->Draw_PVS(camera);
 }

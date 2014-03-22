@@ -91,12 +91,10 @@ C_BspNode::insertStaticObject(staticTreeObject_t *staticMesh, C_Vertex *point)
    } else {
       for(unsigned int i = 0; i < staticObjects.size(); ++i) {
          if(staticObjects[i]->meshID == staticMesh->meshID) {
-//            delete staticMesh;
             return false;
          }
       }
 
-      printf("Inserted in %lu\n", nodeID);
       staticObjects.push_back(staticMesh);
       return true;
    }
@@ -337,8 +335,8 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
       for(unsigned int i = 0; i < staticObjects.size(); ++i) {
          ESMatrix mat = globalModelviewMatrix;
          esMatrixMultiply(&globalModelviewMatrix, &staticObjects[i]->matrix, &globalModelviewMatrix);
-        staticObjects[i]->mesh->draw(camera);
-          globalModelviewMatrix = mat;
+         staticObjects[i]->mesh->draw(camera);
+         globalModelviewMatrix = mat;
       }
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -363,9 +361,15 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
 void
 C_BspNode::Draw()
 {
+   glEnableVertexAttribArray(bspShader->verticesAttribLocation);
+   glEnableVertexAttribArray(bspShader->normalsAttribLocation);
+
 	glVertexAttribPointer(bspShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
 	glVertexAttribPointer(bspShader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)triangles + 3 * sizeof(float));
    glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
+
+   glDisableVertexAttribArray(bspShader->verticesAttribLocation);
+   glDisableVertexAttribArray(bspShader->normalsAttribLocation);
 }
 
 void
@@ -587,14 +591,15 @@ void C_BspNode::DrawPointSet(void)
    int n = pointSet.size();
 
    shaderManager->pushShader(pointShader);
-   pointShader->setUniform4f("u_v4_color", 0.0f, 1.0f, 0.0f, 1.0f);
+      pointShader->setUniform4f("u_v4_color", 0.0f, 1.0f, 0.0f, 1.0f);
 
-	pointShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
- 	pointShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+      pointShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
+      pointShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
-   glEnableVertexAttribArray(pointShader->verticesAttribLocation);
-   glVertexAttribPointer(pointShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, &pointSet[0]);
-   glDrawArrays(GL_POINTS, 0, n);
+      glEnableVertexAttribArray(pointShader->verticesAttribLocation);
+      glVertexAttribPointer(pointShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, 0, &pointSet[0]);
+      glDrawArrays(GL_POINTS, 0, n);
+      glDisableVertexAttribArray(pointShader->verticesAttribLocation);
    shaderManager->popShader();
 }
 

@@ -205,14 +205,11 @@ C_MeshGroup::loadFromFile(const char *filename)
 void
 C_MeshGroup::draw(C_Camera *camera)
 {
-   if(camera && !camera->frustum->cubeInFrustum(&bbox)) {
-      return;
-   }
+//   if(camera && !camera->frustum->cubeInFrustum(&bbox)) {
+//      return;
+//   }
 
-//   vertex_t *mesh_transformedVerts, *tmpVerts;
 	shaderManager->pushShader(shader);
-//   ESMatrix mat = globalModelviewMatrix;
-//   esTranslate(&mat, position.x , position.y , position.z);
 
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalModelviewMatrix.m[0][0]);
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
@@ -233,25 +230,15 @@ C_MeshGroup::draw(C_Camera *camera)
          glBindTexture(GL_TEXTURE_2D, 0);
       }
 
-      /// Manually transform mesh vertices
-//      mesh_transformedVerts = (vertex_t *)malloc(mesh->nVertices * sizeof(vertex_t));
-//      transformMesh(&globalMVP, mesh->vertices, mesh_transformedVerts, mesh->nVertices);
-//
-//      tmpVerts = mesh->vertices;
-//      mesh->vertices = mesh_transformedVerts;
       mesh->draw(shader);
-//      mesh->vertices = tmpVerts;
-//
-//      delete[] mesh_transformedVerts);
-
       mesh = mesh->next;
    }
 
    bbox.Draw();
-//
-//   if(shader->verticesAttribLocation >= 0)   glDisableVertexAttribArray(shader->verticesAttribLocation);
-//   if(shader->colorsAttribLocation >= 0)     glDisableVertexAttribArray(shader->colorsAttribLocation);
-//   if(shader->texCoordsAttribLocation >= 0)  glDisableVertexAttribArray(shader->texCoordsAttribLocation);
+
+   if(shader->verticesAttribLocation >= 0)   glDisableVertexAttribArray(shader->verticesAttribLocation);
+   if(shader->colorsAttribLocation >= 0)     glDisableVertexAttribArray(shader->colorsAttribLocation);
+   if(shader->texCoordsAttribLocation >= 0)  glDisableVertexAttribArray(shader->texCoordsAttribLocation);
 
    shaderManager->popShader();
 
@@ -261,12 +248,18 @@ C_MeshGroup::draw(C_Camera *camera)
 void
 C_Mesh::draw(C_GLShader *shader)
 {
-   if(shader->verticesAttribLocation >= 0)   glVertexAttribPointer(shader->verticesAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, vertices);
-   if(shader->colorsAttribLocation >= 0)     glVertexAttribPointer(shader->colorsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
-   if(shader->texCoordsAttribLocation >= 0)  glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, textCoords);
+   assert((vertices && shader->verticesAttribLocation >= 0)    || ((!vertices) && shader->verticesAttribLocation < 0));
+   assert((colors && shader->colorsAttribLocation >= 0)        || ((!colors) && shader->colorsAttribLocation < 0));
+   assert((textCoords && shader->texCoordsAttribLocation >= 0) || ((!textCoords) && shader->texCoordsAttribLocation< 0));
+
+   if(vertices)   glVertexAttribPointer(shader->verticesAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, vertices);
+   if(colors)     glVertexAttribPointer(shader->colorsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
+   if(textCoords) glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, textCoords);
 
    if(!indices)
       glDrawArrays(GL_TRIANGLES, 0, nVertices);
-   else
+   else {
+      assert(0);
       glDrawElements(GL_TRIANGLES, 3 * nTriangles, GL_UNSIGNED_INT, indices);
+   }
 }

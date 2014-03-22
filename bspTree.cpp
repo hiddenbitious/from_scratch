@@ -625,8 +625,6 @@ C_BspTree::Draw_PVS(C_Camera *camera)
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
 	shaderManager->pushShader(bspShader); {
-      glEnableVertexAttribArray(bspShader->verticesAttribLocation);
-      glEnableVertexAttribArray(bspShader->normalsAttribLocation);
       ESMatrix mat = globalModelviewMatrix;
       esTranslate(&mat, position.x , position.y , position.z);
 
