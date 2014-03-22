@@ -11,9 +11,6 @@
 #include <pthread.h>
 #include <sys/time.h>
 
-int polyCount;
-int leavesDrawn;
-int nodesDrawn;
 int nConvexRooms;
 
 C_BspTree::C_BspTree(USHORT depth)
@@ -36,6 +33,9 @@ C_BspTree::C_BspTree(USHORT depth)
 	leafToDraw = 0;
 	nNodesToDraw = 0;
 	nNodes = 0;
+
+	memset((void *)&treeStats, 0, sizeof(treeStats));
+	memset((void *)&statistics, 0, sizeof(statistics));
 }
 
 C_BspTree::~C_BspTree(void)
@@ -552,11 +552,6 @@ C_BspTree::BuildBspTree(void)
 int
 C_BspTree::Draw2(C_Camera *camera)
 {
-	polyCount = 0;
-	leavesDrawn = 0;
-	nodesDrawn = 1;
-	totalLeaves = 0;
-
 	/// Set all leaves as not drawn
 	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
 		leaves[i]->drawn = false;
@@ -576,7 +571,7 @@ C_BspTree::Draw2(C_Camera *camera)
       headNode->Draw(camera, this, false);
 	shaderManager->popShader();
 
-	return polyCount;
+	return 0;
 }
 
 void
@@ -613,9 +608,8 @@ C_BspTree::Draw3(void)
 int
 C_BspTree::Draw_PVS(C_Camera *camera)
 {
-	polyCount = 0;
-	leavesDrawn = 0;
-	nodesDrawn = 0;
+   /// Initialize tree statistics
+	memset((void *)&statistics, 0, sizeof(statistics));
 
    /// Set all leaves as non drawn
 	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
@@ -635,7 +629,7 @@ C_BspTree::Draw_PVS(C_Camera *camera)
    }
    shaderManager->popShader();
 
-	return polyCount;
+	return 0;
 }
 
 void

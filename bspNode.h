@@ -76,7 +76,7 @@ public:
 
    void Draw(C_Camera *camera, C_BspTree* tree, bool usePVS);
    //		static void Draw_PVS(C_Vector3* cameraPosition , C_BspNode* node , C_BspTree* tree);
-   void Draw(void);
+   void Draw(C_Camera *camera);
 
    /// Brakes down CONVEX polygon of 4 or 5 vertices into triangles.
    /// Also it frees any memory reserved for the previous polygons

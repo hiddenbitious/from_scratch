@@ -305,7 +305,6 @@ C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
 void
 C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
 {
-
    if(!isLeaf) {
       C_Vector3 cameraPosition = camera->GetPosition();
       float side = partitionPlane.distanceFromPoint(&cameraPosition);
@@ -323,21 +322,12 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
       if(drawn) {
          return;
       }
-      drawn = true;
 
-      totalLeaves = PVS.size();
+      tree->statistics.totalLeaves += PVS.size();
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      Draw();
+      Draw(camera);
       DrawPointSet();
-      polyCount += nPolys;
-
-      for(unsigned int i = 0; i < staticObjects.size(); ++i) {
-         ESMatrix mat = globalModelviewMatrix;
-         esMatrixMultiply(&globalModelviewMatrix, &staticObjects[i]->matrix, &globalModelviewMatrix);
-         staticObjects[i]->mesh->draw(camera);
-         globalModelviewMatrix = mat;
-      }
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -347,20 +337,22 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
                continue;
             }
 
-            ++leavesDrawn;
-
-            PVS[i]->drawn = true;
-            PVS[i]->Draw();
+            PVS[i]->Draw(camera);
             PVS[i]->bbox.Draw();
-            polyCount += PVS[i]->nPolys;
          }
       }
    }
 }
 
 void
-C_BspNode::Draw()
+C_BspNode::Draw(C_Camera *camera)
 {
+   drawn = true;
+   tree->statistics.totalStaticObjects += staticObjects.size();
+   tree->statistics.leavesDrawn++;
+
+
+
    glEnableVertexAttribArray(bspShader->verticesAttribLocation);
    glEnableVertexAttribArray(bspShader->normalsAttribLocation);
 
@@ -370,6 +362,19 @@ C_BspNode::Draw()
 
    glDisableVertexAttribArray(bspShader->verticesAttribLocation);
    glDisableVertexAttribArray(bspShader->normalsAttribLocation);
+
+
+
+   for(unsigned int i = 0; i < staticObjects.size(); ++i) {
+      ESMatrix mat = globalModelviewMatrix;
+      esMatrixMultiply(&globalModelviewMatrix, &staticObjects[i]->matrix, &globalModelviewMatrix);
+      staticObjects[i]->mesh->draw(camera);
+      globalModelviewMatrix = mat;
+
+      tree->statistics.staticObjectsDrawn++;
+      tree->statistics.totalTriangles += staticObjects[i]->mesh->nTriangles;
+      tree->statistics.trianglesDrawn += staticObjects[i]->mesh->nTriangles;
+   }
 }
 
 void

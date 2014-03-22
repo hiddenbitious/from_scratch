@@ -7,6 +7,27 @@
 
 using namespace std;
 
+typedef struct {
+   /// Drawing / geometry statistics
+   int leavesDrawn;
+   int totalLeaves;
+   int staticObjectsDrawn;
+   int totalStaticObjects;
+   int trianglesDrawn;
+   int totalTriangles;
+} treeDrawStatistics_t;
+
+/// Tree statistics
+typedef struct {
+   int nLeaves;
+   int nNodes;
+   int nSplits;
+   int maxDepth;
+   int depthReached;
+   int nInitialPolys;
+   int nFinalPolys;
+} treeStatistics_t;
+
 class C_BspTree {
 friend class C_BspNode;
 
@@ -30,6 +51,8 @@ public:
    USHORT leafToDraw;
    USHORT nNodesToDraw;
 
+   treeDrawStatistics_t statistics;
+   treeStatistics_t treeStats;
 public:
    C_BspTree(USHORT depth);
    ~C_BspTree();

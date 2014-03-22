@@ -40,7 +40,6 @@ C_GLShaderManager *shaderManager = NULL;
 C_TextureManager *textureManager = NULL;
 
 char MAX_THREADS = 0;
-int totalLeaves;
 
 C_GLShader *bspShader = NULL;
 C_GLShader *basicShader = NULL;
@@ -183,9 +182,9 @@ Draw(void)
 	camera.PrintText(0 , lineHeight * line++ ,
 					 1.0f , 1.0f , 0.0f , 0.6f ,
 					 "FPS: %d" , (int)fps);
-	camera.PrintText(0, lineHeight * line++,
-					 1.0f, 1.0f, 0.0f, 0.6f,
-					 "PVS size: %d. Drawn: %d" , totalLeaves, leavesDrawn);
+//	camera.PrintText(0, lineHeight * line++,
+//					 1.0f, 1.0f, 0.0f, 0.6f,
+//					 "PVS size: %d. Drawn: %d" , totalLeaves, leavesDrawn);
 //   camera.PrintText(0, lineHeight * line++,
 //					 1.0f, 1.0f, 0.0f, 0.6f,
 //					 "leaves drawn: %d", leavesDrawn);

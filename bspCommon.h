@@ -17,9 +17,6 @@ class C_BspTree;
 #define INTERSECTS	2
 #define COINCIDENT	3
 
-extern int polyCount;
-extern int leavesDrawn;
-extern int nodesDrawn;
 extern int nConvexRooms;
 
 extern vector<C_Vertex> debug;

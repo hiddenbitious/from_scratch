@@ -120,6 +120,30 @@ C_Map::draw(C_Camera *camera)
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
    mapPolys = bspTree->Draw_PVS(camera);
+
+	int line = 2;
+	int lineHeight = 18;
+
+	camera->PrintText(0, lineHeight * line++,
+					 1.0f, 1.0f, 0.0f, 0.6f,
+					 "total leaves: %d. Drawn: %d" , bspTree->statistics.totalLeaves, bspTree->statistics.leavesDrawn);
+
+	camera->PrintText(0, lineHeight * line++,
+					 1.0f, 1.0f, 0.0f, 0.6f,
+					 "total objects: %d. Drawn: %d" , bspTree->statistics.totalStaticObjects, bspTree->statistics.staticObjectsDrawn);
+
+	camera->PrintText(0, lineHeight * line++,
+					 1.0f, 1.0f, 0.0f, 0.6f,
+					 "total triangles: %d. Drawn: %d" , bspTree->statistics.totalTriangles, bspTree->statistics.trianglesDrawn);
+
+//   /// Print statistics
+//   printf("Draw statistics:\n");
+//   printf("\ttotal leaves:%d\n", bspTree->statistics.totalLeaves);
+//   printf("\tleaves drawn:%d\n", bspTree->statistics.leavesDrawn);
+//   printf("\ttotal triangles:%d\n", bspTree->statistics.totalTriangles);
+//   printf("\ttriangles drawn:%d\n", bspTree->statistics.trianglesDrawn);
+//   printf("\ttotal static objects:%d\n", bspTree->statistics.totalStaticObjects);
+//   printf("\tstatic objects drawn:%d\n", bspTree->statistics.staticObjectsDrawn);
 }
 
 bool
