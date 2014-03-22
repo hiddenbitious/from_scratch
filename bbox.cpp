@@ -69,8 +69,6 @@ void C_BBox::SetVertices(void)
 
 void C_BBox::GetVertices(C_Vector3* _vertices) const
 {
-	if(_vertices == NULL) { return; }
-
 	_vertices[0].SetVector(max.x, min.y, min.z);
 	_vertices[1].SetVector(max.x, min.y, max.z);
 	_vertices[2].SetVector(min.x, min.y, max.z);
@@ -84,8 +82,6 @@ void C_BBox::GetVertices(C_Vector3* _vertices) const
 
 void C_BBox::GetVertices(C_Vertex* _vertices) const
 {
-	if(_vertices == NULL) { return; }
-
 	_vertices[0].x = max.x;		_vertices[0].y = min.y;		_vertices[0].z = min.z;
 	_vertices[1].x = max.x;		_vertices[1].y = min.y;		_vertices[1].z = max.z;
 	_vertices[2].x = min.x;		_vertices[2].y = min.y;		_vertices[2].z = max.z;

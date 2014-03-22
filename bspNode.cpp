@@ -366,13 +366,22 @@ C_BspNode::Draw(C_Camera *camera)
 
 
    for(unsigned int i = 0; i < staticObjects.size(); ++i) {
+      tree->statistics.totalTriangles += staticObjects[i]->mesh->nTriangles;
+
+      if(staticObjects[i]->drawn)
+         continue;
+
+      if(!camera->frustum->cubeInFrustum(&staticObjects[i]->bbox))
+         continue;
+
+      staticObjects[i]->drawn = true;
+
       ESMatrix mat = globalModelviewMatrix;
       esMatrixMultiply(&globalModelviewMatrix, &staticObjects[i]->matrix, &globalModelviewMatrix);
       staticObjects[i]->mesh->draw(camera);
       globalModelviewMatrix = mat;
 
       tree->statistics.staticObjectsDrawn++;
-      tree->statistics.totalTriangles += staticObjects[i]->mesh->nTriangles;
       tree->statistics.trianglesDrawn += staticObjects[i]->mesh->nTriangles;
    }
 }

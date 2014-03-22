@@ -211,15 +211,16 @@ C_BspTree::insertStaticObject(C_MeshGroup *staticMesh, ESMatrix *matrix)
 {
    static unsigned int meshID = 0;
    C_Vertex bboxVertices[8];
-   C_BBox bbox = staticMesh->bbox;
-
-   bbox.ApplyTransformation(matrix);
-   bbox.GetVertices(bboxVertices);
 
    staticTreeObject_t *object = new staticTreeObject_t;
    object->matrix = *matrix;
    object->mesh = staticMesh;
    object->meshID = meshID++;
+   object->drawn = false;
+   object->bbox = staticMesh->bbox;
+
+   object->bbox.ApplyTransformation(matrix);
+   object->bbox.GetVertices(bboxVertices);
 
    for(int i = 0; i < 8; ++i) {
       headNode->insertStaticObject(object, &bboxVertices[i]);
@@ -614,6 +615,8 @@ C_BspTree::Draw_PVS(C_Camera *camera)
    /// Set all leaves as non drawn
 	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
 		leaves[i]->drawn = false;
+		for(unsigned int j = 0; j < leaves[i]->staticObjects.size(); ++j)
+		   leaves[i]->staticObjects[j]->drawn = false;
 	}
 
    /// Pass matrices to shader

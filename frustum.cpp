@@ -148,7 +148,7 @@ int C_Frustum::sphereInFrustum2(C_BSphere* sphere) const
 
 bool C_Frustum::cubeInFrustum(const C_BBox* box) const
 {
-   C_Vector3 vertices[8];
+   C_Vertex vertices[8];
    box->GetVertices(vertices);
 
    for(int i = 0 ; i < 6 ; i++) {
