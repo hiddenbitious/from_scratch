@@ -125,7 +125,6 @@ extern C_GLShader *basicShader;
 extern C_GLShader *pointShader;
 extern C_GLShader *wallShader;
 
-extern bool drawConnectedToo;
 extern char MAX_THREADS;
 
 #endif

@@ -166,7 +166,12 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 
       /// Copy material
 //      printf("material: %d", group->material);
-      mesh->texture = textureManager->loadTexture(model->materials[group->material].texture);
+      if(model->materials[group->material].texture_diffuse && strlen(model->materials[group->material].texture_diffuse))
+         mesh->texture_diffuse = textureManager->loadTexture(model->materials[group->material].texture_diffuse);
+      if(model->materials[group->material].texture_specular && strlen(model->materials[group->material].texture_specular))
+         mesh->texture_specular = textureManager->loadTexture(model->materials[group->material].texture_specular);
+      if(model->materials[group->material].texture_normal && strlen(model->materials[group->material].texture_normal))
+         mesh->texture_normal = textureManager->loadTexture(model->materials[group->material].texture_normal);
 
       size += mesh->nVertices * sizeof(C_Vertex);
       if(group->properties & HAS_TEXCOORDS)
@@ -572,6 +577,7 @@ static void glmReadMTL(GLMmodel* model, char* name)
 	rewind(file);
 
 	model->materials = (GLMmaterial*)malloc(sizeof(GLMmaterial) * nummaterials);
+	memset(model->materials, 0, sizeof(GLMmaterial) * nummaterials);
 	model->nummaterials = nummaterials;
 
 	/* set the default material */
@@ -640,9 +646,26 @@ static void glmReadMTL(GLMmodel* model, char* name)
 			}
 			break;
 		case 'm':
-			fscanf(file, "%s", buf);
-			model->materials[nummaterials].texture = strdup(buf);
-			break;
+		   switch(buf[5]) {
+         case 'd':
+         case 'a':
+   			fscanf(file, "%s", buf);
+	   		model->materials[nummaterials].texture_diffuse = strdup(buf);
+			   break;
+         case 's':
+   			fscanf(file, "%s", buf);
+	   		model->materials[nummaterials].texture_specular = strdup(buf);
+			   break;
+         case 'n':
+   			fscanf(file, "%s", buf);
+	   		model->materials[nummaterials].texture_normal = strdup(buf);
+			   break;
+			default:
+            /* eat up rest of line */
+            fgets(buf, sizeof(buf), file);
+            break;
+         }
+         break;
 		default:
 			/* eat up rest of line */
 			fgets(buf, sizeof(buf), file);

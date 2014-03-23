@@ -13,13 +13,15 @@
 
 typedef struct _GLMmaterial
 {
-  char* name;				/* name of material */
-  float diffuse[4];		/* diffuse component */
-  float ambient[4];		/* ambient component */
-  float specular[4];		/* specular component */
-  float emmissive[4];	/* emmissive component */
-  float shininess;		/* specular exponent */
-  char *texture;        /// Texture file name
+  char* name;				   /* name of material */
+  float diffuse[4];		   /* diffuse component */
+  float ambient[4];		   /* ambient component */
+  float specular[4];		   /* specular component */
+  float emmissive[4];	   /* emmissive component */
+  float shininess;		   /* specular exponent */
+  char *texture_diffuse;   /// Texture file name
+  char *texture_specular;  /// Texture file name
+  char *texture_normal;    /// Texture file name
 } GLMmaterial;
 
 /* GLMtriangle: Structure that defines a triangle in a model.

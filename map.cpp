@@ -115,8 +115,22 @@ C_Map::load3DObjects(void)
    /// Obiously an mesh manager will be needed to avoid loading
    /// the same mesh more than once
 
-   wallMesh.loadFromFile("objmodels/fence.obj");
+//   wallMesh.loadFromFile("objmodels/fence.obj");
+   wallMesh.loadFromFile("wallMeshes/wall_01.obj");
    wallMesh.shader = wallShader;
+
+   /// Scale object
+   C_Vertex min, max;
+   wallMesh.bbox.GetMax(&max);
+   wallMesh.bbox.GetMin(&min);
+   float xLen = max.x - min.x;
+   float zLen = max.z - min.z;
+   float scale = TILE_SIZE / MAX(xLen, zLen);
+   ESMatrix matrix = Identity;
+   esScale(&matrix, scale, scale, scale);
+   if(zLen > xLen)
+      esRotate(&matrix, 270.0f, 0.0f, 1.0f, 0.0f);
+   wallMesh.applyTransformationOnVertices(&matrix);
 
    return true;
 }
@@ -128,7 +142,9 @@ C_Map::draw(C_Camera *camera)
 
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+//   wallMesh.draw(camera);
    mapPolys = bspTree->Draw_PVS(camera);
+
 
 	int line = 2;
 	int lineHeight = 18;

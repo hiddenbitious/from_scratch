@@ -30,7 +30,6 @@
 using namespace std;
 
 int mapPolys;
-bool drawConnectedToo = false;
 static C_Map map;
 
 
@@ -262,15 +261,10 @@ hande_simple_keys(unsigned char key , int x , int y)
 			printf("bspRenderingType: %d\n", bspRenderingType);
 			break;
 
-      case 'e': {
-         drawConnectedToo = !drawConnectedToo;
-         break;
-      }
-
 		default:
 			cout << int (key) << '\n';
 			break;
-	}
+   }
 }
 
 /// arrow keys handling

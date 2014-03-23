@@ -23,8 +23,10 @@ C_Mesh::C_Mesh(void)
    normals = NULL;
    indices = NULL;
    next = NULL;
-   texture = NULL;
    refCounter = 1;
+   texture_diffuse = NULL;
+   texture_specular = NULL;
+   texture_normal = NULL;
 }
 
 C_Mesh *
@@ -101,9 +103,15 @@ C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
       nVertices = mesh.nVertices;
       nTriangles = mesh.nTriangles;
       refCounter = mesh.refCounter;
-      if(mesh.texture) {
-//         texture = new C_Texture;
-         texture = mesh.texture->refTexture();
+
+      if(mesh.texture_diffuse) {
+         texture_diffuse = mesh.texture_diffuse->refTexture();
+      }
+      if(mesh.texture_normal) {
+         texture_normal = mesh.texture_normal->refTexture();
+      }
+      if(mesh.texture_specular) {
+         texture_specular = mesh.texture_specular->refTexture();
       }
    }
    return *this;
@@ -115,12 +123,14 @@ C_Mesh::~C_Mesh(void)
 
    assert(!refCounter);
 
-   if(colors)                       delete[] colors;
-   if(vertices)                     delete[] vertices;
-   if(textCoords)                   delete[] textCoords;
-   if(normals)                      delete[] normals;
-   if(indices)                      delete[] indices;
-   if(!texture->unrefTexture())     delete texture;
+   if(colors)     delete[] colors;
+   if(vertices)   delete[] vertices;
+   if(textCoords) delete[] textCoords;
+   if(normals)    delete[] normals;
+   if(indices)    delete[] indices;
+   if(texture_diffuse && !texture_diffuse->unrefTexture())     delete texture_diffuse;
+   if(texture_normal && !texture_normal->unrefTexture())       delete texture_normal;
+   if(texture_specular && !texture_specular->unrefTexture())   delete texture_specular;
 }
 
 C_MeshGroup::C_MeshGroup(void)
@@ -288,9 +298,9 @@ C_MeshGroup::draw(C_Camera *camera)
    C_Mesh *mesh = meshes;
    while(mesh) {
       /// If mesh has texture enable it
-      if(mesh->texture && shader->textureUniformLocation_0 >= 0) {
+      if(mesh->texture_diffuse && shader->textureUniformLocation_0 >= 0) {
          glActiveTexture(GL_TEXTURE0);
-         glBindTexture(GL_TEXTURE_2D, mesh->texture->getGLtextureID());
+         glBindTexture(GL_TEXTURE_2D, mesh->texture_diffuse->getGLtextureID());
 //         glUniform1i(shader->textureUniformLocation_0, 0);
          shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_0, 0);
       } else {

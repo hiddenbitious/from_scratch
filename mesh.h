@@ -23,14 +23,16 @@ public:
 
 class C_Mesh : public C_BaseMesh {
 public:
-   C_Vertex       *vertices;     /// vertices
-   C_Color        *colors;       /// colors
-   C_TexCoord     *textCoords;   /// texture coordinates
-   C_Normal       *normals;      /// normals
-   int            *indices;      /// Vertex indices
-   C_Mesh         *next;         /// Pointer to next mesh in meshGroup
-   C_Texture      *texture;      /// Pointer to texture struct
+   C_Vertex       *vertices;           /// vertices
+   C_Color        *colors;             /// colors
+   C_TexCoord     *textCoords;         /// texture coordinates
+   C_Normal       *normals;            /// normals
+   int            *indices;            /// Vertex indices
+   C_Mesh         *next;               /// Pointer to next mesh in meshGroup
    int            refCounter;
+   C_Texture      *texture_diffuse;    /// Pointer to texture struct
+   C_Texture      *texture_specular;   /// Pointer to texture struct
+   C_Texture      *texture_normal;     /// Pointer to texture struct
 
    C_Mesh(void);
    ~C_Mesh(void);
