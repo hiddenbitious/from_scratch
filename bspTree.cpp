@@ -597,7 +597,7 @@ C_BspTree::Draw_PVS(C_Camera *camera)
    /// Initialize tree statistics
 	memset((void *)&statistics, 0, sizeof(statistics));
 
-   /// Set all leaves as non drawn
+   /// Set all leaves as not drawn
 	for(unsigned int i = 0 ; i < leaves.size() ; i++) {
 		leaves[i]->drawn = false;
 		for(unsigned int j = 0; j < leaves[i]->staticObjects.size(); ++j)

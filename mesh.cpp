@@ -311,7 +311,7 @@ C_MeshGroup::draw(C_Camera *camera)
       mesh = mesh->next;
    }
 
-   bbox.Draw();
+//   bbox.Draw();
 
    if(shader->verticesAttribLocation >= 0)   glDisableVertexAttribArray(shader->verticesAttribLocation);
    if(shader->colorsAttribLocation >= 0)     glDisableVertexAttribArray(shader->colorsAttribLocation);

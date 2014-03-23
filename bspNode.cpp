@@ -89,7 +89,7 @@ C_BspNode::insertStaticObject(staticTreeObject_t *staticMesh, C_Vertex *point)
    if(!isLeaf) {
       float side = partitionPlane.distanceFromPoint(point);
 
-      if(side > 0.0f) {
+      if(FLOAT_EQ(side, 0.0f) || side >= 0.0f) {
          return frontNode->insertStaticObject(staticMesh, point);
       } else {
          return backNode->insertStaticObject(staticMesh, point);
@@ -325,26 +325,27 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
          backNode->Draw(camera, tree, usePVS);
       }
    } else {
-      if(drawn) {
-         return;
-      }
-
       tree->statistics.totalLeaves += PVS.size();
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       Draw(camera);
-      DrawPointSet();
+//      DrawPointSet();
 
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
       if(usePVS) {
          for(unsigned int i = 0 ; i < PVS.size() ; i++) {
-            if(!camera->frustum->cubeInFrustum(&PVS[i]->bbox) || PVS[i]->drawn) {
+            if(PVS[i]->drawn) {
+               assert(0);
+               continue;
+            }
+
+            if(!camera->frustum->cubeInFrustum(&PVS[i]->bbox)) {
                continue;
             }
 
             PVS[i]->Draw(camera);
-            PVS[i]->bbox.Draw();
+//            PVS[i]->bbox.Draw();
          }
       }
    }
@@ -358,25 +359,27 @@ C_BspNode::Draw(C_Camera *camera)
    tree->statistics.leavesDrawn++;
 
    /// Draw bsp geometry
-   glEnableVertexAttribArray(bspShader->verticesAttribLocation);
-   glEnableVertexAttribArray(bspShader->normalsAttribLocation);
-
-	glVertexAttribPointer(bspShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
-	glVertexAttribPointer(bspShader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)triangles + 3 * sizeof(float));
-   glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
-
-   glDisableVertexAttribArray(bspShader->verticesAttribLocation);
-   glDisableVertexAttribArray(bspShader->normalsAttribLocation);
+//   glEnableVertexAttribArray(bspShader->verticesAttribLocation);
+//   glEnableVertexAttribArray(bspShader->normalsAttribLocation);
+//
+//   glVertexAttribPointer(bspShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
+//   glVertexAttribPointer(bspShader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)triangles + 3 * sizeof(float));
+//   glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
+//
+//   glDisableVertexAttribArray(bspShader->verticesAttribLocation);
+//   glDisableVertexAttribArray(bspShader->normalsAttribLocation);
 
    /// Draw static meshes
    for(unsigned int i = 0; i < staticObjects.size(); ++i) {
       tree->statistics.totalTriangles += staticObjects[i]->mesh.nTriangles;
 
-      if(staticObjects[i]->drawn)
+      if(staticObjects[i]->drawn) {
          continue;
+      }
 
-      if(!camera->frustum->cubeInFrustum(&staticObjects[i]->mesh.bbox))
+      if(!camera->frustum->cubeInFrustum(&staticObjects[i]->mesh.bbox)) {
          continue;
+      }
 
       staticObjects[i]->mesh.draw(camera);
       staticObjects[i]->drawn = true;
