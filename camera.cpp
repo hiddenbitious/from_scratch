@@ -39,15 +39,15 @@ C_Camera::C_Camera(void)
 
 void C_Camera::Look(void)
 {
-	rotationQuaternion.QuaternionToMatrix16(&ESrotMatrix);
+	rotationQuaternion.QuaternionToMatrix16(&globalViewMatrix);
 
 //	esMatrixLoadIdentity(&globalModelviewMatrix);
-	esMatrixLoadIdentity(&globalViewMatrix);
+//	esMatrixLoadIdentity(&globalViewMatrix);
 
 //	esMatrixMultiply(&globalModelviewMatrix, &ESrotMatrix, &globalModelviewMatrix);
 //	esTranslate(&globalModelviewMatrix, -position.x, -position.y, -position.z);
 
-	esMatrixMultiply(&globalViewMatrix, &ESrotMatrix, &globalViewMatrix);
+//	esMatrixMultiply(&globalViewMatrix, &ESrotMatrix, &Identity);
 	esTranslate(&globalViewMatrix, -position.x, -position.y, -position.z);
 
 	if(updateFrustum) {

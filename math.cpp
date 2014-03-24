@@ -1,4 +1,6 @@
 #include <string.h>
+#include <stdio.h>
+
 #include "math.h"
 #include "vectors.h"
 
@@ -217,33 +219,57 @@ esOrtho(ESMatrix *result, float left, float right, float bottom, float top, floa
 }
 
 void
-esMatrixMultiply(ESMatrix *result, ESMatrix *srcA, ESMatrix *srcB)
+esMatrixMultiply(ESMatrix *result, const ESMatrix *srcA, const ESMatrix *srcB)
 {
-   ESMatrix    tmp;
    int         i;
 
-   for (i=0; i<4; i++) {
-      tmp.m[i][0] =	(srcA->m[i][0] * srcB->m[0][0]) +
-                     (srcA->m[i][1] * srcB->m[1][0]) +
-                     (srcA->m[i][2] * srcB->m[2][0]) +
-                     (srcA->m[i][3] * srcB->m[3][0]) ;
+   if(result != srcA && result != srcB) {
+     for (i=0; i<4; i++) {
+         result->m[i][0] =	(srcA->m[i][0] * srcB->m[0][0]) +
+                        (srcA->m[i][1] * srcB->m[1][0]) +
+                        (srcA->m[i][2] * srcB->m[2][0]) +
+                        (srcA->m[i][3] * srcB->m[3][0]) ;
 
-      tmp.m[i][1] =	(srcA->m[i][0] * srcB->m[0][1]) +
-                     (srcA->m[i][1] * srcB->m[1][1]) +
-                     (srcA->m[i][2] * srcB->m[2][1]) +
-                     (srcA->m[i][3] * srcB->m[3][1]) ;
+         result->m[i][1] =	(srcA->m[i][0] * srcB->m[0][1]) +
+                        (srcA->m[i][1] * srcB->m[1][1]) +
+                        (srcA->m[i][2] * srcB->m[2][1]) +
+                        (srcA->m[i][3] * srcB->m[3][1]) ;
 
-      tmp.m[i][2] =	(srcA->m[i][0] * srcB->m[0][2]) +
-                     (srcA->m[i][1] * srcB->m[1][2]) +
-                     (srcA->m[i][2] * srcB->m[2][2]) +
-                     (srcA->m[i][3] * srcB->m[3][2]) ;
+         result->m[i][2] =	(srcA->m[i][0] * srcB->m[0][2]) +
+                        (srcA->m[i][1] * srcB->m[1][2]) +
+                        (srcA->m[i][2] * srcB->m[2][2]) +
+                        (srcA->m[i][3] * srcB->m[3][2]) ;
 
-      tmp.m[i][3] =	(srcA->m[i][0] * srcB->m[0][3]) +
-                     (srcA->m[i][1] * srcB->m[1][3]) +
-                     (srcA->m[i][2] * srcB->m[2][3]) +
-                     (srcA->m[i][3] * srcB->m[3][3]) ;
+         result->m[i][3] =	(srcA->m[i][0] * srcB->m[0][3]) +
+                        (srcA->m[i][1] * srcB->m[1][3]) +
+                        (srcA->m[i][2] * srcB->m[2][3]) +
+                        (srcA->m[i][3] * srcB->m[3][3]) ;
+      }
+   } else {
+      ESMatrix    tmp;
+      for (i=0; i<4; i++) {
+         tmp.m[i][0] =	(srcA->m[i][0] * srcB->m[0][0]) +
+                        (srcA->m[i][1] * srcB->m[1][0]) +
+                        (srcA->m[i][2] * srcB->m[2][0]) +
+                        (srcA->m[i][3] * srcB->m[3][0]) ;
+
+         tmp.m[i][1] =	(srcA->m[i][0] * srcB->m[0][1]) +
+                        (srcA->m[i][1] * srcB->m[1][1]) +
+                        (srcA->m[i][2] * srcB->m[2][1]) +
+                        (srcA->m[i][3] * srcB->m[3][1]) ;
+
+         tmp.m[i][2] =	(srcA->m[i][0] * srcB->m[0][2]) +
+                        (srcA->m[i][1] * srcB->m[1][2]) +
+                        (srcA->m[i][2] * srcB->m[2][2]) +
+                        (srcA->m[i][3] * srcB->m[3][2]) ;
+
+         tmp.m[i][3] =	(srcA->m[i][0] * srcB->m[0][3]) +
+                        (srcA->m[i][1] * srcB->m[1][3]) +
+                        (srcA->m[i][2] * srcB->m[2][3]) +
+                        (srcA->m[i][3] * srcB->m[3][3]) ;
+      }
+      memcpy(result, &tmp, sizeof(ESMatrix));
    }
-   memcpy(result, &tmp, sizeof(ESMatrix));
 }
 
 void
