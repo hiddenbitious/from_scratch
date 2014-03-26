@@ -49,6 +49,7 @@ typedef struct _GLMgroup {
 typedef struct _GLMmodel {
   char            *pathname;			/* path to this model */
   char            *mtllibname;		/* name of the material library */
+  char            properties;    /// HAS_TEXCOORDS | HAS_NORMALS ?
 
   unsigned int    numvertices;		/* number of vertices in model */
   float           *vertices;			/* array of vertices  */

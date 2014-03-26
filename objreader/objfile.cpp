@@ -87,15 +87,32 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 	/// Init mesh struct
 	meshgroup->nMeshes = model->numgroups;
 
+   /// Copy data
+   meshgroup->nVertices = model->numvertices;
+	meshgroup->vertices = new C_Vertex[model->numvertices];
+	assert(meshgroup->vertices);
+	memcpy(meshgroup->vertices, model->vertices + 3, 3 * model->numvertices * sizeof(float));
+
+	if(model->properties & HAS_TEXCOORDS) {
+	   assert(model->numtexcoords);
+	   /// Use model->numvertices instead of model->numtexcoords
+	   meshgroup->textCoords = new C_TexCoord[model->numvertices];
+	   assert(meshgroup->textCoords);
+	}
+
+	if(model->properties & HAS_NORMALS) {
+	   assert(model->numnormals);
+	   /// Use model->numvertices instead of model->numnormals
+	   meshgroup->normals = new C_Vertex[model->numvertices];
+	   assert(meshgroup->normals);
+	}
+
    /// Copy mesh information
    GLMgroup *group = model->groups;
    C_Mesh *mesh;
    int totalVertices = 0, totalTriangles = 0;
    while(group) {
-//      if(group->name)
-//         printf("%s:\n", group->name);
-
-      assert(group->properties);
+      assert(group->properties == model->properties);
 
       /// Allocate memory
       mesh = meshgroup->addMesh();
@@ -105,10 +122,61 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       if(group->properties & HAS_TEXCOORDS)
          mesh->textCoords = new C_TexCoord[mesh->nVertices];
       if(group->properties & HAS_NORMALS)
-         mesh->normals = new C_Normal[mesh->nVertices];
+         mesh->normals = new C_Vertex[mesh->nVertices];
+
+      mesh->indices = new int[3 * group->numtriangles];
 
       totalVertices += mesh->nVertices;
       totalTriangles += mesh->nTriangles;
+
+      for(unsigned int i = 0; i < group->numtriangles; ++i) {
+         mesh->indices[3 * i    ] = model->triangles[group->triangles[i]].vindices[0] - 1;
+         mesh->indices[3 * i + 1] = model->triangles[group->triangles[i]].vindices[1] - 1;
+         mesh->indices[3 * i + 2] = model->triangles[group->triangles[i]].vindices[2] - 1;
+
+         printf("%d %d %d\n", mesh->indices[3 * i    ], mesh->indices[3 * i+1], mesh->indices[3 * i+2]);
+
+         /// Copy texture coordinates
+         if(model->properties & HAS_TEXCOORDS) {
+            index = mesh->indices[3 * i    ];
+            int vindex = 2 * model->triangles[group->triangles[i]].tindices[0];
+            meshgroup->textCoords[index].u = fabs(model->texcoords[vindex    ]);
+            meshgroup->textCoords[index].v = fabs(model->texcoords[vindex + 1]);
+
+            index = mesh->indices[3 * i + 1];
+            vindex = 2 * model->triangles[group->triangles[i]].tindices[1];
+            meshgroup->textCoords[index].u = fabs(model->texcoords[vindex    ]);
+            meshgroup->textCoords[index].v = fabs(model->texcoords[vindex + 1]);
+
+            index = mesh->indices[3 * i + 2];
+            vindex = 2 * model->triangles[group->triangles[i]].tindices[2];
+            meshgroup->textCoords[index].u = fabs(model->texcoords[vindex    ]);
+            meshgroup->textCoords[index].v = fabs(model->texcoords[vindex + 1]);
+         }
+
+         /// Copy normals
+         if(model->properties & HAS_NORMALS) {
+            index = mesh->indices[3 * i    ];
+            int vindex = 3 * model->triangles[group->triangles[i]].nindices[0];
+            meshgroup->normals[3 * index].x = model->normals[vindex    ];
+            meshgroup->normals[3 * index].y = model->normals[vindex + 1];
+            meshgroup->normals[3 * index].z = model->normals[vindex + 2];
+
+            index = mesh->indices[3 * i + 1];
+            vindex = 3 * model->triangles[group->triangles[i]].nindices[1];
+            meshgroup->normals[3 * index].x = model->normals[vindex    ];
+            meshgroup->normals[3 * index].y = model->normals[vindex + 1];
+            meshgroup->normals[3 * index].z = model->normals[vindex + 2];
+
+            index = mesh->indices[3 * i + 2];
+            vindex = 3 * model->triangles[group->triangles[i]].nindices[2];
+            meshgroup->normals[3 * index].x = model->normals[vindex    ];
+            meshgroup->normals[3 * index].y = model->normals[vindex + 1];
+            meshgroup->normals[3 * index].z = model->normals[vindex + 2];
+         }
+      }
+
+      /// ----------------------------
 
       for(unsigned int i = 0; i < group->numtriangles; i++) {
          /// Copy vertices
@@ -148,19 +216,19 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
          /// Copy normals
          if(group->properties & HAS_NORMALS) {
             index = 3 * model->triangles[group->triangles[i]].nindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
-            mesh->normals[3 * i    ].nx = model->normals[index    ];
-            mesh->normals[3 * i    ].ny = model->normals[index + 1];
-            mesh->normals[3 * i    ].nz = model->normals[index + 2];
+            mesh->normals[3 * i    ].x = model->normals[index    ];
+            mesh->normals[3 * i    ].y = model->normals[index + 1];
+            mesh->normals[3 * i    ].z = model->normals[index + 2];
 
             index = 3 * model->triangles[group->triangles[i]].nindices[1];
-            mesh->normals[3 * i + 1].nx = model->normals[index    ];
-            mesh->normals[3 * i + 1].ny = model->normals[index + 1];
-            mesh->normals[3 * i + 1].nz = model->normals[index + 2];
+            mesh->normals[3 * i + 1].x = model->normals[index    ];
+            mesh->normals[3 * i + 1].y = model->normals[index + 1];
+            mesh->normals[3 * i + 1].z = model->normals[index + 2];
 
             index = 3 * model->triangles[group->triangles[i]].nindices[2];
-            mesh->normals[3 * i + 2].nx = model->normals[index    ];
-            mesh->normals[3 * i + 2].ny = model->normals[index + 1];
-            mesh->normals[3 * i + 2].nz = model->normals[index + 2];
+            mesh->normals[3 * i + 2].x = model->normals[index    ];
+            mesh->normals[3 * i + 2].y = model->normals[index + 1];
+            mesh->normals[3 * i + 2].z = model->normals[index + 2];
          }
       }
 
@@ -177,13 +245,13 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       if(group->properties & HAS_TEXCOORDS)
          size += mesh->nVertices * sizeof(C_TexCoord);
       if(group->properties & HAS_NORMALS)
-         size += mesh->nVertices * sizeof(C_Normal);
+         size += mesh->nVertices * sizeof(C_Vertex);
 
       group = group->next;
    }
 
    meshgroup->nTriangles = totalTriangles;
-   meshgroup->nVertices = totalVertices;
+//   meshgroup->nVertices = totalVertices;
 
    printf("\t%d vertices - %d triangles\n", totalVertices, totalTriangles);
    printf("\tTotal size of model: %lu bytes\n", size);
@@ -274,6 +342,7 @@ void glmFirstPass(GLMmodel* model, FILE* file)
 				numtriangles++;
 				group->numtriangles++;
 				group->properties = HAS_VERTICES | HAS_NORMALS;
+				model->properties = HAS_VERTICES | HAS_NORMALS;
 				while(fscanf(file, "%d//%d", &v, &n) > 0) {
 					numtriangles++;
 					group->numtriangles++;
@@ -285,6 +354,7 @@ void glmFirstPass(GLMmodel* model, FILE* file)
 				numtriangles++;
 				group->numtriangles++;
 				group->properties = HAS_VERTICES | HAS_NORMALS | HAS_TEXCOORDS;
+				model->properties = HAS_VERTICES | HAS_NORMALS | HAS_TEXCOORDS;
 				while(fscanf(file, "%d/%d/%d", &v, &t, &n) > 0) {
 					numtriangles++;
 					group->numtriangles++;
@@ -296,6 +366,7 @@ void glmFirstPass(GLMmodel* model, FILE* file)
 				numtriangles++;
 				group->numtriangles++;
 				group->properties = HAS_VERTICES | HAS_TEXCOORDS;
+				model->properties = HAS_VERTICES | HAS_TEXCOORDS;
 				while(fscanf(file, "%d/%d", &v, &t) > 0) {
 					numtriangles++;
 					group->numtriangles++;
@@ -307,6 +378,7 @@ void glmFirstPass(GLMmodel* model, FILE* file)
 				numtriangles++;
 				group->numtriangles++;
 				group->properties = HAS_VERTICES;
+				model->properties = HAS_VERTICES;
 				while(fscanf(file, "%d", &v) > 0) {
 					numtriangles++;
 					group->numtriangles++;
@@ -672,6 +744,8 @@ static void glmReadMTL(GLMmodel* model, char* name)
 			break;
 		}
 	}
+
+	fclose(file);
 }
 
 
@@ -699,6 +773,7 @@ GLMgroup* glmAddGroup(GLMmodel* model, const char* name)
 	GLMgroup* group;
 
 	group = glmFindGroup(model, name);
+	model->properties = 0;
 	if (!group) {
 		group = (GLMgroup*)malloc(sizeof(GLMgroup));
 		group->name = strdup(name);

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "map.h"
 
 C_Map::C_Map(void)
@@ -115,9 +116,27 @@ C_Map::load3DObjects(void)
    /// Obiously an mesh manager will be needed to avoid loading
    /// the same mesh more than once
 
-//   wallMesh.loadFromFile("objmodels/fence.obj");
-   wallMesh.loadFromFile("wallMeshes/wall_01.obj");
+   wallMesh.loadFromFile("objmodels/fence.obj");
+//   wallMesh.loadFromFile("wallMeshes/wall_01.obj");
    wallMesh.shader = wallShader;
+
+   C_Mesh *mesh = wallMesh.meshes;
+   int index;
+   for(int i = 0; i < wallMesh.nTriangles; ++i) {
+      index = mesh->indices[3 * i];
+      printf("%d: %f %f %f\n", index, wallMesh.vertices[index].x, wallMesh.vertices[index].y, wallMesh.vertices[index].z);
+      printf("%d: %f %f\n", index, wallMesh.textCoords[index].u, wallMesh.textCoords[index].v);
+
+      index = mesh->indices[3 * i + 1];
+      printf("%d: %f %f %f\n", index, wallMesh.vertices[index].x, wallMesh.vertices[index].y, wallMesh.vertices[index].z);
+      printf("%d: %f %f\n", index, wallMesh.textCoords[index].u, wallMesh.textCoords[index].v);
+
+      index = mesh->indices[3 * i + 2];
+      printf("%d: %f %f %f\n", index, wallMesh.vertices[index].x, wallMesh.vertices[index].y, wallMesh.vertices[index].z);
+      printf("%d: %f %f\n\n", index, wallMesh.textCoords[index].u, wallMesh.textCoords[index].v);
+   }
+
+   exit(0);
 
    /// Scale object
    C_Vertex min, max;

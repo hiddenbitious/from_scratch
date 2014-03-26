@@ -26,10 +26,15 @@ public:
    C_Vertex       *vertices;           /// vertices
    C_Color        *colors;             /// colors
    C_TexCoord     *textCoords;         /// texture coordinates
-   C_Normal       *normals;            /// normals
+   C_Vertex       *normals;            /// normals
    int            *indices;            /// Vertex indices
+   int            nIndices;
    C_Mesh         *next;               /// Pointer to next mesh in meshGroup
+
+
    int            refCounter;
+
+
    C_Texture      *texture_diffuse;    /// Pointer to texture struct
    C_Texture      *texture_specular;   /// Pointer to texture struct
    C_Texture      *texture_normal;     /// Pointer to texture struct
@@ -52,6 +57,13 @@ public:
    int            nMeshes;       /// Number of meshes in group
    C_GLShader     *shader;
    ESMatrix       matrix;
+
+
+   C_Vertex       *vertices;           /// vertices
+   C_Color        *colors;             /// colors
+   C_TexCoord     *textCoords;         /// texture coordinates
+   C_Vertex       *normals;            /// normals
+
 
    C_MeshGroup(void);
    ~C_MeshGroup(void);
