@@ -58,13 +58,6 @@ public:
    C_GLShader     *shader;
    ESMatrix       matrix;
 
-
-   C_Vertex       *vertices;           /// vertices
-   C_Color        *colors;             /// colors
-   C_TexCoord     *textCoords;         /// texture coordinates
-   C_Vertex       *normals;            /// normals
-
-
    C_MeshGroup(void);
    ~C_MeshGroup(void);
 

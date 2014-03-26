@@ -606,17 +606,17 @@ C_BspTree::Draw_PVS(C_Camera *camera)
 
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
-	shaderManager->pushShader(bspShader); {
-      ESMatrix mat = Identity;
-      esTranslate(&mat, position.x , position.y , position.z);
-
-      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
-      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODEL_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+//	shaderManager->pushShader(bspShader); {
+//      ESMatrix mat = Identity;
+//      esTranslate(&mat, position.x , position.y , position.z);
+//
+//      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
+//      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODEL_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+//      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
       headNode->Draw(camera, this, true);
-   }
-   shaderManager->popShader();
+//   }
+//   shaderManager->popShader();
 
 	return 0;
 }

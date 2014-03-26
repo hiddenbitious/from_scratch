@@ -116,24 +116,67 @@ C_Map::load3DObjects(void)
    /// Obiously an mesh manager will be needed to avoid loading
    /// the same mesh more than once
 
-   wallMesh.loadFromFile("objmodels/fence.obj");
+   wallMesh.loadFromFile("objmodels/cube.obj");
 //   wallMesh.loadFromFile("wallMeshes/wall_01.obj");
    wallMesh.shader = wallShader;
 
    C_Mesh *mesh = wallMesh.meshes;
-   int index;
-   for(int i = 0; i < wallMesh.nTriangles; ++i) {
-      index = mesh->indices[3 * i];
-      printf("%d: %f %f %f\n", index, wallMesh.vertices[index].x, wallMesh.vertices[index].y, wallMesh.vertices[index].z);
-      printf("%d: %f %f\n", index, wallMesh.textCoords[index].u, wallMesh.textCoords[index].v);
+//   int index;
+//   for(int i = 0; i < mesh->nTriangles; ++i) {
+//      index = mesh->indices[3 * i];
+//      printf("%d: %f %f %f\n", index, mesh->vertices[index].x, mesh->vertices[index].y, mesh->vertices[index].z);
+//      printf("%d: %f %f\n", index, mesh->textCoords[index].u, mesh->textCoords[index].v);
+//
+//      index = mesh->indices[3 * i + 1];
+//      printf("%d: %f %f %f\n", index, mesh->vertices[index].x, mesh->vertices[index].y, mesh->vertices[index].z);
+//      printf("%d: %f %f\n", index, mesh->textCoords[index].u, mesh->textCoords[index].v);
+//
+//      index = mesh->indices[3 * i + 2];
+//      printf("%d: %f %f %f\n", index, mesh->vertices[index].x, mesh->vertices[index].y, mesh->vertices[index].z);
+//      printf("%d: %f %f\n\n", index, mesh->textCoords[index].u, mesh->textCoords[index].v);
+//   }
 
-      index = mesh->indices[3 * i + 1];
-      printf("%d: %f %f %f\n", index, wallMesh.vertices[index].x, wallMesh.vertices[index].y, wallMesh.vertices[index].z);
-      printf("%d: %f %f\n", index, wallMesh.textCoords[index].u, wallMesh.textCoords[index].v);
 
-      index = mesh->indices[3 * i + 2];
-      printf("%d: %f %f %f\n", index, wallMesh.vertices[index].x, wallMesh.vertices[index].y, wallMesh.vertices[index].z);
-      printf("%d: %f %f\n\n", index, wallMesh.textCoords[index].u, wallMesh.textCoords[index].v);
+   while(mesh) {
+      assert(!(mesh->nVertices%3));
+      for(unsigned int i = 0; i < mesh->nVertices / 3; i++) {
+         printf("v%d(%f %f %f) -- ", i, mesh->vertices[3 * i    ].x,
+                                        mesh->vertices[3 * i    ].y,
+                                        mesh->vertices[3 * i    ].z);
+
+         printf("(%f %f %f) -- ", mesh->vertices[3 * i + 1].x,
+                                  mesh->vertices[3 * i + 1].y,
+                                  mesh->vertices[3 * i + 1].z);
+
+         printf("(%f %f %f)\n",   mesh->vertices[3 * i + 2].x,
+                                  mesh->vertices[3 * i + 2].y,
+                                  mesh->vertices[3 * i + 2].z);
+
+
+         printf("n%d(%f %f %f) -- ", i, mesh->normals[3 * i    ].x,
+                                        mesh->normals[3 * i    ].y,
+                                        mesh->normals[3 * i    ].z);
+
+         printf("(%f %f %f) -- ", mesh->normals[3 * i + 1].x,
+                                  mesh->normals[3 * i + 1].y,
+                                  mesh->normals[3 * i + 1].z);
+
+         printf("(%f %f %f)\n",   mesh->normals[3 * i + 2].x,
+                                  mesh->normals[3 * i + 2].y,
+                                  mesh->normals[3 * i + 2].z);
+
+         if(mesh->textCoords) {
+            printf("t%d(%f %f) -- ", i, mesh->textCoords[3 * i    ].u,
+                                        mesh->textCoords[3 * i    ].v);
+
+            printf("(%f %f) -- ", mesh->textCoords[3 * i + 1].u,
+                                  mesh->textCoords[3 * i + 1].v);
+
+            printf("(%f %f)\n\n", mesh->textCoords[3 * i + 2].u,
+                                  mesh->textCoords[3 * i + 2].v);
+         }
+      }
+      mesh = mesh->next;
    }
 
    exit(0);

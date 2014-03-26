@@ -16,6 +16,30 @@ math::Magnitude(float x , float y , float z)
 }
 
 void
+math::Normalize(C_Vertex *vec)
+{
+	float lenght = math::Magnitude(vec->x, vec->y, vec->z);
+
+	if(lenght) {
+		vec->x /= lenght;
+		vec->y /= lenght;
+		vec->z /= lenght;
+   }
+}
+
+C_Vertex
+math::CrossProduct(const C_Vertex* v1 , const C_Vertex* v2 , const C_Vertex* v3)
+{
+	C_Vertex tempVec;
+
+	tempVec.x = (v1->y - v2->y) * (v2->z - v3->z)  - (v2->y - v3->y) * (v1->z - v2->z);
+	tempVec.y = (v2->x - v3->x) * (v1->z - v2->z)  - (v1->x - v2->x) * (v2->z - v3->z);
+	tempVec.z = (v1->x - v2->x) * (v2->y - v3->y)  - (v2->x - v3->x) * (v1->y - v2->y);
+
+	return tempVec;
+}
+
+void
 math::Normalize(float* x , float* y , float *z)
 {
    float length = math::Magnitude(*x , *y , *z);
@@ -221,7 +245,7 @@ esOrtho(ESMatrix *result, float left, float right, float bottom, float top, floa
 void
 esMatrixMultiply(ESMatrix *result, const ESMatrix *srcA, const ESMatrix *srcB)
 {
-   int         i;
+   int i;
 
    if(result != srcA && result != srcB) {
      for (i=0; i<4; i++) {

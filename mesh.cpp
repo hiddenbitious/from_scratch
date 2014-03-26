@@ -137,11 +137,6 @@ C_MeshGroup::C_MeshGroup(void)
 {
    PRINT_FUNC_ENTRY;
 
-   vertices = NULL;
-   colors = NULL;
-   textCoords = NULL;
-   normals = NULL;
-
    meshes = NULL;
    nMeshes = 0;
    esMatrixLoadIdentity(&matrix);
@@ -301,10 +296,6 @@ C_MeshGroup::draw(C_Camera *camera)
    if(shader->colorsAttribLocation >= 0)     glEnableVertexAttribArray(shader->colorsAttribLocation);
    if(shader->texCoordsAttribLocation >= 0)  glEnableVertexAttribArray(shader->texCoordsAttribLocation);
 
-//   if(vertices)   glVertexAttribPointer(shader->verticesAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, vertices);
-//   if(colors)     glVertexAttribPointer(shader->colorsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
-//   if(textCoords) glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, textCoords);
-
    C_Mesh *mesh = meshes;
    while(mesh) {
       /// If mesh has texture enable it
@@ -343,9 +334,10 @@ C_Mesh::draw(C_GLShader *shader)
    if(colors)     glVertexAttribPointer(shader->colorsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
    if(textCoords) glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, textCoords);
 
-   if(!indices)
+   if(!indices) {
       glDrawArrays(GL_TRIANGLES, 0, nVertices);
-   else {
+   } else {
+      assert(0);
       glDrawElements(GL_TRIANGLES, 3 * nTriangles, GL_UNSIGNED_INT, indices);
    }
 }

@@ -17,6 +17,111 @@ unsigned int glmFindMaterial(GLMmodel* model, char* name);
 
 #define T(x) (model->triangles[(x)])
 
+
+static void
+calculateNormals(GLMmodel *model, GLMgroup *group)
+{
+   int index1, index2, index3;
+   C_Vertex v1, v2, v3, norm;
+   unsigned int i;
+
+   assert(!model->normals);
+   assert(!model->numnormals);
+   assert(!(group->properties & HAS_NORMALS));
+
+   model->numnormals = model->numvertices;
+   model->normals = new float[3 * model->numvertices];
+   assert(model->normals);
+   memset(model->normals, 0, 3 * model->numvertices * sizeof(float));
+
+   group->properties |= HAS_NORMALS;
+
+   int *counters = new int[model->numvertices];
+   assert(counters);
+   memset(counters, 0, model->numvertices * sizeof(int));
+
+   for(i = 0; i < group->numtriangles; i++) {
+      index1 = model->triangles[group->triangles[i]].vindices[0];
+      index2 = model->triangles[group->triangles[i]].vindices[1];
+      index3 = model->triangles[group->triangles[i]].vindices[2];
+
+      printf("%d %d %d\n", index1, index2, index3);
+
+      v1.x = model->vertices[3 * index1    ];
+      v1.y = model->vertices[3 * index1 + 1];
+      v1.z = model->vertices[3 * index1 + 2];
+
+      printf("%f %f %f\n", v1.x, v1.y, v1.z);
+
+      v2.x = model->vertices[3 * index2    ];
+      v2.y = model->vertices[3 * index2 + 1];
+      v2.z = model->vertices[3 * index2 + 2];
+
+      printf("%f %f %f\n", v2.x, v2.y, v2.z);
+
+      v3.x = model->vertices[3 * index3    ];
+      v3.y = model->vertices[3 * index3 + 1];
+      v3.z = model->vertices[3 * index3 + 2];
+
+      printf("%f %f %f\n", v3.x, v3.y, v3.z);
+
+//      norm = math::CrossProduct(&v1, &v2, &v3);
+//
+//      model->normals[3 * index1    ] += norm.x;
+//      model->normals[3 * index1 + 1] += norm.y;
+//      model->normals[3 * index1 + 2] += norm.z;
+//
+//      model->normals[3 * index2    ] += norm.x;
+//      model->normals[3 * index2 + 1] += norm.y;
+//      model->normals[3 * index2 + 2] += norm.z;
+//
+//      model->normals[3 * index3    ] += norm.x;
+//      model->normals[3 * index3 + 1] += norm.y;
+//      model->normals[3 * index3 + 2] += norm.z;
+//
+//      ++counters[index1];
+//      ++counters[index2];
+//      ++counters[index3];
+   }
+
+//   for(i = 0; i < group->numtriangles; i++) {
+//      index1 = model->triangles[group->triangles[i]].vindices[0];
+//      index2 = model->triangles[group->triangles[i]].vindices[1];
+//      index3 = model->triangles[group->triangles[i]].vindices[2];
+//
+//      assert(counters[index1]);
+//      assert(counters[index2]);
+//      assert(counters[index3]);
+//
+//      model->normals[3 * index1    ] /= counters[index1];
+//      model->normals[3 * index1 + 1] /= counters[index1];
+//      model->normals[3 * index1 + 2] /= counters[index1];
+//
+//      model->normals[3 * index2    ] /= counters[index2];
+//      model->normals[3 * index2 + 1] /= counters[index2];
+//      model->normals[3 * index2 + 2] /= counters[index2];
+//
+//      model->normals[3 * index3    ] /= counters[index3];
+//      model->normals[3 * index3 + 1] /= counters[index3];
+//      model->normals[3 * index3 + 2] /= counters[index3];
+//
+////      math::Normalize(&model->normals[3 * index1    ],
+////                      &model->normals[3 * index1 + 1],
+////                      &model->normals[3 * index1 + 2]);
+////
+////      math::Normalize(&model->normals[3 * index2    ],
+////                      &model->normals[3 * index2 + 1],
+////                      &model->normals[3 * index2 + 2]);
+////
+////      math::Normalize(&model->normals[3 * index3    ],
+////                      &model->normals[3 * index3 + 1],
+////                      &model->normals[3 * index3 + 2]);
+//   }
+
+   delete[] counters;
+}
+
+
 /* glmReadOBJ: Reads a model description from a Wavefront .OBJ file.
  * Returns a pointer to the created object which should be free'd with
  * glmDelete().
@@ -87,26 +192,6 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 	/// Init mesh struct
 	meshgroup->nMeshes = model->numgroups;
 
-   /// Copy data
-   meshgroup->nVertices = model->numvertices;
-	meshgroup->vertices = new C_Vertex[model->numvertices];
-	assert(meshgroup->vertices);
-	memcpy(meshgroup->vertices, model->vertices + 3, 3 * model->numvertices * sizeof(float));
-
-	if(model->properties & HAS_TEXCOORDS) {
-	   assert(model->numtexcoords);
-	   /// Use model->numvertices instead of model->numtexcoords
-	   meshgroup->textCoords = new C_TexCoord[model->numvertices];
-	   assert(meshgroup->textCoords);
-	}
-
-	if(model->properties & HAS_NORMALS) {
-	   assert(model->numnormals);
-	   /// Use model->numvertices instead of model->numnormals
-	   meshgroup->normals = new C_Vertex[model->numvertices];
-	   assert(meshgroup->normals);
-	}
-
    /// Copy mesh information
    GLMgroup *group = model->groups;
    C_Mesh *mesh;
@@ -119,64 +204,19 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       mesh->nTriangles = group->numtriangles;
       mesh->nVertices = 3 * group->numtriangles;
       mesh->vertices = new C_Vertex[mesh->nVertices];
-      if(group->properties & HAS_TEXCOORDS)
-         mesh->textCoords = new C_TexCoord[mesh->nVertices];
-      if(group->properties & HAS_NORMALS)
-         mesh->normals = new C_Vertex[mesh->nVertices];
 
-      mesh->indices = new int[3 * group->numtriangles];
+      mesh->normals = new C_Vertex[mesh->nVertices];
+
+      if(group->properties & HAS_TEXCOORDS) {
+         mesh->textCoords = new C_TexCoord[mesh->nVertices];
+      }
+
+      if(!(group->properties & HAS_NORMALS)) {
+         calculateNormals(model, group);
+      }
 
       totalVertices += mesh->nVertices;
       totalTriangles += mesh->nTriangles;
-
-      for(unsigned int i = 0; i < group->numtriangles; ++i) {
-         mesh->indices[3 * i    ] = model->triangles[group->triangles[i]].vindices[0] - 1;
-         mesh->indices[3 * i + 1] = model->triangles[group->triangles[i]].vindices[1] - 1;
-         mesh->indices[3 * i + 2] = model->triangles[group->triangles[i]].vindices[2] - 1;
-
-         printf("%d %d %d\n", mesh->indices[3 * i    ], mesh->indices[3 * i+1], mesh->indices[3 * i+2]);
-
-         /// Copy texture coordinates
-         if(model->properties & HAS_TEXCOORDS) {
-            index = mesh->indices[3 * i    ];
-            int vindex = 2 * model->triangles[group->triangles[i]].tindices[0];
-            meshgroup->textCoords[index].u = fabs(model->texcoords[vindex    ]);
-            meshgroup->textCoords[index].v = fabs(model->texcoords[vindex + 1]);
-
-            index = mesh->indices[3 * i + 1];
-            vindex = 2 * model->triangles[group->triangles[i]].tindices[1];
-            meshgroup->textCoords[index].u = fabs(model->texcoords[vindex    ]);
-            meshgroup->textCoords[index].v = fabs(model->texcoords[vindex + 1]);
-
-            index = mesh->indices[3 * i + 2];
-            vindex = 2 * model->triangles[group->triangles[i]].tindices[2];
-            meshgroup->textCoords[index].u = fabs(model->texcoords[vindex    ]);
-            meshgroup->textCoords[index].v = fabs(model->texcoords[vindex + 1]);
-         }
-
-         /// Copy normals
-         if(model->properties & HAS_NORMALS) {
-            index = mesh->indices[3 * i    ];
-            int vindex = 3 * model->triangles[group->triangles[i]].nindices[0];
-            meshgroup->normals[3 * index].x = model->normals[vindex    ];
-            meshgroup->normals[3 * index].y = model->normals[vindex + 1];
-            meshgroup->normals[3 * index].z = model->normals[vindex + 2];
-
-            index = mesh->indices[3 * i + 1];
-            vindex = 3 * model->triangles[group->triangles[i]].nindices[1];
-            meshgroup->normals[3 * index].x = model->normals[vindex    ];
-            meshgroup->normals[3 * index].y = model->normals[vindex + 1];
-            meshgroup->normals[3 * index].z = model->normals[vindex + 2];
-
-            index = mesh->indices[3 * i + 2];
-            vindex = 3 * model->triangles[group->triangles[i]].nindices[2];
-            meshgroup->normals[3 * index].x = model->normals[vindex    ];
-            meshgroup->normals[3 * index].y = model->normals[vindex + 1];
-            meshgroup->normals[3 * index].z = model->normals[vindex + 2];
-         }
-      }
-
-      /// ----------------------------
 
       for(unsigned int i = 0; i < group->numtriangles; i++) {
          /// Copy vertices
@@ -215,17 +255,17 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 
          /// Copy normals
          if(group->properties & HAS_NORMALS) {
-            index = 3 * model->triangles[group->triangles[i]].nindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
+            index = 3 * model->triangles[group->triangles[i]].vindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
             mesh->normals[3 * i    ].x = model->normals[index    ];
             mesh->normals[3 * i    ].y = model->normals[index + 1];
             mesh->normals[3 * i    ].z = model->normals[index + 2];
 
-            index = 3 * model->triangles[group->triangles[i]].nindices[1];
+            index = 3 * model->triangles[group->triangles[i]].vindices[1];
             mesh->normals[3 * i + 1].x = model->normals[index    ];
             mesh->normals[3 * i + 1].y = model->normals[index + 1];
             mesh->normals[3 * i + 1].z = model->normals[index + 2];
 
-            index = 3 * model->triangles[group->triangles[i]].nindices[2];
+            index = 3 * model->triangles[group->triangles[i]].vindices[2];
             mesh->normals[3 * i + 2].x = model->normals[index    ];
             mesh->normals[3 * i + 2].y = model->normals[index + 1];
             mesh->normals[3 * i + 2].z = model->normals[index + 2];
@@ -251,7 +291,7 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
    }
 
    meshgroup->nTriangles = totalTriangles;
-//   meshgroup->nVertices = totalVertices;
+   meshgroup->nVertices = totalVertices;
 
    printf("\t%d vertices - %d triangles\n", totalVertices, totalTriangles);
    printf("\tTotal size of model: %lu bytes\n", size);
