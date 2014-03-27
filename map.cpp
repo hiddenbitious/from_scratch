@@ -116,7 +116,7 @@ C_Map::load3DObjects(void)
    /// Obiously an mesh manager will be needed to avoid loading
    /// the same mesh more than once
 
-   wallMesh.loadFromFile("objmodels/cube.obj");
+   wallMesh.loadFromFile("objmodels/fence.obj");
 //   wallMesh.loadFromFile("wallMeshes/wall_01.obj");
    wallMesh.shader = wallShader;
 
@@ -179,7 +179,7 @@ C_Map::load3DObjects(void)
       mesh = mesh->next;
    }
 
-   exit(0);
+//   exit(0);
 
    /// Scale object
    C_Vertex min, max;

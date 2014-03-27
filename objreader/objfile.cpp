@@ -30,7 +30,7 @@ calculateNormals(GLMmodel *model, GLMgroup *group)
    assert(!(group->properties & HAS_NORMALS));
 
    model->numnormals = model->numvertices;
-   model->normals = new float[3 * model->numvertices];
+   model->normals = new float[3 * (model->numvertices + 1)];
    assert(model->normals);
    memset(model->normals, 0, 3 * model->numvertices * sizeof(float));
 
@@ -44,6 +44,10 @@ calculateNormals(GLMmodel *model, GLMgroup *group)
       index1 = model->triangles[group->triangles[i]].vindices[0];
       index2 = model->triangles[group->triangles[i]].vindices[1];
       index3 = model->triangles[group->triangles[i]].vindices[2];
+
+      model->triangles[group->triangles[i]].nindices[0] = index1;
+      model->triangles[group->triangles[i]].nindices[1] = index2;
+      model->triangles[group->triangles[i]].nindices[2] = index3;
 
       printf("%d %d %d\n", index1, index2, index3);
 
@@ -65,58 +69,58 @@ calculateNormals(GLMmodel *model, GLMgroup *group)
 
       printf("%f %f %f\n", v3.x, v3.y, v3.z);
 
-//      norm = math::CrossProduct(&v1, &v2, &v3);
-//
-//      model->normals[3 * index1    ] += norm.x;
-//      model->normals[3 * index1 + 1] += norm.y;
-//      model->normals[3 * index1 + 2] += norm.z;
-//
-//      model->normals[3 * index2    ] += norm.x;
-//      model->normals[3 * index2 + 1] += norm.y;
-//      model->normals[3 * index2 + 2] += norm.z;
-//
-//      model->normals[3 * index3    ] += norm.x;
-//      model->normals[3 * index3 + 1] += norm.y;
-//      model->normals[3 * index3 + 2] += norm.z;
-//
-//      ++counters[index1];
-//      ++counters[index2];
-//      ++counters[index3];
+      norm = math::CrossProduct(&v1, &v2, &v3);
+
+      model->normals[3 * index1    ] += norm.x;
+      model->normals[3 * index1 + 1] += norm.y;
+      model->normals[3 * index1 + 2] += norm.z;
+
+      model->normals[3 * index2    ] += norm.x;
+      model->normals[3 * index2 + 1] += norm.y;
+      model->normals[3 * index2 + 2] += norm.z;
+
+      model->normals[3 * index3    ] += norm.x;
+      model->normals[3 * index3 + 1] += norm.y;
+      model->normals[3 * index3 + 2] += norm.z;
+
+      ++counters[index1];
+      ++counters[index2];
+      ++counters[index3];
    }
 
-//   for(i = 0; i < group->numtriangles; i++) {
-//      index1 = model->triangles[group->triangles[i]].vindices[0];
-//      index2 = model->triangles[group->triangles[i]].vindices[1];
-//      index3 = model->triangles[group->triangles[i]].vindices[2];
-//
-//      assert(counters[index1]);
-//      assert(counters[index2]);
-//      assert(counters[index3]);
-//
-//      model->normals[3 * index1    ] /= counters[index1];
-//      model->normals[3 * index1 + 1] /= counters[index1];
-//      model->normals[3 * index1 + 2] /= counters[index1];
-//
-//      model->normals[3 * index2    ] /= counters[index2];
-//      model->normals[3 * index2 + 1] /= counters[index2];
-//      model->normals[3 * index2 + 2] /= counters[index2];
-//
-//      model->normals[3 * index3    ] /= counters[index3];
-//      model->normals[3 * index3 + 1] /= counters[index3];
-//      model->normals[3 * index3 + 2] /= counters[index3];
-//
-////      math::Normalize(&model->normals[3 * index1    ],
-////                      &model->normals[3 * index1 + 1],
-////                      &model->normals[3 * index1 + 2]);
-////
-////      math::Normalize(&model->normals[3 * index2    ],
-////                      &model->normals[3 * index2 + 1],
-////                      &model->normals[3 * index2 + 2]);
-////
-////      math::Normalize(&model->normals[3 * index3    ],
-////                      &model->normals[3 * index3 + 1],
-////                      &model->normals[3 * index3 + 2]);
-//   }
+   for(i = 0; i < group->numtriangles; i++) {
+      index1 = model->triangles[group->triangles[i]].vindices[0];
+      index2 = model->triangles[group->triangles[i]].vindices[1];
+      index3 = model->triangles[group->triangles[i]].vindices[2];
+
+      assert(counters[index1]);
+      assert(counters[index2]);
+      assert(counters[index3]);
+
+      model->normals[3 * index1    ] /= counters[index1];
+      model->normals[3 * index1 + 1] /= counters[index1];
+      model->normals[3 * index1 + 2] /= counters[index1];
+
+      model->normals[3 * index2    ] /= counters[index2];
+      model->normals[3 * index2 + 1] /= counters[index2];
+      model->normals[3 * index2 + 2] /= counters[index2];
+
+      model->normals[3 * index3    ] /= counters[index3];
+      model->normals[3 * index3 + 1] /= counters[index3];
+      model->normals[3 * index3 + 2] /= counters[index3];
+
+      math::Normalize(&model->normals[3 * index1    ],
+                      &model->normals[3 * index1 + 1],
+                      &model->normals[3 * index1 + 2]);
+
+      math::Normalize(&model->normals[3 * index2    ],
+                      &model->normals[3 * index2 + 1],
+                      &model->normals[3 * index2 + 2]);
+
+      math::Normalize(&model->normals[3 * index3    ],
+                      &model->normals[3 * index3 + 1],
+                      &model->normals[3 * index3 + 2]);
+   }
 
    delete[] counters;
 }
@@ -255,17 +259,17 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 
          /// Copy normals
          if(group->properties & HAS_NORMALS) {
-            index = 3 * model->triangles[group->triangles[i]].vindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
+            index = 3 * model->triangles[group->triangles[i]].nindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
             mesh->normals[3 * i    ].x = model->normals[index    ];
             mesh->normals[3 * i    ].y = model->normals[index + 1];
             mesh->normals[3 * i    ].z = model->normals[index + 2];
 
-            index = 3 * model->triangles[group->triangles[i]].vindices[1];
+            index = 3 * model->triangles[group->triangles[i]].nindices[1];
             mesh->normals[3 * i + 1].x = model->normals[index    ];
             mesh->normals[3 * i + 1].y = model->normals[index + 1];
             mesh->normals[3 * i + 1].z = model->normals[index + 2];
 
-            index = 3 * model->triangles[group->triangles[i]].vindices[2];
+            index = 3 * model->triangles[group->triangles[i]].nindices[2];
             mesh->normals[3 * i + 2].x = model->normals[index    ];
             mesh->normals[3 * i + 2].y = model->normals[index + 1];
             mesh->normals[3 * i + 2].z = model->normals[index + 2];
