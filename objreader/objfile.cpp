@@ -32,7 +32,7 @@ calculateNormals(GLMmodel *model, GLMgroup *group, bool flatShaded)
    assert(!(group->properties & HAS_NORMALS));
 
    model->numnormals = flatShaded ? 3 * model->numtriangles : model->numvertices;
-   model->normals = new float[3 * (model->numnormals + 1)];
+   model->normals = (float *)malloc(3 * (model->numnormals + 1) * sizeof(float));
    memset(model->normals, 0, 3 * (model->numnormals + 1) * sizeof(float));
 
    group->properties |= HAS_NORMALS;
