@@ -19,110 +19,131 @@ unsigned int glmFindMaterial(GLMmodel* model, char* name);
 
 
 static void
-calculateNormals(GLMmodel *model, GLMgroup *group)
+calculateNormals(GLMmodel *model, GLMgroup *group, bool flatShaded)
 {
-   int index1, index2, index3;
+   int vindex1, vindex2, vindex3;
+   int nindex1, nindex2, nindex3;
    C_Vertex v1, v2, v3, norm;
    unsigned int i;
+   int *counters = NULL;
 
    assert(!model->normals);
    assert(!model->numnormals);
    assert(!(group->properties & HAS_NORMALS));
 
-   model->numnormals = model->numvertices;
-   model->normals = new float[3 * (model->numvertices + 1)];
-   assert(model->normals);
-   memset(model->normals, 0, 3 * model->numvertices * sizeof(float));
+   model->numnormals = flatShaded ? 3 * model->numtriangles : model->numvertices;
+   model->normals = new float[3 * (model->numnormals + 1)];
+   memset(model->normals, 0, 3 * (model->numnormals + 1) * sizeof(float));
 
    group->properties |= HAS_NORMALS;
 
-   int *counters = new int[model->numvertices];
-   assert(counters);
-   memset(counters, 0, model->numvertices * sizeof(int));
+   if(!flatShaded) {
+      counters = new int[model->numvertices];
+      assert(counters);
+      memset(counters, 0, model->numvertices * sizeof(int));
+   }
 
    for(i = 0; i < group->numtriangles; i++) {
-      index1 = model->triangles[group->triangles[i]].vindices[0];
-      index2 = model->triangles[group->triangles[i]].vindices[1];
-      index3 = model->triangles[group->triangles[i]].vindices[2];
+      vindex1 = model->triangles[group->triangles[i]].vindices[0];
+      vindex2 = model->triangles[group->triangles[i]].vindices[1];
+      vindex3 = model->triangles[group->triangles[i]].vindices[2];
 
-      model->triangles[group->triangles[i]].nindices[0] = index1;
-      model->triangles[group->triangles[i]].nindices[1] = index2;
-      model->triangles[group->triangles[i]].nindices[2] = index3;
+      if(!flatShaded) {
+         nindex1 = vindex1;
+         nindex2 = vindex2;
+         nindex3 = vindex3;
+      } else {
+         nindex1 = 3 * i;
+         nindex2 = 3 * i + 1;
+         nindex3 = 3 * i + 2;
+      }
 
-      printf("%d %d %d\n", index1, index2, index3);
+      model->triangles[group->triangles[i]].nindices[0] = nindex1;
+      model->triangles[group->triangles[i]].nindices[1] = nindex2;
+      model->triangles[group->triangles[i]].nindices[2] = nindex3;
 
-      v1.x = model->vertices[3 * index1    ];
-      v1.y = model->vertices[3 * index1 + 1];
-      v1.z = model->vertices[3 * index1 + 2];
+      printf("%d %d %d\n", vindex1, vindex2, vindex3);
+      printf("%d %d %d\n", nindex1, nindex2, nindex3);
 
-      printf("%f %f %f\n", v1.x, v1.y, v1.z);
+      v1.x = model->vertices[3 * vindex1    ];
+      v1.y = model->vertices[3 * vindex1 + 1];
+      v1.z = model->vertices[3 * vindex1 + 2];
 
-      v2.x = model->vertices[3 * index2    ];
-      v2.y = model->vertices[3 * index2 + 1];
-      v2.z = model->vertices[3 * index2 + 2];
+      v2.x = model->vertices[3 * vindex2    ];
+      v2.y = model->vertices[3 * vindex2 + 1];
+      v2.z = model->vertices[3 * vindex2 + 2];
 
-      printf("%f %f %f\n", v2.x, v2.y, v2.z);
-
-      v3.x = model->vertices[3 * index3    ];
-      v3.y = model->vertices[3 * index3 + 1];
-      v3.z = model->vertices[3 * index3 + 2];
-
-      printf("%f %f %f\n", v3.x, v3.y, v3.z);
+      v3.x = model->vertices[3 * vindex3    ];
+      v3.y = model->vertices[3 * vindex3 + 1];
+      v3.z = model->vertices[3 * vindex3 + 2];
 
       norm = math::CrossProduct(&v1, &v2, &v3);
 
-      model->normals[3 * index1    ] += norm.x;
-      model->normals[3 * index1 + 1] += norm.y;
-      model->normals[3 * index1 + 2] += norm.z;
+      model->normals[3 * nindex1    ] += norm.x;
+      model->normals[3 * nindex1 + 1] += norm.y;
+      model->normals[3 * nindex1 + 2] += norm.z;
 
-      model->normals[3 * index2    ] += norm.x;
-      model->normals[3 * index2 + 1] += norm.y;
-      model->normals[3 * index2 + 2] += norm.z;
+      model->normals[3 * nindex2    ] += norm.x;
+      model->normals[3 * nindex2 + 1] += norm.y;
+      model->normals[3 * nindex2 + 2] += norm.z;
 
-      model->normals[3 * index3    ] += norm.x;
-      model->normals[3 * index3 + 1] += norm.y;
-      model->normals[3 * index3 + 2] += norm.z;
+      model->normals[3 * nindex3    ] += norm.x;
+      model->normals[3 * nindex3 + 1] += norm.y;
+      model->normals[3 * nindex3 + 2] += norm.z;
 
-      ++counters[index1];
-      ++counters[index2];
-      ++counters[index3];
+      printf("%f %f %f\n", v1.x, v1.y, v1.z);
+      printf("%f %f %f\n\n", model->normals[3 * nindex1    ], model->normals[3 * nindex1+1], model->normals[3 * nindex1+2]);
+
+      printf("%f %f %f\n", v2.x, v2.y, v2.z);
+      printf("%f %f %f\n\n", model->normals[3 * nindex2    ], model->normals[3 * nindex2+1], model->normals[3 * nindex2+2]);
+
+      printf("%f %f %f\n", v3.x, v3.y, v3.z);
+      printf("%f %f %f\n\n", model->normals[3 * nindex3    ], model->normals[3 * nindex3+1], model->normals[3 * nindex3+2]);
+
+      if(!flatShaded) {
+         ++counters[vindex1];
+         ++counters[vindex2];
+         ++counters[vindex3];
+      }
    }
 
-   for(i = 0; i < group->numtriangles; i++) {
-      index1 = model->triangles[group->triangles[i]].vindices[0];
-      index2 = model->triangles[group->triangles[i]].vindices[1];
-      index3 = model->triangles[group->triangles[i]].vindices[2];
+   for(i = 0; !flatShaded && i < group->numtriangles; ++i) {
+      vindex1 = model->triangles[group->triangles[i]].vindices[0];
+      vindex2 = model->triangles[group->triangles[i]].vindices[1];
+      vindex3 = model->triangles[group->triangles[i]].vindices[2];
 
-      assert(counters[index1]);
-      assert(counters[index2]);
-      assert(counters[index3]);
+      assert(counters[vindex1]);
+      assert(counters[vindex2]);
+      assert(counters[vindex3]);
 
-      model->normals[3 * index1    ] /= counters[index1];
-      model->normals[3 * index1 + 1] /= counters[index1];
-      model->normals[3 * index1 + 2] /= counters[index1];
+      model->normals[3 * vindex1    ] /= counters[vindex1];
+      model->normals[3 * vindex1 + 1] /= counters[vindex1];
+      model->normals[3 * vindex1 + 2] /= counters[vindex1];
 
-      model->normals[3 * index2    ] /= counters[index2];
-      model->normals[3 * index2 + 1] /= counters[index2];
-      model->normals[3 * index2 + 2] /= counters[index2];
+      model->normals[3 * vindex2    ] /= counters[vindex2];
+      model->normals[3 * vindex2 + 1] /= counters[vindex2];
+      model->normals[3 * vindex2 + 2] /= counters[vindex2];
 
-      model->normals[3 * index3    ] /= counters[index3];
-      model->normals[3 * index3 + 1] /= counters[index3];
-      model->normals[3 * index3 + 2] /= counters[index3];
+      model->normals[3 * vindex3    ] /= counters[vindex3];
+      model->normals[3 * vindex3 + 1] /= counters[vindex3];
+      model->normals[3 * vindex3 + 2] /= counters[vindex3];
 
-      math::Normalize(&model->normals[3 * index1    ],
-                      &model->normals[3 * index1 + 1],
-                      &model->normals[3 * index1 + 2]);
+      math::Normalize(&model->normals[3 * vindex1    ],
+                      &model->normals[3 * vindex1 + 1],
+                      &model->normals[3 * vindex1 + 2]);
 
-      math::Normalize(&model->normals[3 * index2    ],
-                      &model->normals[3 * index2 + 1],
-                      &model->normals[3 * index2 + 2]);
+      math::Normalize(&model->normals[3 * vindex2    ],
+                      &model->normals[3 * vindex2 + 1],
+                      &model->normals[3 * vindex2 + 2]);
 
-      math::Normalize(&model->normals[3 * index3    ],
-                      &model->normals[3 * index3 + 1],
-                      &model->normals[3 * index3 + 2]);
+      math::Normalize(&model->normals[3 * vindex3    ],
+                      &model->normals[3 * vindex3 + 1],
+                      &model->normals[3 * vindex3 + 2]);
    }
 
-   delete[] counters;
+   if(!flatShaded) {
+      delete[] counters;
+   }
 }
 
 
@@ -216,7 +237,7 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       }
 
       if(!(group->properties & HAS_NORMALS)) {
-         calculateNormals(model, group);
+         calculateNormals(model, group, false);
       }
 
       totalVertices += mesh->nVertices;
