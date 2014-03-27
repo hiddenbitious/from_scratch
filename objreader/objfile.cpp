@@ -38,9 +38,9 @@ calculateNormals(GLMmodel *model, GLMgroup *group, bool flatShaded)
    group->properties |= HAS_NORMALS;
 
    if(!flatShaded) {
-      counters = new int[model->numvertices];
+      counters = new int[model->numnormals + 1];
       assert(counters);
-      memset(counters, 0, model->numvertices * sizeof(int));
+      memset(counters, 0, (model->numnormals + 1) * sizeof(int));
    }
 
    for(i = 0; i < group->numtriangles; i++) {
