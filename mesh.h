@@ -27,13 +27,13 @@ public:
    C_Color        *colors;             /// colors
    C_TexCoord     *textCoords;         /// texture coordinates
    C_Vertex       *normals;            /// normals
+   C_Vertex       *tangents;
+   C_Vertex       *binormals;
    int            *indices;            /// Vertex indices
    int            nIndices;
    C_Mesh         *next;               /// Pointer to next mesh in meshGroup
 
-
    int            refCounter;
-
 
    C_Texture      *texture_diffuse;    /// Pointer to texture struct
    C_Texture      *texture_specular;   /// Pointer to texture struct

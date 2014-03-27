@@ -217,6 +217,9 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 	/// Init mesh struct
 	meshgroup->nMeshes = model->numgroups;
 
+   /// Copy vertices
+   meshgroup->nVertices = model->numvertices;
+
    /// Copy mesh information
    GLMgroup *group = model->groups;
    C_Mesh *mesh;
@@ -229,8 +232,10 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       mesh->nTriangles = group->numtriangles;
       mesh->nVertices = 3 * group->numtriangles;
       mesh->vertices = new C_Vertex[mesh->nVertices];
-
       mesh->normals = new C_Vertex[mesh->nVertices];
+      mesh->tangents = new C_Vertex[mesh->nVertices];
+      mesh->binormals = new C_Vertex[mesh->nVertices];
+//      mesh->indices = new int[3 * group->numtriangles];
 
       if(group->properties & HAS_TEXCOORDS) {
          mesh->textCoords = new C_TexCoord[mesh->nVertices];
@@ -244,6 +249,11 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       totalTriangles += mesh->nTriangles;
 
       for(unsigned int i = 0; i < group->numtriangles; i++) {
+//         /// Copy indices
+//         mesh->indices[3 * i    ] = model->triangles[group->triangles[i]].vindices[0];
+//         mesh->indices[3 * i + 1] = model->triangles[group->triangles[i]].vindices[1];
+//         mesh->indices[3 * i + 2] = model->triangles[group->triangles[i]].vindices[2];
+
          /// Copy vertices
          index = 3 * model->triangles[group->triangles[i]].vindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
          mesh->vertices[3 * i    ].x = model->vertices[index    ];
@@ -316,7 +326,7 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
    }
 
    meshgroup->nTriangles = totalTriangles;
-   meshgroup->nVertices = totalVertices;
+//   meshgroup->nVertices = totalVertices;
 
    printf("\t%d vertices - %d triangles\n", totalVertices, totalTriangles);
    printf("\tTotal size of model: %lu bytes\n", size);

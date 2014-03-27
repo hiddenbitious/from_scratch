@@ -116,26 +116,11 @@ C_Map::load3DObjects(void)
    /// Obiously an mesh manager will be needed to avoid loading
    /// the same mesh more than once
 
-   wallMesh.loadFromFile("objmodels/fence.obj");
-//   wallMesh.loadFromFile("wallMeshes/wall_01.obj");
+//   wallMesh.loadFromFile("objmodels/cube.obj");
+   wallMesh.loadFromFile("wallMeshes/wall_01.obj");
    wallMesh.shader = wallShader;
 
    C_Mesh *mesh = wallMesh.meshes;
-//   int index;
-//   for(int i = 0; i < mesh->nTriangles; ++i) {
-//      index = mesh->indices[3 * i];
-//      printf("%d: %f %f %f\n", index, mesh->vertices[index].x, mesh->vertices[index].y, mesh->vertices[index].z);
-//      printf("%d: %f %f\n", index, mesh->textCoords[index].u, mesh->textCoords[index].v);
-//
-//      index = mesh->indices[3 * i + 1];
-//      printf("%d: %f %f %f\n", index, mesh->vertices[index].x, mesh->vertices[index].y, mesh->vertices[index].z);
-//      printf("%d: %f %f\n", index, mesh->textCoords[index].u, mesh->textCoords[index].v);
-//
-//      index = mesh->indices[3 * i + 2];
-//      printf("%d: %f %f %f\n", index, mesh->vertices[index].x, mesh->vertices[index].y, mesh->vertices[index].z);
-//      printf("%d: %f %f\n\n", index, mesh->textCoords[index].u, mesh->textCoords[index].v);
-//   }
-
 
    while(mesh) {
       assert(!(mesh->nVertices%3));
@@ -204,7 +189,7 @@ C_Map::draw(C_Camera *camera)
 
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-//   wallMesh.draw(camera);
+   wallMesh.draw(camera);
    mapPolys = bspTree->Draw_PVS(camera);
 
 

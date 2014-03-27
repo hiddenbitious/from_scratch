@@ -21,6 +21,8 @@ C_Mesh::C_Mesh(void)
    colors = NULL;
    textCoords = NULL;
    normals = NULL;
+   tangents = NULL;
+   binormals = NULL;
    indices = NULL;
    next = NULL;
    refCounter = 1;
@@ -86,6 +88,16 @@ C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
          memcpy(normals, mesh.normals, mesh.nVertices* sizeof(C_Vertex));
       }
 
+      if(mesh.tangents) {
+         tangents = new C_Vertex[mesh.nVertices];
+         memcpy(tangents, mesh.tangents, mesh.nVertices* sizeof(C_Vertex));
+      }
+
+      if(mesh.binormals) {
+         binormals = new C_Vertex[mesh.nVertices];
+         memcpy(binormals, mesh.binormals, mesh.nVertices* sizeof(C_Vertex));
+      }
+
       if(mesh.textCoords) {
          textCoords = new C_TexCoord[mesh.nVertices];
          memcpy(textCoords, mesh.textCoords, mesh.nVertices * sizeof(C_TexCoord));
@@ -127,6 +139,8 @@ C_Mesh::~C_Mesh(void)
    if(vertices)   delete[] vertices;
    if(textCoords) delete[] textCoords;
    if(normals)    delete[] normals;
+   if(tangents)   delete[] normals;
+   if(binormals)  delete[] normals;
    if(indices)    delete[] indices;
    if(texture_diffuse && !texture_diffuse->unrefTexture())     delete texture_diffuse;
    if(texture_normal && !texture_normal->unrefTexture())       delete texture_normal;
@@ -201,8 +215,15 @@ C_MeshGroup::addMesh(void)
 void
 C_Mesh::applyTransformationOnVertices(const ESMatrix *mat)
 {
-   for (int i = 0; i < nVertices; i++)
+   assert(normals);
+   assert(vertices);
+
+   for (int i = 0; i < nVertices; i++) {
       vertices[i] = math::transformPoint(mat, &vertices[i]);
+      normals[i] = math::transformPoint(mat, &normals[i]);
+
+      math::Normalize(&normals[i]);
+   }
 }
 
 void
@@ -290,11 +311,13 @@ C_MeshGroup::draw(C_Camera *camera)
 	esMatrixMultiply(&mat, &matrix, &globalViewMatrix);
 
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+//   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODEL_MATRIX, 1, GL_FALSE, (GLfloat *)&matrix.m[0][0]);
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
 
    if(shader->verticesAttribLocation >= 0)   glEnableVertexAttribArray(shader->verticesAttribLocation);
    if(shader->colorsAttribLocation >= 0)     glEnableVertexAttribArray(shader->colorsAttribLocation);
    if(shader->texCoordsAttribLocation >= 0)  glEnableVertexAttribArray(shader->texCoordsAttribLocation);
+   if(shader->normalsAttribLocation >= 0)    glEnableVertexAttribArray(shader->normalsAttribLocation);
 
    C_Mesh *mesh = meshes;
    while(mesh) {
@@ -317,6 +340,7 @@ C_MeshGroup::draw(C_Camera *camera)
    if(shader->verticesAttribLocation >= 0)   glDisableVertexAttribArray(shader->verticesAttribLocation);
    if(shader->colorsAttribLocation >= 0)     glDisableVertexAttribArray(shader->colorsAttribLocation);
    if(shader->texCoordsAttribLocation >= 0)  glDisableVertexAttribArray(shader->texCoordsAttribLocation);
+   if(shader->normalsAttribLocation >= 0)    glDisableVertexAttribArray(shader->normalsAttribLocation);
 
    shaderManager->popShader();
 
@@ -333,6 +357,7 @@ C_Mesh::draw(C_GLShader *shader)
    if(vertices)   glVertexAttribPointer(shader->verticesAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, vertices);
    if(colors)     glVertexAttribPointer(shader->colorsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
    if(textCoords) glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, textCoords);
+   if(normals)    glVertexAttribPointer(shader->normalsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, normals);
 
    if(!indices) {
       glDrawArrays(GL_TRIANGLES, 0, nVertices);

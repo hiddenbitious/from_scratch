@@ -151,8 +151,8 @@ Initializations(void)
 
    wallShader = shaderManager->LoadShaderProgram("shaders/shader1.vert", "shaders/shader1.frag");
    assert(wallShader->verticesAttribLocation >= 0);
-   assert(wallShader->normalsAttribLocation == -1);
-   assert(wallShader->textureUniformLocation_0 >= 0);
+//   assert(wallShader->normalsAttribLocation == -1);
+//   assert(wallShader->textureUniformLocation_0 >= 0);
    assert(wallShader->textureUniformLocation_1 == -1);
 
    /// Texture manager

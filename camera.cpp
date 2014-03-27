@@ -80,7 +80,7 @@ void C_Camera::Move(const float x , const float y , const float z)
 	position.Translate(x , y , z);
 	lookAt.Translate(x , y , z);
 
-//	printf("camera position: %f %f %f\n", position.x, position.y, position.z);
+	printf("camera position: %f %f %f\n", position.x, position.y, position.z);
 
 	updateFrustum = true;
 	translation = true;
