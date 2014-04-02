@@ -34,7 +34,7 @@ static C_Map map;
 
 
 /// Global variables
-ESMatrix globalViewMatrix, globalProjectionMatrix;
+ESMatrix globalViewMatrix, globalProjectionMatrix, globalMVPMatrix;
 
 C_GLShaderManager *shaderManager = NULL;
 C_TextureManager *textureManager = NULL;

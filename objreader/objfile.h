@@ -56,6 +56,8 @@ typedef struct _GLMmodel {
 
   unsigned int    numnormals;			/* number of normals in model */
   float           *normals;			/* array of normals */
+  float           *tangents;			/* array of tangents */
+  float           *binormals;			/* array of binormals */
 
   unsigned int    numtexcoords;		/* number of texcoords in model */
   float           *texcoords;			/* array of texture coordinates */

@@ -309,10 +309,12 @@ C_MeshGroup::draw(C_Camera *camera)
 	shaderManager->pushShader(shader);
 	ESMatrix mat;
 	esMatrixMultiply(&mat, &matrix, &globalViewMatrix);
+	esMatrixMultiply(&globalMVPMatrix, &mat, &globalProjectionMatrix);
 
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
 //   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODEL_MATRIX, 1, GL_FALSE, (GLfloat *)&matrix.m[0][0]);
-   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+//   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MVP_MATRIX, 1, GL_FALSE, (GLfloat *)&globalMVPMatrix.m[0][0]);
 
    if(shader->verticesAttribLocation >= 0)   glEnableVertexAttribArray(shader->verticesAttribLocation);
    if(shader->colorsAttribLocation >= 0)     glEnableVertexAttribArray(shader->colorsAttribLocation);

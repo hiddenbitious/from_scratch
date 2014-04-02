@@ -117,7 +117,7 @@ class C_GLShaderManager;
 class C_TextureManager;
 class C_GLShader;
 
-extern ESMatrix globalViewMatrix, globalProjectionMatrix;
+extern ESMatrix globalViewMatrix, globalProjectionMatrix, globalMVPMatrix;
 extern C_GLShaderManager *shaderManager;
 extern C_TextureManager *textureManager;
 extern C_GLShader *bspShader;

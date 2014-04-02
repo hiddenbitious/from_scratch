@@ -17,6 +17,147 @@ unsigned int glmFindMaterial(GLMmodel* model, char* name);
 
 #define T(x) (model->triangles[(x)])
 
+static void
+calculateTBN(GLMmodel *model, GLMgroup *group)
+{
+   unsigned int i;
+   int vindex1, vindex2, vindex3;
+   int tindex1, tindex2, tindex3;
+   int *counters = NULL;
+   C_TexCoord dUV1, dUV2;
+   C_Vertex dV1, dV2;
+   float rcp;
+
+   assert(model->vertices);
+   assert(model->texcoords);
+
+   counters = new int[model->numvertices + 1];
+   memset(counters, 0, (model->numvertices + 1) * sizeof(int));
+
+   model->tangents = (float *)malloc(3 * (model->numvertices + 1) * sizeof(float));
+   assert(model->tangents);
+   memset(model->tangents, 0, 3 * (model->numvertices + 1) * sizeof(float));
+
+   model->binormals = (float *)malloc(3 * (model->numvertices + 1)* sizeof(float));
+   assert(model->binormals);
+   memset(model->binormals, 0, 3 * (model->numvertices + 1) * sizeof(float));
+
+   for(i = 0; i < group->numtriangles; i++) {
+      vindex1 = model->triangles[group->triangles[i]].vindices[0];
+      vindex2 = model->triangles[group->triangles[i]].vindices[1];
+      vindex3 = model->triangles[group->triangles[i]].vindices[2];
+
+      tindex1 = model->triangles[group->triangles[i]].tindices[0];
+      tindex2 = model->triangles[group->triangles[i]].tindices[1];
+      tindex3 = model->triangles[group->triangles[i]].tindices[2];
+
+      dUV1.u = model->texcoords[3 * tindex2    ] - model->texcoords[3 * tindex1    ];
+      dUV1.v = model->texcoords[3 * tindex2 + 1] - model->texcoords[3 * tindex1 + 1];
+
+      dUV2.u = model->texcoords[3 * tindex3    ] - model->texcoords[3 * tindex1    ];
+      dUV2.v = model->texcoords[3 * tindex3 + 1] - model->texcoords[3 * tindex1 + 1];
+
+      dV1.x = model->vertices[3 * vindex2    ] - model->vertices[3 * vindex1    ];
+      dV1.y = model->vertices[3 * vindex2 + 1] - model->vertices[3 * vindex1 + 1];
+      dV1.z = model->vertices[3 * vindex2 + 2] - model->vertices[3 * vindex1 + 2];
+
+      dV2.x = model->vertices[3 * vindex3    ] - model->vertices[3 * vindex1    ];
+      dV2.y = model->vertices[3 * vindex3 + 1] - model->vertices[3 * vindex1 + 1];
+      dV2.z = model->vertices[3 * vindex3 + 2] - model->vertices[3 * vindex1 + 2];
+
+      rcp = 1.0f / (dUV1.u * dUV2.v - dUV1.v * dUV2.u);
+
+      model->tangents[3 * vindex1    ] += (dV1.x * dUV2.v - dV2.x * dUV1.v) * rcp;
+      model->tangents[3 * vindex1 + 1] += (dV1.y * dUV2.v - dV2.y * dUV1.v) * rcp;
+      model->tangents[3 * vindex1 + 2] += (dV1.z * dUV2.v - dV2.z * dUV1.v) * rcp;
+
+      model->tangents[3 * vindex2    ] = model->tangents[3 * vindex1    ];
+      model->tangents[3 * vindex2 + 1] = model->tangents[3 * vindex1 + 1];
+      model->tangents[3 * vindex2 + 2] = model->tangents[3 * vindex1 + 2];
+
+      model->tangents[3 * vindex3    ] = model->tangents[3 * vindex1    ];
+      model->tangents[3 * vindex3 + 1] = model->tangents[3 * vindex1 + 1];
+      model->tangents[3 * vindex3 + 2] = model->tangents[3 * vindex1 + 2];
+
+
+      model->binormals[3 * vindex1    ] += (dV2.x * dUV1.u - dV1.x * dUV2.u) * rcp;
+      model->binormals[3 * vindex1 + 1] += (dV2.y * dUV1.u - dV1.y * dUV2.u) * rcp;
+      model->binormals[3 * vindex1 + 2] += (dV2.z * dUV1.u - dV1.z * dUV2.u) * rcp;
+
+      model->binormals[3 * vindex2    ] = model->binormals[3 * vindex1    ];
+      model->binormals[3 * vindex2 + 1] = model->binormals[3 * vindex1 + 1];
+      model->binormals[3 * vindex2 + 2] = model->binormals[3 * vindex1 + 2];
+
+      model->binormals[3 * vindex3    ] = model->binormals[3 * vindex1    ];
+      model->binormals[3 * vindex3 + 1] = model->binormals[3 * vindex1 + 1];
+      model->binormals[3 * vindex3 + 2] = model->binormals[3 * vindex1 + 2];
+
+      ++counters[vindex1];
+      ++counters[vindex2];
+      ++counters[vindex3];
+   }
+
+   for(i = 0; i < group->numtriangles; ++i) {
+      vindex1 = model->triangles[group->triangles[i]].vindices[0];
+      vindex2 = model->triangles[group->triangles[i]].vindices[1];
+      vindex3 = model->triangles[group->triangles[i]].vindices[2];
+
+      assert(counters[vindex1]);
+      assert(counters[vindex2]);
+      assert(counters[vindex3]);
+
+      model->tangents[3 * vindex1    ] /= counters[vindex1];
+      model->tangents[3 * vindex1 + 1] /= counters[vindex1];
+      model->tangents[3 * vindex1 + 2] /= counters[vindex1];
+
+      model->tangents[3 * vindex2    ] /= counters[vindex2];
+      model->tangents[3 * vindex2 + 1] /= counters[vindex2];
+      model->tangents[3 * vindex2 + 2] /= counters[vindex2];
+
+      model->tangents[3 * vindex3    ] /= counters[vindex3];
+      model->tangents[3 * vindex3 + 1] /= counters[vindex3];
+      model->tangents[3 * vindex3 + 2] /= counters[vindex3];
+
+      math::Normalize(&model->tangents[3 * vindex1    ],
+                      &model->tangents[3 * vindex1 + 1],
+                      &model->tangents[3 * vindex1 + 2]);
+
+      math::Normalize(&model->tangents[3 * vindex2    ],
+                      &model->tangents[3 * vindex2 + 1],
+                      &model->tangents[3 * vindex2 + 2]);
+
+      math::Normalize(&model->tangents[3 * vindex3    ],
+                      &model->tangents[3 * vindex3 + 1],
+                      &model->tangents[3 * vindex3 + 2]);
+
+      model->binormals[3 * vindex1    ] /= counters[vindex1];
+      model->binormals[3 * vindex1 + 1] /= counters[vindex1];
+      model->binormals[3 * vindex1 + 2] /= counters[vindex1];
+
+      model->binormals[3 * vindex2    ] /= counters[vindex2];
+      model->binormals[3 * vindex2 + 1] /= counters[vindex2];
+      model->binormals[3 * vindex2 + 2] /= counters[vindex2];
+
+      model->binormals[3 * vindex3    ] /= counters[vindex3];
+      model->binormals[3 * vindex3 + 1] /= counters[vindex3];
+      model->binormals[3 * vindex3 + 2] /= counters[vindex3];
+
+      math::Normalize(&model->binormals[3 * vindex1    ],
+                      &model->binormals[3 * vindex1 + 1],
+                      &model->binormals[3 * vindex1 + 2]);
+
+      math::Normalize(&model->binormals[3 * vindex2    ],
+                      &model->binormals[3 * vindex2 + 1],
+                      &model->binormals[3 * vindex2 + 2]);
+
+      math::Normalize(&model->binormals[3 * vindex3    ],
+                      &model->binormals[3 * vindex3 + 1],
+                      &model->binormals[3 * vindex3 + 2]);
+   }
+
+   delete[] counters;
+}
+
 
 static void
 calculateNormals(GLMmodel *model, GLMgroup *group, bool flatShaded)
@@ -157,7 +298,7 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 {
 	GLMmodel* model;
 	FILE*     file;
-	int index;
+	int index, nindex;
    size_t size = 0;
 
    printf("Reading \"%s\" file... \n", filename);
@@ -176,6 +317,8 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
 	model->vertices      = NULL;
 	model->numnormals    = 0;
 	model->normals       = NULL;
+	model->tangents      = NULL;
+	model->binormals     = NULL;
 	model->numtexcoords  = 0;
 	model->texcoords     = NULL;
 	model->numfacetnorms = 0;
@@ -235,7 +378,6 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       mesh->normals = new C_Vertex[mesh->nVertices];
       mesh->tangents = new C_Vertex[mesh->nVertices];
       mesh->binormals = new C_Vertex[mesh->nVertices];
-//      mesh->indices = new int[3 * group->numtriangles];
 
       if(group->properties & HAS_TEXCOORDS) {
          mesh->textCoords = new C_TexCoord[mesh->nVertices];
@@ -245,15 +387,12 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
          calculateNormals(model, group, false);
       }
 
+      calculateTBN(model, group);
+
       totalVertices += mesh->nVertices;
       totalTriangles += mesh->nTriangles;
 
       for(unsigned int i = 0; i < group->numtriangles; i++) {
-//         /// Copy indices
-//         mesh->indices[3 * i    ] = model->triangles[group->triangles[i]].vindices[0];
-//         mesh->indices[3 * i + 1] = model->triangles[group->triangles[i]].vindices[1];
-//         mesh->indices[3 * i + 2] = model->triangles[group->triangles[i]].vindices[2];
-
          /// Copy vertices
          index = 3 * model->triangles[group->triangles[i]].vindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
          mesh->vertices[3 * i    ].x = model->vertices[index    ];
@@ -288,22 +427,49 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
             mesh->textCoords[3 * i + 2].v = fabs(model->texcoords[index + 1]);
          }
 
-         /// Copy normals
+         /// Copy TBN
          if(group->properties & HAS_NORMALS) {
-            index = 3 * model->triangles[group->triangles[i]].nindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
-            mesh->normals[3 * i    ].x = model->normals[index    ];
-            mesh->normals[3 * i    ].y = model->normals[index + 1];
-            mesh->normals[3 * i    ].z = model->normals[index + 2];
+            index = 3 * model->triangles[group->triangles[i]].vindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
+            nindex = 3 * model->triangles[group->triangles[i]].nindices[0] /* - 1*/; /// -1 is not needed allthough obj file format considers starts indexing from 1 instead of 0.
+            mesh->normals[3 * i    ].x = model->normals[nindex    ];
+            mesh->normals[3 * i    ].y = model->normals[nindex + 1];
+            mesh->normals[3 * i    ].z = model->normals[nindex + 2];
 
-            index = 3 * model->triangles[group->triangles[i]].nindices[1];
-            mesh->normals[3 * i + 1].x = model->normals[index    ];
-            mesh->normals[3 * i + 1].y = model->normals[index + 1];
-            mesh->normals[3 * i + 1].z = model->normals[index + 2];
+            mesh->tangents[3 * i    ].x = model->tangents[index    ];
+            mesh->tangents[3 * i    ].y = model->tangents[index + 1];
+            mesh->tangents[3 * i    ].z = model->tangents[index + 2];
 
-            index = 3 * model->triangles[group->triangles[i]].nindices[2];
-            mesh->normals[3 * i + 2].x = model->normals[index    ];
-            mesh->normals[3 * i + 2].y = model->normals[index + 1];
-            mesh->normals[3 * i + 2].z = model->normals[index + 2];
+            mesh->binormals[3 * i    ].x = model->binormals[index    ];
+            mesh->binormals[3 * i    ].y = model->binormals[index + 1];
+            mesh->binormals[3 * i    ].z = model->binormals[index + 2];
+
+            index = 3 * model->triangles[group->triangles[i]].vindices[1];
+            nindex = 3 * model->triangles[group->triangles[i]].nindices[1];
+            mesh->normals[3 * i + 1].x = model->normals[nindex    ];
+            mesh->normals[3 * i + 1].y = model->normals[nindex + 1];
+            mesh->normals[3 * i + 1].z = model->normals[nindex + 2];
+
+            mesh->tangents[3 * i + 1].x = model->tangents[index    ];
+            mesh->tangents[3 * i + 1].y = model->tangents[index + 1];
+            mesh->tangents[3 * i + 1].z = model->tangents[index + 2];
+
+            mesh->binormals[3 * i + 1].x = model->binormals[index    ];
+            mesh->binormals[3 * i + 1].y = model->binormals[index + 1];
+            mesh->binormals[3 * i + 1].z = model->binormals[index + 2];
+
+            index = 3 * model->triangles[group->triangles[i]].vindices[2];
+            nindex = 3 * model->triangles[group->triangles[i]].nindices[2];
+            mesh->normals[3 * i + 2].x = model->normals[nindex    ];
+            mesh->normals[3 * i + 2].y = model->normals[nindex + 1];
+            mesh->normals[3 * i + 2].z = model->normals[nindex + 2];
+
+            mesh->tangents[3 * i + 2].x = model->tangents[index    ];
+            mesh->tangents[3 * i + 2].y = model->tangents[index + 1];
+            mesh->tangents[3 * i + 2].z = model->tangents[index + 2];
+
+            mesh->binormals[3 * i + 2].x = model->binormals[index    ];
+            mesh->binormals[3 * i + 2].y = model->binormals[index + 1];
+            mesh->binormals[3 * i + 2].z = model->binormals[index + 2];
          }
       }
 
@@ -877,6 +1043,8 @@ void glmDelete(GLMmodel* model)
   if (model->mtllibname) free(model->mtllibname);
   if (model->vertices)   free(model->vertices);
   if (model->normals)    free(model->normals);
+  if (model->binormals)  free(model->binormals);
+  if (model->tangents)   free(model->tangents);
   if (model->texcoords)  free(model->texcoords);
   if (model->facetnorms) free(model->facetnorms);
   if (model->triangles)  free(model->triangles);

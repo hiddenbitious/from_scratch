@@ -24,9 +24,12 @@
 #define VERTEX_ATTRIBUTE_VARIABLE_NAME_NORMALS     "a_normals"
 #define VERTEX_ATTRIBUTE_VARIABLE_NAME_TEXCOORDS   "a_texCoords"
 #define VERTEX_ATTRIBUTE_VARIABLE_NAME_COLORS      "a_colors"
+#define VERTEX_ATTRIBUTE_VARIABLE_NAME_TANGENTS    "a_tangents"
+#define VERTEX_ATTRIBUTE_VARIABLE_NAME_BINORMALS   "a_binormals"
 
 #define UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX     "u_modelviewMatrix"
 #define UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX    "u_projectionMatrix"
+#define UNIFORM_VARIABLE_NAME_MVP_MATRIX           "u_mvpMatrix"
 #define UNIFORM_VARIABLE_NAME_MODEL_MATRIX         "u_modelMatrix"
 #define UNIFORM_VARIABLE_NAME_VIEW_MATRIX          "u_viewMatrix"
 
@@ -119,6 +122,7 @@ public:
    void printAttribInfo(GLint attrib);
 
    GLint verticesAttribLocation, normalsAttribLocation, texCoordsAttribLocation, colorsAttribLocation;
+   GLint tangetsAttribLocation, binormalsAttribLocation;
    GLint textureUniformLocation_0, textureUniformLocation_1, textureUniformLocation_2;
 
 protected:
