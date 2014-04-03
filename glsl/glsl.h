@@ -37,6 +37,9 @@
 #define UNIFORM_VARIABLE_NAME_TEXTURE_1            "u_texture_1"
 #define UNIFORM_VARIABLE_NAME_TEXTURE_2            "u_texture_2"
 
+#define UNIFORM_VARIABLE_NAME_TEXTURE_DIFFUSE      "u_texture_diffuse"
+#define UNIFORM_VARIABLE_NAME_TEXTURE_NORMAL_MAP   "u_texture_normal_map"
+
 using namespace std;
 class C_GLShader;
 typedef enum {NO_SHADER, VERTEX_SHADER, FRAGMENT_SHADER} shader_type_t;

@@ -203,8 +203,8 @@ calculateNormals(GLMmodel *model, GLMgroup *group, bool flatShaded)
       model->triangles[group->triangles[i]].nindices[1] = nindex2;
       model->triangles[group->triangles[i]].nindices[2] = nindex3;
 
-      printf("%d %d %d\n", vindex1, vindex2, vindex3);
-      printf("%d %d %d\n", nindex1, nindex2, nindex3);
+//      printf("%d %d %d\n", vindex1, vindex2, vindex3);
+//      printf("%d %d %d\n", nindex1, nindex2, nindex3);
 
       v1.x = model->vertices[3 * vindex1    ];
       v1.y = model->vertices[3 * vindex1 + 1];
@@ -232,14 +232,14 @@ calculateNormals(GLMmodel *model, GLMgroup *group, bool flatShaded)
       model->normals[3 * nindex3 + 1] += norm.y;
       model->normals[3 * nindex3 + 2] += norm.z;
 
-      printf("%f %f %f\n", v1.x, v1.y, v1.z);
-      printf("%f %f %f\n\n", model->normals[3 * nindex1    ], model->normals[3 * nindex1+1], model->normals[3 * nindex1+2]);
-
-      printf("%f %f %f\n", v2.x, v2.y, v2.z);
-      printf("%f %f %f\n\n", model->normals[3 * nindex2    ], model->normals[3 * nindex2+1], model->normals[3 * nindex2+2]);
-
-      printf("%f %f %f\n", v3.x, v3.y, v3.z);
-      printf("%f %f %f\n\n", model->normals[3 * nindex3    ], model->normals[3 * nindex3+1], model->normals[3 * nindex3+2]);
+//      printf("%f %f %f\n", v1.x, v1.y, v1.z);
+//      printf("%f %f %f\n\n", model->normals[3 * nindex1    ], model->normals[3 * nindex1+1], model->normals[3 * nindex1+2]);
+//
+//      printf("%f %f %f\n", v2.x, v2.y, v2.z);
+//      printf("%f %f %f\n\n", model->normals[3 * nindex2    ], model->normals[3 * nindex2+1], model->normals[3 * nindex2+2]);
+//
+//      printf("%f %f %f\n", v3.x, v3.y, v3.z);
+//      printf("%f %f %f\n\n", model->normals[3 * nindex3    ], model->normals[3 * nindex3+1], model->normals[3 * nindex3+2]);
 
       if(!flatShaded) {
          ++counters[vindex1];
