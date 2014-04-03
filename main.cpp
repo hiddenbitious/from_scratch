@@ -31,7 +31,8 @@ using namespace std;
 
 int mapPolys;
 static C_Map map;
-
+C_Vertex lightPosition = {4.0f, 0.0f, 4.0f};
+C_MeshGroup cube;
 
 /// Global variables
 ESMatrix globalViewMatrix, globalProjectionMatrix, globalMVPMatrix;
@@ -153,12 +154,15 @@ Initializations(void)
    assert(wallShader->verticesAttribLocation >= 0);
 //   assert(wallShader->normalsAttribLocation == -1);
 //   assert(wallShader->textureUniformLocation_0 >= 0);
-   assert(wallShader->textureUniformLocation_1 == -1);
+//   assert(wallShader->textureUniformLocation_1 == -1);
 
    /// Texture manager
    textureManager = C_TextureManager::getSingleton();
 
    map.createMap("map.txt");
+
+   cube.loadFromFile("objmodels/cube.obj");
+   cube.shader = wallShader;
 
 	/// timer initialization
 	timer.Initialize ();
@@ -171,6 +175,13 @@ Draw(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	camera.Look();
+
+	cube.position.x = camera.position.x + 4.0f;
+	cube.position.y = camera.position.y;
+	cube.position.z = camera.position.z + 4.0f;
+//	lightPosition = cube.position;
+   wallShader->setUniform3f("u_lightPosition", lightPosition.x, lightPosition.y, lightPosition.z);
+	cube.draw(&camera);
 
    map.draw(&camera);
 

@@ -309,6 +309,7 @@ C_MeshGroup::draw(C_Camera *camera)
 	shaderManager->pushShader(shader);
 	ESMatrix mat;
 	esMatrixMultiply(&mat, &matrix, &globalViewMatrix);
+	esTranslate(&mat, position.x, position.y, position.z);
 	esMatrixMultiply(&globalMVPMatrix, &mat, &globalProjectionMatrix);
 
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
@@ -320,6 +321,8 @@ C_MeshGroup::draw(C_Camera *camera)
    if(shader->colorsAttribLocation >= 0)     glEnableVertexAttribArray(shader->colorsAttribLocation);
    if(shader->texCoordsAttribLocation >= 0)  glEnableVertexAttribArray(shader->texCoordsAttribLocation);
    if(shader->normalsAttribLocation >= 0)    glEnableVertexAttribArray(shader->normalsAttribLocation);
+   if(shader->binormalsAttribLocation >= 0)  glEnableVertexAttribArray(shader->binormalsAttribLocation);
+   if(shader->tangetsAttribLocation >= 0)    glEnableVertexAttribArray(shader->tangetsAttribLocation);
 
    C_Mesh *mesh = meshes;
    while(mesh) {
@@ -327,8 +330,13 @@ C_MeshGroup::draw(C_Camera *camera)
       if(mesh->texture_diffuse && shader->textureUniformLocation_0 >= 0) {
          glActiveTexture(GL_TEXTURE0);
          glBindTexture(GL_TEXTURE_2D, mesh->texture_diffuse->getGLtextureID());
-//         glUniform1i(shader->textureUniformLocation_0, 0);
          shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_0, 0);
+
+         if(mesh->texture_normal) {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, mesh->texture_normal->getGLtextureID());
+            shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_1, 1);
+         }
       } else {
          glBindTexture(GL_TEXTURE_2D, 0);
       }
@@ -343,6 +351,8 @@ C_MeshGroup::draw(C_Camera *camera)
    if(shader->colorsAttribLocation >= 0)     glDisableVertexAttribArray(shader->colorsAttribLocation);
    if(shader->texCoordsAttribLocation >= 0)  glDisableVertexAttribArray(shader->texCoordsAttribLocation);
    if(shader->normalsAttribLocation >= 0)    glDisableVertexAttribArray(shader->normalsAttribLocation);
+   if(shader->binormalsAttribLocation >= 0)  glDisableVertexAttribArray(shader->binormalsAttribLocation);
+   if(shader->tangetsAttribLocation >= 0)    glDisableVertexAttribArray(shader->tangetsAttribLocation);
 
    shaderManager->popShader();
 
@@ -360,6 +370,8 @@ C_Mesh::draw(C_GLShader *shader)
    if(colors)     glVertexAttribPointer(shader->colorsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
    if(textCoords) glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, textCoords);
    if(normals)    glVertexAttribPointer(shader->normalsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, normals);
+   if(binormals)  glVertexAttribPointer(shader->binormalsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, binormals);
+   if(tangents)   glVertexAttribPointer(shader->tangetsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, tangents);
 
    if(!indices) {
       glDrawArrays(GL_TRIANGLES, 0, nVertices);
