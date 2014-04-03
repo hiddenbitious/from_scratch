@@ -51,11 +51,11 @@ calculateTBN(GLMmodel *model, GLMgroup *group)
       tindex2 = model->triangles[group->triangles[i]].tindices[1];
       tindex3 = model->triangles[group->triangles[i]].tindices[2];
 
-      dUV1.u = model->texcoords[3 * tindex2    ] - model->texcoords[3 * tindex1    ];
-      dUV1.v = model->texcoords[3 * tindex2 + 1] - model->texcoords[3 * tindex1 + 1];
+      dUV1.u = model->texcoords[2 * tindex2    ] - model->texcoords[2 * tindex1    ];
+      dUV1.v = model->texcoords[2 * tindex2 + 1] - model->texcoords[2 * tindex1 + 1];
 
-      dUV2.u = model->texcoords[3 * tindex3    ] - model->texcoords[3 * tindex1    ];
-      dUV2.v = model->texcoords[3 * tindex3 + 1] - model->texcoords[3 * tindex1 + 1];
+      dUV2.u = model->texcoords[2 * tindex3    ] - model->texcoords[2 * tindex1    ];
+      dUV2.v = model->texcoords[2 * tindex3 + 1] - model->texcoords[2 * tindex1 + 1];
 
       dV1.x = model->vertices[3 * vindex2    ] - model->vertices[3 * vindex1    ];
       dV1.y = model->vertices[3 * vindex2 + 1] - model->vertices[3 * vindex1 + 1];
