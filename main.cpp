@@ -92,7 +92,8 @@ Initializations(void)
    printf("FLT_MIN: %g\n", FLT_MIN);
 
 	/// Set clear color
-	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
+//	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
+	glClearColor(0.0, 0.0, 0.0, 1.0f);
 
 	/// Backface culling
 	glDisable(GL_CULL_FACE);
@@ -192,12 +193,6 @@ Draw(void)
 	camera.PrintText(0 , lineHeight * line++ ,
 					 1.0f , 1.0f , 0.0f , 0.6f ,
 					 "FPS: %d" , (int)fps);
-//	camera.PrintText(0, lineHeight * line++,
-//					 1.0f, 1.0f, 0.0f, 0.6f,
-//					 "PVS size: %d. Drawn: %d" , totalLeaves, leavesDrawn);
-//   camera.PrintText(0, lineHeight * line++,
-//					 1.0f, 1.0f, 0.0f, 0.6f,
-//					 "leaves drawn: %d", leavesDrawn);
 
 	/// Update timer
 	timer.Update ();

@@ -41,14 +41,19 @@ void C_Camera::Look(void)
 {
 	rotationQuaternion.QuaternionToMatrix16(&globalViewMatrix);
 
-//	esMatrixLoadIdentity(&globalModelviewMatrix);
-//	esMatrixLoadIdentity(&globalViewMatrix);
-
-//	esMatrixMultiply(&globalModelviewMatrix, &ESrotMatrix, &globalModelviewMatrix);
-//	esTranslate(&globalModelviewMatrix, -position.x, -position.y, -position.z);
-
-//	esMatrixMultiply(&globalViewMatrix, &ESrotMatrix, &Identity);
 	esTranslate(&globalViewMatrix, -position.x, -position.y, -position.z);
+
+/// Fixed pipeline
+/// --------------
+   C_Quaternion revQ;
+   rotationQuaternion.GetReverseQuat ( &revQ );
+   revQ.QuaternionToMatrix16 ( rotMatrix );
+
+   //Rotate and then translate.
+   glLoadIdentity ();
+   glMultMatrixf ( rotMatrix );
+   glTranslatef ( -position.x , -position.y , -position.z );
+/// --------------
 
 	if(updateFrustum) {
 		frustum->calculateFrustum();
@@ -162,23 +167,16 @@ void C_Camera::setProjection(int w , int h)
 	esMatrixLoadIdentity(&globalProjectionMatrix);
 	esPerspective(&globalProjectionMatrix, fov, float(w) / float(h), zNear, zFar);
 
-//	glMatrixMode(GL_PROJECTION);
-//	glLoadIdentity();
-//
-////	float ratio = float(w) / float(h);
-////	gluPerspective ( fov , ratio , zNear , zFar );
-//
-//	float aspect = (float)w / (float)h;
-//	float f = cos(fov * DEGREES_TO_RADIANS) / sin(fov * DEGREES_TO_RADIANS);
-//
-//	float projMatrix[16] = { f / aspect, 0.0f,	0.0f,									0.0f ,
-//							 0.0f,		 f,		0.0f,									0.0f ,
-//							 0.0f,		 0.0f,	(zFar + zNear) / (zNear - zFar),		-1.0f ,
-//							 0.0f,		 0.0f, 	(2 * zFar * zNear) / (zNear - zFar),	0.0f};
-//
-//	glMultMatrixf(projMatrix);
+/// Fixed pipeline
+/// --------------
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 
-//	glMatrixMode(GL_MODELVIEW);
+	float ratio = float(w) / float(h);
+	gluPerspective ( fov , ratio , zNear , zFar );
+
+	glMatrixMode(GL_MODELVIEW);
+/// --------------
 }
 
 void C_Camera::PrintText(int x , int y , float r , float g , float b, float a , const char *string , ...)
