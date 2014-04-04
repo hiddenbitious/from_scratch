@@ -139,8 +139,8 @@ C_Mesh::~C_Mesh(void)
    if(vertices)   delete[] vertices;
    if(textCoords) delete[] textCoords;
    if(normals)    delete[] normals;
-   if(tangents)   delete[] normals;
-   if(binormals)  delete[] normals;
+   if(tangents)   delete[] tangents;
+   if(binormals)  delete[] binormals;
    if(indices)    delete[] indices;
    if(texture_diffuse && !texture_diffuse->unrefTexture())     delete texture_diffuse;
    if(texture_normal && !texture_normal->unrefTexture())       delete texture_normal;
