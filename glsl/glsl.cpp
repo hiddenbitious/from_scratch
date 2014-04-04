@@ -418,7 +418,7 @@ bool C_GLShader::setUniform1i(const char* varname, GLint v0)
 //    if (!_noshader) return true;
 
 	GLint loc = GetUniLoc(varname);
-	if(loc == -1) { return false; } // can't find variable
+	if(loc == -1) { assert(0); return false; } // can't find variable
 
 	glUniform1i(loc, v0);
 
@@ -662,6 +662,10 @@ void C_GLShader::UpdateAttribLocations(void)
    textureUniformLocation_0 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_0);
    textureUniformLocation_1 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_1);
    textureUniformLocation_2 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_2);
+
+   textureDiffuseLocation_0   = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_DIFFUSE);
+   textureNormalMapLocation_1 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_NORMAL_MAP);
+   textureSpecularLocation_2  = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_SPECULAR);
 }
 
 C_GLShaderManager::C_GLShaderManager(void)

@@ -45,14 +45,14 @@ void C_Camera::Look(void)
 
 /// Fixed pipeline
 /// --------------
-   C_Quaternion revQ;
-   rotationQuaternion.GetReverseQuat ( &revQ );
-   revQ.QuaternionToMatrix16 ( rotMatrix );
-
-   //Rotate and then translate.
-   glLoadIdentity ();
-   glMultMatrixf ( rotMatrix );
-   glTranslatef ( -position.x , -position.y , -position.z );
+//   C_Quaternion revQ;
+//   rotationQuaternion.GetReverseQuat ( &revQ );
+//   revQ.QuaternionToMatrix16 ( rotMatrix );
+//
+//   //Rotate and then translate.
+//   glLoadIdentity ();
+//   glMultMatrixf ( rotMatrix );
+//   glTranslatef ( -position.x , -position.y , -position.z );
 /// --------------
 
 	if(updateFrustum) {
@@ -169,13 +169,13 @@ void C_Camera::setProjection(int w , int h)
 
 /// Fixed pipeline
 /// --------------
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	float ratio = float(w) / float(h);
-	gluPerspective ( fov , ratio , zNear , zFar );
-
-	glMatrixMode(GL_MODELVIEW);
+//	glMatrixMode(GL_PROJECTION);
+//	glLoadIdentity();
+//
+//	float ratio = float(w) / float(h);
+//	gluPerspective ( fov , ratio , zNear , zFar );
+//
+//	glMatrixMode(GL_MODELVIEW);
 /// --------------
 }
 

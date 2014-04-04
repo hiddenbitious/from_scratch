@@ -386,11 +386,11 @@ C_MeshGroup::draw(C_Camera *camera)
 	esMatrixMultiply(&globalMVPMatrix, &mat, &globalProjectionMatrix);
 
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
+//   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
 //   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MVP_MATRIX, 1, GL_FALSE, (GLfloat *)&globalMVPMatrix.m[0][0]);
 
-   wallShader->setUniform3f("u_lightPosition", lightPosition.x, lightPosition.y, lightPosition.z);
+   wallShader->setUniform3f("u_lightPosition_eyeSpace", lightPosition.x, lightPosition.y, lightPosition.z);
 
    if(shader->verticesAttribLocation >= 0)   glEnableVertexAttribArray(shader->verticesAttribLocation);
    if(shader->colorsAttribLocation >= 0)     glEnableVertexAttribArray(shader->colorsAttribLocation);
@@ -402,16 +402,22 @@ C_MeshGroup::draw(C_Camera *camera)
    C_Mesh *mesh = meshes;
    while(mesh) {
       /// If mesh has texture enable it
-      if(mesh->texture_diffuse && shader->textureUniformLocation_0 >= 0) {
+      if(mesh->texture_diffuse) {
          glActiveTexture(GL_TEXTURE0);
          glBindTexture(GL_TEXTURE_2D, mesh->texture_diffuse->getGLtextureID());
-         shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_0, 0);
+         shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_DIFFUSE, 0);
 
          if(mesh->texture_normal) {
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, mesh->texture_normal->getGLtextureID());
-            shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_1, 1);
+            shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_NORMAL_MAP, 1);
          }
+
+//         if(mesh->texture_specular) {
+//            glActiveTexture(GL_TEXTURE1);
+//            glBindTexture(GL_TEXTURE_2D, mesh->texture_specular->getGLtextureID());
+//            shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_SPECULAR, 2);
+//         }
       } else {
          glBindTexture(GL_TEXTURE_2D, 0);
       }

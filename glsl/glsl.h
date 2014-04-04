@@ -39,6 +39,7 @@
 
 #define UNIFORM_VARIABLE_NAME_TEXTURE_DIFFUSE      "u_texture_diffuse"
 #define UNIFORM_VARIABLE_NAME_TEXTURE_NORMAL_MAP   "u_texture_normal_map"
+#define UNIFORM_VARIABLE_NAME_TEXTURE_SPECULAR     "u_texture_specular"
 
 using namespace std;
 class C_GLShader;
@@ -127,6 +128,7 @@ public:
    GLint verticesAttribLocation, normalsAttribLocation, texCoordsAttribLocation, colorsAttribLocation;
    GLint tangetsAttribLocation, binormalsAttribLocation;
    GLint textureUniformLocation_0, textureUniformLocation_1, textureUniformLocation_2;
+   GLint textureDiffuseLocation_0, textureNormalMapLocation_1, textureSpecularLocation_2;
 
 protected:
    char *linkerLog;

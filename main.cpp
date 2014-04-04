@@ -96,8 +96,8 @@ Initializations(void)
 //	glClearColor(0.0, 0.0, 0.0, 1.0f);
 
 	/// Backface culling
-	glDisable(GL_CULL_FACE);
-//	glEnable(GL_CULL_FACE);
+//	glDisable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 //	glFrontFace(GL_CW);
 //	glCullFace(GL_BACK);
 
@@ -188,7 +188,7 @@ Draw(void)
 	cube.position.y = camera.position.y;
 	cube.position.z = camera.position.z + offset.z;
 
-	lightPosition = cube.position;
+	lightPosition = math::transformPoint(&globalViewMatrix, &cube.position);
 
 	angle += .05f;
 	if(angle >= 360.0f) angle = 0.0f;
