@@ -80,9 +80,9 @@ calculateTBN(GLMmodel *model, GLMgroup *group)
       model->tangents[3 * vindex3 + 2] = model->tangents[3 * vindex1 + 2];
 
 
-      model->binormals[3 * vindex1    ] += (dV2.x * dUV1.u - dV1.x * dUV2.u) * rcp;
-      model->binormals[3 * vindex1 + 1] += (dV2.y * dUV1.u - dV1.y * dUV2.u) * rcp;
-      model->binormals[3 * vindex1 + 2] += (dV2.z * dUV1.u - dV1.z * dUV2.u) * rcp;
+      model->binormals[3 * vindex1    ] -= (dV2.x * dUV1.u - dV1.x * dUV2.u) * rcp;
+      model->binormals[3 * vindex1 + 1] -= (dV2.y * dUV1.u - dV1.y * dUV2.u) * rcp;
+      model->binormals[3 * vindex1 + 2] -= (dV2.z * dUV1.u - dV1.z * dUV2.u) * rcp;
 
       model->binormals[3 * vindex2    ] = model->binormals[3 * vindex1    ];
       model->binormals[3 * vindex2 + 1] = model->binormals[3 * vindex1 + 1];
