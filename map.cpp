@@ -61,6 +61,8 @@ C_Map::createMap(const char *filename)
 bool
 C_Map::placeObjects(void)
 {
+   static float scale = 1.07f;
+
    ESMatrix mat;
    for(int x = 0; x < TILES_ON_X; x++) {
       for(int y = 0; y < TILES_ON_Y; y++) {
@@ -73,6 +75,7 @@ C_Map::placeObjects(void)
             esMatrixLoadIdentity(&mat);
 
             esTranslate(&mat, (float)(y + 1) * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+            esScale(&mat, scale, scale, scale);
             esRotate(&mat, 180.0f, 0.0f, 1.0f, 0.0f);
             bspTree->insertStaticObject(&wallMesh, &mat);
          }
@@ -82,6 +85,7 @@ C_Map::placeObjects(void)
             esMatrixLoadIdentity(&mat);
 
             esTranslate(&mat, (float)(y+1) * TILE_SIZE, 0.0f, (float)(x+1) * TILE_SIZE);
+            esScale(&mat, scale, scale, scale);
             esRotate(&mat, 270.0f, 0.0f, 1.0f, 0.0f);
             bspTree->insertStaticObject(&wallMesh, &mat);
          }
@@ -91,6 +95,7 @@ C_Map::placeObjects(void)
             esMatrixLoadIdentity(&mat);
 
             esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)(x+1) * TILE_SIZE);
+            esScale(&mat, scale, scale, scale);
             bspTree->insertStaticObject(&wallMesh, &mat);
          }
 
@@ -99,6 +104,7 @@ C_Map::placeObjects(void)
             esMatrixLoadIdentity(&mat);
 
             esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+            esScale(&mat, scale, scale, scale);
             esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
             bspTree->insertStaticObject(&wallMesh, &mat);
          }
