@@ -222,17 +222,17 @@ C_Mesh::applyTransformationOnVertices(const ESMatrix *mat)
       vertices[i] = math::transformPoint(mat, &vertices[i]);
 
       if(normals) {
-         normals[i] = math::transformPoint(mat, &normals[i]);
+         normals[i] = math::transformNormal(mat, &normals[i]);
          math::Normalize(&normals[i]);
       }
 
       if(binormals) {
-         binormals[i] = math::transformPoint(mat, &binormals[i]);
+         binormals[i] = math::transformNormal(mat, &binormals[i]);
          math::Normalize(&binormals[i]);
       }
 
       if(tangents) {
-         tangents[i] = math::transformPoint(mat, &tangents[i]);
+         tangents[i] = math::transformNormal(mat, &tangents[i]);
          math::Normalize(&tangents[i]);
       }
    }
@@ -386,11 +386,11 @@ C_MeshGroup::draw(C_Camera *camera)
 	esMatrixMultiply(&globalMVPMatrix, &mat, &globalProjectionMatrix);
 
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-//   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
+//   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODEL_MATRIX, 1, GL_FALSE, (GLfloat *)&matrix.m[0][0]);
 //   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MVP_MATRIX, 1, GL_FALSE, (GLfloat *)&globalMVPMatrix.m[0][0]);
 
-   wallShader->setUniform3f("u_lightPosition_eyeSpace", lightPosition.x, lightPosition.y, lightPosition.z);
+   wallShader->setUniform3f("u_lightPosition_es", lightPosition.x, lightPosition.y, lightPosition.z);
 
    if(shader->verticesAttribLocation >= 0)   glEnableVertexAttribArray(shader->verticesAttribLocation);
    if(shader->colorsAttribLocation >= 0)     glEnableVertexAttribArray(shader->colorsAttribLocation);

@@ -67,46 +67,50 @@ C_Map::placeObjects(void)
    for(int x = 0; x < TILES_ON_X; x++) {
       for(int y = 0; y < TILES_ON_Y; y++) {
 
-         if(tiles[x][y].getType() != TILE_WALL)
-            continue;
+         if(tiles[x][y].getType() == TILE_WALL) {
+            /// Left wall
+            if(x > 0 && tiles[x-1][y].getArea() == AREA_WALKABLE) {
+               esMatrixLoadIdentity(&mat);
 
-         /// Left wall
-         if(x > 0 && tiles[x-1][y].getArea() == AREA_WALKABLE) {
-            esMatrixLoadIdentity(&mat);
+               esTranslate(&mat, (float)(y + 1) * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+               esScale(&mat, scale, scale, scale);
+               esRotate(&mat, 180.0f, 0.0f, 1.0f, 0.0f);
+               bspTree->insertStaticObject(&wallMesh, &mat);
+            }
 
-            esTranslate(&mat, (float)(y + 1) * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
-            esScale(&mat, scale, scale, scale);
-            esRotate(&mat, 180.0f, 0.0f, 1.0f, 0.0f);
-            bspTree->insertStaticObject(&wallMesh, &mat);
-         }
+            /// Upper wall
+            if(y < TILES_ON_Y - 1 && tiles[x][y+1].getArea() == AREA_WALKABLE) {
+               esMatrixLoadIdentity(&mat);
 
-         /// Upper wall
-         if(y < TILES_ON_Y - 1 && tiles[x][y+1].getArea() == AREA_WALKABLE) {
-            esMatrixLoadIdentity(&mat);
+               esTranslate(&mat, (float)(y+1) * TILE_SIZE, 0.0f, (float)(x+1) * TILE_SIZE);
+               esScale(&mat, scale, scale, scale);
+               esRotate(&mat, 270.0f, 0.0f, 1.0f, 0.0f);
+               bspTree->insertStaticObject(&wallMesh, &mat);
+            }
 
-            esTranslate(&mat, (float)(y+1) * TILE_SIZE, 0.0f, (float)(x+1) * TILE_SIZE);
-            esScale(&mat, scale, scale, scale);
-            esRotate(&mat, 270.0f, 0.0f, 1.0f, 0.0f);
-            bspTree->insertStaticObject(&wallMesh, &mat);
-         }
+            /// Right wall
+            if(x < TILES_ON_X - 1 && tiles[x+1][y].getArea() == AREA_WALKABLE) {
+               esMatrixLoadIdentity(&mat);
 
-         /// Right wall
-         if(x < TILES_ON_X - 1 && tiles[x+1][y].getArea() == AREA_WALKABLE) {
-            esMatrixLoadIdentity(&mat);
+               esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)(x+1) * TILE_SIZE);
+               esScale(&mat, scale, scale, scale);
+               bspTree->insertStaticObject(&wallMesh, &mat);
+            }
 
-            esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)(x+1) * TILE_SIZE);
-            esScale(&mat, scale, scale, scale);
-            bspTree->insertStaticObject(&wallMesh, &mat);
-         }
+            /// Bottom wall
+            if(y > 0 && tiles[x][y-1].getArea() == AREA_WALKABLE) {
+               esMatrixLoadIdentity(&mat);
 
-         /// Bottom wall
-         if(y > 0 && tiles[x][y-1].getArea() == AREA_WALKABLE) {
+               esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+               esScale(&mat, scale, scale, scale);
+               esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
+               bspTree->insertStaticObject(&wallMesh, &mat);
+            }
+         } else if(tiles[x][y].getArea() == AREA_WALKABLE) {
             esMatrixLoadIdentity(&mat);
 
             esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
-            esScale(&mat, scale, scale, scale);
-            esRotate(&mat, 90.0f, 0.0f, 1.0f, 0.0f);
-            bspTree->insertStaticObject(&wallMesh, &mat);
+            bspTree->insertStaticObject(&floorMesh, &mat);
          }
       }
    }
@@ -127,18 +131,36 @@ C_Map::load3DObjects(void)
    wallMesh.loadFromFile("wallMeshes/wall_01.obj");
    wallMesh.shader = wallShader;
 
-   /// Scale object
+   floorMesh.loadFromFile("wallMeshes/floor_01.obj");
+   floorMesh.shader = wallShader;
+
+   /// Scale wall mesh
    C_Vertex min, max;
    wallMesh.bbox.GetMax(&max);
    wallMesh.bbox.GetMin(&min);
    float xLen = max.x - min.x;
    float zLen = max.z - min.z;
    float scale = TILE_SIZE / MAX(xLen, zLen);
+   /// Scale it to fit TILE_SIZE
    ESMatrix matrix = Identity;
    esScale(&matrix, scale, scale, scale);
+   /// Orient it to face down the +z
    if(zLen > xLen)
       esRotate(&matrix, 270.0f, 0.0f, 1.0f, 0.0f);
    wallMesh.applyTransformationOnVertices(&matrix);
+
+   /// Scale floor mesh
+   floorMesh.bbox.GetMax(&max);
+   floorMesh.bbox.GetMin(&min);
+   xLen = max.x - min.x;
+   zLen = max.z - min.z;
+   scale = TILE_SIZE / MAX(xLen, zLen);
+   matrix = Identity;
+   /// Translate it a bit
+   esTranslate(&matrix, TILE_SIZE / 2.0f, 0.0f, TILE_SIZE / 2.0f);
+   /// Scale it to fit TILE_SIZE
+   esScale(&matrix, scale, scale, scale);
+   floorMesh.applyTransformationOnVertices(&matrix);
 
    return true;
 }
@@ -150,7 +172,7 @@ C_Map::draw(C_Camera *camera)
 
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-   wallMesh.draw(camera);
+   floorMesh.draw(camera);
    mapPolys = bspTree->Draw_PVS(camera);
 
 

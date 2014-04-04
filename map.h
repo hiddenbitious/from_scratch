@@ -20,7 +20,7 @@ public:
 private:
    C_BspTree *bspTree;
    C_MeshGroup wallMesh;
-
+   C_MeshGroup floorMesh;
 
    /// All map tiles
    tile tiles[TILES_ON_X][TILES_ON_Y];

@@ -82,6 +82,18 @@ math::transformPoint(const ESMatrix *matrix, const C_Vertex *point)
    return transformedPoint;
 }
 
+C_Vertex
+math::transformNormal(const ESMatrix *matrix, const C_Vertex *point)
+{
+   C_Vertex transformedPoint;
+
+   transformedPoint.x = point->x * matrix->m[0][0] + point->y * matrix->m[1][0] + point->z * matrix->m[2][0];
+   transformedPoint.y = point->x * matrix->m[0][1] + point->y * matrix->m[1][1] + point->z * matrix->m[2][1];
+   transformedPoint.z = point->x * matrix->m[0][2] + point->y * matrix->m[1][2] + point->z * matrix->m[2][2];
+
+   return transformedPoint;
+}
+
 C_Vector3
 math::transformPoint(const ESMatrix *matrix, const C_Vector3 *point)
 {

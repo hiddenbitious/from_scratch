@@ -92,8 +92,8 @@ Initializations(void)
    printf("FLT_MIN: %g\n", FLT_MIN);
 
 	/// Set clear color
-	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
-//	glClearColor(0.0, 0.0, 0.0, 1.0f);
+//	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
+	glClearColor(0.0, 0.0, 0.0, 1.0f);
 
 	/// Backface culling
 //	glDisable(GL_CULL_FACE);
@@ -190,7 +190,7 @@ Draw(void)
 
 	lightPosition = math::transformPoint(&globalViewMatrix, &cube.position);
 
-	angle += .05f;
+	angle += .03f;
 	if(angle >= 360.0f) angle = 0.0f;
 
 	cube.draw(&camera);

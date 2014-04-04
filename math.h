@@ -41,6 +41,7 @@ namespace math {
    float Magnitude(float x , float y , float z);
    float PointToPointDistance(C_Vertex *p1 , C_Vertex *p2);
    C_Vertex transformPoint(const ESMatrix *matrix, const C_Vertex *point);
+   C_Vertex transformNormal(const ESMatrix *matrix, const C_Vertex *point);
    C_Vector3 transformPoint(const ESMatrix *matrix, const C_Vector3 *point);
    C_Vertex CrossProduct(const C_Vertex* v1 , const C_Vertex* v2 , const C_Vertex* v3);
    C_Vertex CrossProduct(const C_Vertex* v1 , const C_Vertex* v2);
