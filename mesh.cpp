@@ -153,7 +153,7 @@ C_MeshGroup::C_MeshGroup(void)
 
    meshes = NULL;
    nMeshes = 0;
-   esMatrixLoadIdentity(&matrix);
+   matrix = Identity;
 }
 
 C_MeshGroup::~C_MeshGroup(void)
@@ -220,9 +220,21 @@ C_Mesh::applyTransformationOnVertices(const ESMatrix *mat)
 
    for (int i = 0; i < nVertices; i++) {
       vertices[i] = math::transformPoint(mat, &vertices[i]);
-      normals[i] = math::transformPoint(mat, &normals[i]);
 
-      math::Normalize(&normals[i]);
+      if(normals) {
+         normals[i] = math::transformPoint(mat, &normals[i]);
+         math::Normalize(&normals[i]);
+      }
+
+      if(binormals) {
+         binormals[i] = math::transformPoint(mat, &binormals[i]);
+         math::Normalize(&binormals[i]);
+      }
+
+      if(tangents) {
+         tangents[i] = math::transformPoint(mat, &tangents[i]);
+         math::Normalize(&tangents[i]);
+      }
    }
 }
 
