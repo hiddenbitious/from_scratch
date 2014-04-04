@@ -92,6 +92,29 @@ calculateTBN(GLMmodel *model, GLMgroup *group)
       model->binormals[3 * vindex3 + 1] = model->binormals[3 * vindex1 + 1];
       model->binormals[3 * vindex3 + 2] = model->binormals[3 * vindex1 + 2];
 
+///      This code should give the same tangents as the code above
+//      C_Vertex normal = {model->normals[3 * vindex1    ],
+//                         model->normals[3 * vindex1 + 1],
+//                         model->normals[3 * vindex1 + 2]};
+//
+//      C_Vertex binormal = {model->binormals[3 * vindex1    ],
+//                           model->binormals[3 * vindex1 + 1],
+//                           model->binormals[3 * vindex1 + 2]};
+//
+//      C_Vertex tangent = math::CrossProduct(&binormal, &normal);
+//
+//      model->tangents[3 * vindex1    ] += tangent.x;
+//      model->tangents[3 * vindex1 + 1] += tangent.y;
+//      model->tangents[3 * vindex1 + 2] += tangent.z;
+//
+//      model->tangents[3 * vindex2    ] += tangent.x;
+//      model->tangents[3 * vindex2 + 1] += tangent.y;
+//      model->tangents[3 * vindex2 + 2] += tangent.z;
+//
+//      model->tangents[3 * vindex3    ] += tangent.x;
+//      model->tangents[3 * vindex3 + 1] += tangent.y;
+//      model->tangents[3 * vindex3 + 2] += tangent.z;
+
       ++counters[vindex1];
       ++counters[vindex2];
       ++counters[vindex3];
@@ -153,6 +176,15 @@ calculateTBN(GLMmodel *model, GLMgroup *group)
       math::Normalize(&model->binormals[3 * vindex3    ],
                       &model->binormals[3 * vindex3 + 1],
                       &model->binormals[3 * vindex3 + 2]);
+
+//      printf("normal:\n");
+//      printf("  %f %f %f\n", model->normals[3 * vindex1], model->normals[3 * vindex1 + 1], model->normals[3 * vindex1 + 2]);
+//
+//      printf("tangent:\n");
+//      printf("  %f %f %f\n", model->tangents[3 * vindex1], model->tangents[3 * vindex1 + 1], model->tangents[3 * vindex1 + 2]);
+//
+//      printf("tangent:\n");
+//      printf("  %f %f %f\n\n", model->binormals[3 * vindex1], model->binormals[3 * vindex1 + 1], model->binormals[3 * vindex1 + 2]);
    }
 
    delete[] counters;
