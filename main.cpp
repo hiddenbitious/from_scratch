@@ -142,20 +142,17 @@ Initializations(void)
 	bspShader = shaderManager->LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
    assert(bspShader->verticesAttribLocation >= 0);
    assert(bspShader->normalsAttribLocation >= 0);
-
-   basicShader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
-   assert(basicShader->verticesAttribLocation >= 0);
-   assert(basicShader->normalsAttribLocation == -1);
-
-   pointShader = shaderManager->LoadShaderProgram("shaders/points_shader.vert", "shaders/points_shader.frag");
-   assert(pointShader->verticesAttribLocation >= 0);
-   assert(pointShader->normalsAttribLocation == -1);
+//
+//   basicShader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
+//   assert(basicShader->verticesAttribLocation >= 0);
+//   assert(basicShader->normalsAttribLocation == -1);
+//
+//   pointShader = shaderManager->LoadShaderProgram("shaders/points_shader.vert", "shaders/points_shader.frag");
+//   assert(pointShader->verticesAttribLocation >= 0);
+//   assert(pointShader->normalsAttribLocation == -1);
 
    wallShader = shaderManager->LoadShaderProgram("shaders/shader1.vert", "shaders/shader1.frag");
    assert(wallShader->verticesAttribLocation >= 0);
-//   assert(wallShader->normalsAttribLocation == -1);
-//   assert(wallShader->textureUniformLocation_0 >= 0);
-//   assert(wallShader->textureUniformLocation_1 == -1);
 
    /// Texture manager
    textureManager = C_TextureManager::getSingleton();
@@ -170,10 +167,18 @@ Initializations(void)
 }
 
 static void
+shutdown(void)
+{
+   delete shaderManager;
+
+   map.~C_Map();
+}
+
+static void
 Draw(void)
 {
    static float angle = 0.0f;
-   static float radius = 10.0f;
+   static float radius = 4.0f;
    C_Vertex offset;
 	/// Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -257,7 +262,7 @@ hande_simple_keys(unsigned char key , int x , int y)
 {
 	switch(key) {
 		case 27 : case 13 :	//ESC
-		   map.~C_Map();
+		   shutdown();
 			exit(0);
 			break;
 
