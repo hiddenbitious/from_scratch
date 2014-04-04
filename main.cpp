@@ -31,7 +31,7 @@ using namespace std;
 
 int mapPolys;
 static C_Map map;
-C_Vertex lightPosition = {4.0f, 0.0f, 4.0f};
+C_Vertex lightPosition;
 C_MeshGroup cube;
 
 /// Global variables
@@ -92,8 +92,8 @@ Initializations(void)
    printf("FLT_MIN: %g\n", FLT_MIN);
 
 	/// Set clear color
-//	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
-	glClearColor(0.0, 0.0, 0.0, 1.0f);
+	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
+//	glClearColor(0.0, 0.0, 0.0, 1.0f);
 
 	/// Backface culling
 	glDisable(GL_CULL_FACE);
@@ -172,16 +172,27 @@ Initializations(void)
 static void
 Draw(void)
 {
+   static float angle = 0.0f;
+   static float radius = 10.0f;
+   C_Vertex offset;
 	/// Clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	camera.Look();
 
-	cube.position.x = camera.position.x + 4.0f;
+   offset.x = radius * cos(angle);
+   offset.z = radius * sin(angle);
+   offset.y = 0.0f;
+
+	cube.position.x = camera.position.x + offset.x;
 	cube.position.y = camera.position.y;
-	cube.position.z = camera.position.z + 4.0f;
-//	lightPosition = cube.position;
-   wallShader->setUniform3f("u_lightPosition", lightPosition.x, lightPosition.y, lightPosition.z);
+	cube.position.z = camera.position.z + offset.z;
+
+	lightPosition = cube.position;
+
+	angle += .05f;
+	if(angle >= 360.0f) angle = 0.0f;
+
 	cube.draw(&camera);
 
    map.draw(&camera);

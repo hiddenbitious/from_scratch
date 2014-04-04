@@ -124,7 +124,7 @@ extern C_GLShader *bspShader;
 extern C_GLShader *basicShader;
 extern C_GLShader *pointShader;
 extern C_GLShader *wallShader;
-
+extern C_Vertex lightPosition;
 extern char MAX_THREADS;
 
 #endif

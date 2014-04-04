@@ -392,7 +392,7 @@ bool C_GLShader::setUniform3f(const char* varname, GLfloat v0, GLfloat v1, GLflo
 //    if (!_noshader) return true;
 
 	GLint loc = GetUniLoc(varname);
-	if(loc == -1) { return false; } // can't find variable
+	if(loc == -1) { assert(0); return false; } // can't find variable
 
 	glUniform3f(loc, v0, v1, v2);
 

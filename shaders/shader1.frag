@@ -15,6 +15,4 @@ void main(void) {
 
    vec4 diffuseMaterial = texture2D(u_texture_0, v_texCoords);
    gl_FragColor = diffuseMaterial * lightColor * lamberFactor;
-
-//   gl_FragColor = texture2D(u_texture_0, v_texCoords) * normalize(v_normals);
 }
