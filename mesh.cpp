@@ -300,6 +300,67 @@ C_MeshGroup::loadFromFile(const char *filename)
 }
 
 void
+C_MeshGroup::drawNormals(C_Camera *camera)
+{
+   glUseProgram(0);
+
+   glPushMatrix();
+   glTranslatef(position.x, position.y, position.z);
+
+   C_Mesh *mesh = meshes;
+   while(mesh) {
+      mesh->drawNormals();
+      mesh = mesh->next;
+   }
+
+   glPopMatrix();
+}
+
+void
+C_Mesh::drawNormals(void)
+{
+   glBegin(GL_LINES);
+   for(unsigned int i = 0; i < nTriangles; i++) {
+      /// Draw normals
+      glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+
+      glVertex3f(vertices[3 * i].x, vertices[3 * i].y, vertices[3 * i].z);
+      glVertex3f(vertices[3 * i].x + normals[3 * i].x, vertices[3 * i].y + normals[3 * i].y, vertices[3 * i].z + normals[3 * i].z);
+
+      glVertex3f(vertices[3 * i + 1].x, vertices[3 * i + 1].y, vertices[3 * i + 1].z);
+      glVertex3f(vertices[3 * i + 1].x + normals[3 * i + 1].x, vertices[3 * i + 1].y + normals[3 * i + 1].y, vertices[3 * i + 1].z + normals[3 * i + 1].z);
+
+      glVertex3f(vertices[3 * i + 2].x, vertices[3 * i + 2].y, vertices[3 * i + 2].z);
+      glVertex3f(vertices[3 * i + 2].x + normals[3 * i + 2].x, vertices[3 * i + 2].y + normals[3 * i + 2].y, vertices[3 * i + 2].z + normals[3 * i + 2].z);
+
+      /// Draw tangents
+      glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+
+      glVertex3f(vertices[3 * i].x, vertices[3 * i].y, vertices[3 * i].z);
+      glVertex3f(vertices[3 * i].x + tangents[3 * i].x, vertices[3 * i].y + tangents[3 * i].y, vertices[3 * i].z + tangents[3 * i].z);
+
+      glVertex3f(vertices[3 * i + 1].x, vertices[3 * i + 1].y, vertices[3 * i + 1].z);
+      glVertex3f(vertices[3 * i + 1].x + tangents[3 * i + 1].x, vertices[3 * i + 1].y + tangents[3 * i + 1].y, vertices[3 * i + 1].z + tangents[3 * i + 1].z);
+
+      glVertex3f(vertices[3 * i + 2].x, vertices[3 * i + 2].y, vertices[3 * i + 2].z);
+      glVertex3f(vertices[3 * i + 2].x + tangents[3 * i + 2].x, vertices[3 * i + 2].y + tangents[3 * i + 2].y, vertices[3 * i + 2].z + tangents[3 * i + 2].z);
+
+      /// Draw binormals
+      glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+
+      glVertex3f(vertices[3 * i].x, vertices[3 * i].y, vertices[3 * i].z);
+      glVertex3f(vertices[3 * i].x + binormals[3 * i].x, vertices[3 * i].y + binormals[3 * i].y, vertices[3 * i].z + binormals[3 * i].z);
+
+      glVertex3f(vertices[3 * i + 1].x, vertices[3 * i + 1].y, vertices[3 * i + 1].z);
+      glVertex3f(vertices[3 * i + 1].x + binormals[3 * i + 1].x, vertices[3 * i + 1].y + binormals[3 * i + 1].y, vertices[3 * i + 1].z + binormals[3 * i + 1].z);
+
+      glVertex3f(vertices[3 * i + 2].x, vertices[3 * i + 2].y, vertices[3 * i + 2].z);
+      glVertex3f(vertices[3 * i + 2].x + binormals[3 * i + 2].x, vertices[3 * i + 2].y + binormals[3 * i + 2].y, vertices[3 * i + 2].z + binormals[3 * i + 2].z);
+   }
+   glEnd();
+}
+
+void
 C_MeshGroup::draw(C_Camera *camera)
 {
 //   if(camera && !camera->frustum->cubeInFrustum(&bbox)) {

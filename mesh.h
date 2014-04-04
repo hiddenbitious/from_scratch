@@ -47,6 +47,7 @@ public:
    int unRefMesh(void);
 
    void draw(C_GLShader *shader);
+   void drawNormals(void);
    void calculateBbox(void);
    void applyTransformationOnVertices(const ESMatrix *mat);
 };
@@ -67,6 +68,7 @@ public:
    C_Mesh *addMesh(void);        /// Creates a new mesh, adds it in the linked list and returns
                                  /// a pointer to it
    void draw(C_Camera *camera);
+   void drawNormals(C_Camera *camera);
    void calculateBbox(void);
    void applyTransformationOnVertices(const ESMatrix *mat);
    bool loadFromFile(const char *filename);
