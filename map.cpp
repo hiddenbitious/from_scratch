@@ -72,7 +72,8 @@ C_Map::placeObjects(void)
          if(x > 0 && tiles[x-1][y].getArea() == AREA_WALKABLE) {
             esMatrixLoadIdentity(&mat);
 
-            esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+            esTranslate(&mat, (float)(y + 1) * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+            esRotate(&mat, 180.0f, 0.0f, 1.0f, 0.0f);
             bspTree->insertStaticObject(&wallMesh, &mat);
          }
 
