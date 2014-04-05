@@ -13,6 +13,8 @@ C_GLShaderManager *C_GLShaderManager::classInstance = NULL;
 
 C_GLShaderObject::C_GLShaderObject(void)
 {
+   PRINT_FUNC_ENTRY;
+
 	type = NO_SHADER;
 	shaderObject = 0;
 	sourceBytes = 0;
@@ -23,6 +25,8 @@ C_GLShaderObject::C_GLShaderObject(void)
 
 C_GLShaderObject::~C_GLShaderObject(void)
 {
+   PRINT_FUNC_ENTRY;
+
 	if(shaderSource != NULL) {
 		delete[] shaderSource;
 	}
@@ -160,6 +164,8 @@ bool C_GLShaderObject::compile(bool printSource)
 
 C_GLVertexShader::C_GLVertexShader(void)
 {
+   PRINT_FUNC_ENTRY;
+
 	type = VERTEX_SHADER;
 
 	if(glslAvailable) {
@@ -169,11 +175,15 @@ C_GLVertexShader::C_GLVertexShader(void)
 
 C_GLVertexShader::~C_GLVertexShader(void)
 {
+   PRINT_FUNC_ENTRY;
+
    glDeleteShader(shaderObject);
 }
 
 C_GLFragmentShader::C_GLFragmentShader(void)
 {
+   PRINT_FUNC_ENTRY;
+
 	type = FRAGMENT_SHADER;
 
 	if(glslAvailable) {
@@ -183,6 +193,8 @@ C_GLFragmentShader::C_GLFragmentShader(void)
 
 C_GLFragmentShader::~C_GLFragmentShader(void)
 {
+   PRINT_FUNC_ENTRY;
+
    glDeleteShader(shaderObject);
 }
 //-------------------------------------------------------------
@@ -190,6 +202,8 @@ C_GLFragmentShader::~C_GLFragmentShader(void)
 //-------------------------------------------------------------
 C_GLShader::C_GLShader(void)
 {
+   PRINT_FUNC_ENTRY;
+
 	programObject = 0;
 	isLinked = false;
 	inUse = false;
@@ -208,6 +222,8 @@ C_GLShader::C_GLShader(void)
 //-------------------------------------------------------------
 C_GLShader::~C_GLShader(void)
 {
+   PRINT_FUNC_ENTRY;
+
 	if(glslAvailable) {
 		for(int i = 0; i < nShaders; i++) {
 			glDetachShader(programObject , shaderList[i]->shaderObject);
@@ -670,11 +686,15 @@ void C_GLShader::UpdateAttribLocations(void)
 
 C_GLShaderManager::C_GLShaderManager(void)
 {
+   PRINT_FUNC_ENTRY;
+
 //	shaderList = NULL;
 }
 
 C_GLShaderManager::~C_GLShaderManager(void)
 {
+   PRINT_FUNC_ENTRY;
+
    for(unsigned int i = 0; i < shaderList.size(); ++i) {
       delete shaderList[i];
    }
@@ -1048,6 +1068,13 @@ bool CheckGLSL(void)
 		glslAvailable = false;
 	} else {
 		cout << "GL_ARB_shader_objects extension is available!" << endl;
+	}
+
+	if(GL_TRUE != glewGetExtension("GL_EXT_framebuffer_object")) {
+		cout << "GL_EXT_framebuffer_object extension is not available!" << endl;
+		glslAvailable = false;
+	} else {
+		cout << "GL_EXT_framebuffer_object extension is available!" << endl;
 	}
 
 	if(glslAvailable) {

@@ -14,6 +14,8 @@
 
 C_BspNode::C_BspNode(void)
 {
+   PRINT_FUNC_ENTRY;
+
    isLeaf = false;
    nodeID = 0;
    nPolys = 0;
@@ -30,6 +32,8 @@ C_BspNode::C_BspNode(void)
 
 C_BspNode::C_BspNode(poly_t** geometry , int nPolys)
 {
+   PRINT_FUNC_ENTRY;
+
    this->geometry = geometry;
    isLeaf = false;
    nodeID = 0;
@@ -46,7 +50,7 @@ C_BspNode::C_BspNode(poly_t** geometry , int nPolys)
 
 C_BspNode::~C_BspNode()
 {
-    PRINT_FUNC_ENTRY;
+   PRINT_FUNC_ENTRY;
 
    delete frontNode;
    delete backNode;

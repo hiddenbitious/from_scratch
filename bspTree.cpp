@@ -15,6 +15,8 @@ int nConvexRooms;
 
 C_BspTree::C_BspTree(USHORT depth)
 {
+   PRINT_FUNC_ENTRY;
+
 	nBrushes = 0;
 	nPolys = 0;
 	scaleFactor = 1.0f;

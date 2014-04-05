@@ -4,6 +4,8 @@
 
 C_Map::C_Map(void)
 {
+   PRINT_FUNC_ENTRY;
+
    bspTree = NULL;
 
    for(int x = 0; x < TILES_ON_X; x++) {
@@ -19,6 +21,7 @@ C_Map::C_Map(void)
 C_Map::~C_Map()
 {
    PRINT_FUNC_ENTRY;
+
    if(bspTree) {
       delete bspTree;
       bspTree = NULL;
