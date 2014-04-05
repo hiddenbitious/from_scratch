@@ -6,6 +6,14 @@
 
 #define FILENAME_LEN    128
 
+typedef enum {TEXTURE_NEAREST,      /// GL_NEAREST
+              TEXTURE_LINEAR,       /// GL_LINEAR
+              TEXTURE_BILINEAR,     /// GL_LINEAR_MIPMAP_NEAREST
+              TEXTURE_TRILINEAR,    /// GL_LINEAR_MIPMAP_LINEAR
+
+              MAX_FILTERING_METHODS
+              } filtering_method_t;
+
 class C_TextureManager;
 
 class C_Texture
@@ -27,7 +35,7 @@ private:
    unsigned int   refCounter;             /// Reference counter
    char           filename[FILENAME_LEN]; /// Texture's filename on disk
 
-   bool loadGLTexture(const char *filename);
+   bool loadGLTexture(const char *filename, filtering_method_t filteringMethod);
 
 public:
    C_Texture(void);
@@ -49,7 +57,7 @@ private:
    static C_TextureManager *classInstance;
 
 public:
-   C_Texture *loadTexture(const char *filename);
+   C_Texture *loadTexture(const char *filename, filtering_method_t filteringMethod);
    ~C_TextureManager(void);
    static C_TextureManager *getSingleton(void);
 };

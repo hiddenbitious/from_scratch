@@ -1070,6 +1070,7 @@ bool CheckGLSL(void)
 		cout << "GL_ARB_shader_objects extension is available!" << endl;
 	}
 
+   /// This is needed for the glGenerateMipmap function
 	if(GL_TRUE != glewGetExtension("GL_EXT_framebuffer_object")) {
 		cout << "GL_EXT_framebuffer_object extension is not available!" << endl;
 		glslAvailable = false;

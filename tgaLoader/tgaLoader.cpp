@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../glsl/glsl.h"
 #include <GL/gl.h>
 
 #include "texture.h"
@@ -310,7 +311,7 @@ C_TextureManager::~C_TextureManager(void)
 }
 
 C_Texture *
-C_TextureManager::loadTexture(const char *filename)
+C_TextureManager::loadTexture(const char *filename, filtering_method_t filteringMethod)
 {
    /// Search if texture with that filename already exists
    for(unsigned int i = 0; i < textures.size(); ++i) {
@@ -321,7 +322,7 @@ C_TextureManager::loadTexture(const char *filename)
 
    /// If it does not exist, create it, load it from disk and return it
    C_Texture *texture = new C_Texture;
-   if(texture->loadGLTexture(filename))
+   if(texture->loadGLTexture(filename, filteringMethod))
       return texture;
    else {
       delete texture;
@@ -331,6 +332,8 @@ C_TextureManager::loadTexture(const char *filename)
 
 C_Texture::C_Texture(void)
 {
+   printf("%s\n", __FUNCTION__);
+
    imageData = NULL;
    imageSize = 0;
    refCounter = 1;
@@ -339,6 +342,8 @@ C_Texture::C_Texture(void)
 
 C_Texture::~C_Texture()
 {
+   printf("%s\n", __FUNCTION__);
+
    assert(!refCounter);
 
    if(imageData) {
@@ -378,7 +383,7 @@ C_Texture &C_Texture::operator= (const C_Texture &texture)
 }
 
 bool
-C_Texture::loadGLTexture(const char *filename)
+C_Texture::loadGLTexture(const char *filename, filtering_method_t filteringMethod)
 {
    printf("-----------\n");
    printf("Loading texture: \"%s\"...", filename);
@@ -392,8 +397,30 @@ C_Texture::loadGLTexture(const char *filename)
    glGenTextures(1, &texID);
    glBindTexture(GL_TEXTURE_2D, texID);
    glTexImage2D(GL_TEXTURE_2D, 0, bpp / 8, width, height, 0, type, GL_UNSIGNED_BYTE, imageData);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+   int filteringParam;
+   switch(filteringMethod) {
+   case TEXTURE_NEAREST:
+      filteringParam = GL_NEAREST;
+      break;
+   case TEXTURE_LINEAR:
+      filteringParam = GL_LINEAR;
+      break;
+   case TEXTURE_BILINEAR:
+      glGenerateMipmap(GL_TEXTURE_2D);
+      filteringParam = GL_LINEAR_MIPMAP_NEAREST;
+      break;
+   case TEXTURE_TRILINEAR:
+      glGenerateMipmap(GL_TEXTURE_2D);
+      filteringParam = GL_LINEAR_MIPMAP_LINEAR;
+      break;
+   default:
+      assert(0);
+      break;
+   }
+
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filteringParam);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filteringParam);
    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 

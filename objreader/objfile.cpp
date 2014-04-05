@@ -508,11 +508,11 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
       /// Copy material
 //      printf("material: %d", group->material);
       if(model->materials[group->material].texture_diffuse && strlen(model->materials[group->material].texture_diffuse))
-         mesh->texture_diffuse = textureManager->loadTexture(model->materials[group->material].texture_diffuse);
+         mesh->texture_diffuse = textureManager->loadTexture(model->materials[group->material].texture_diffuse, TEXTURE_TRILINEAR);
       if(model->materials[group->material].texture_specular && strlen(model->materials[group->material].texture_specular))
-         mesh->texture_specular = textureManager->loadTexture(model->materials[group->material].texture_specular);
+         mesh->texture_specular = textureManager->loadTexture(model->materials[group->material].texture_specular, TEXTURE_TRILINEAR);
       if(model->materials[group->material].texture_normal && strlen(model->materials[group->material].texture_normal))
-         mesh->texture_normal = textureManager->loadTexture(model->materials[group->material].texture_normal);
+         mesh->texture_normal = textureManager->loadTexture(model->materials[group->material].texture_normal, TEXTURE_TRILINEAR);
 
       size += mesh->nVertices * sizeof(C_Vertex);
       if(group->properties & HAS_TEXCOORDS)
