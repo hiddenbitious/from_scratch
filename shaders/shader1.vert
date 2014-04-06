@@ -15,8 +15,6 @@ varying vec3 v_lightVec_ts;
 varying vec3 v_eyeDirection_ts;
 varying vec3 v_vertexPosition_es;
 
-vec3 v;
-
 void main(void) {
    vec3 t = vec3(u_modelviewMatrix * vec4(a_tangents, 0.0));
    vec3 b = vec3(u_modelviewMatrix * vec4(a_binormals, 0.0));
@@ -25,10 +23,10 @@ void main(void) {
    vec3 vertexPosition_es = vec3(u_modelviewMatrix * vec4(a_vertices, 1.0));
 	vec3 lightDir_es = (u_lightPosition_es - vertexPosition_es);
 
-//   v_vertexPosition_ws = (u_modelMatrix * vec4(a_vertices, 1.0)).xyz;
    v_vertexPosition_es = vertexPosition_es;
 
    /// Light direction
+   vec3 v;
 	v.x = dot (lightDir_es, t);
 	v.y = dot (lightDir_es, b);
 	v.z = dot (lightDir_es, n);
