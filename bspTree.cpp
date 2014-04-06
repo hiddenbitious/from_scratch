@@ -368,15 +368,6 @@ C_BspTree::TraceVisibility(void)
 
    assert(nLeaves == leaves.size());
 
-/// Initialize variables
-/// ----------------------
-	for(i = 0 ; i < nLeaves; i++) {
-		leaves[i]->visibleFrom = new bool[nNodes];
-		leaves[i]->checkedVisibilityWith = new bool[nNodes];
-
-		memset(leaves[i]->visibleFrom, false, nNodes * sizeof(bool));
-		memset(leaves[i]->checkedVisibilityWith, false, nNodes * sizeof(bool));
-	}
 
 /// Find connected leaves
 /// NOTE: Two leaves sharing at least one visibility point will be considered as connected
@@ -398,14 +389,16 @@ C_BspTree::TraceVisibility(void)
 						FLOAT_EQ(leaves[i]->pointSet[p1].z, leaves[j]->pointSet[p2].z)) {
 						if(leaves[j]->visibleFrom[leaves[i]->nodeID] == false) {
 							leaves[j]->connectedLeaves.push_back(leaves[i]);
-							leaves[j]->PVS.push_back(leaves[i]);
-							leaves[j]->visibleFrom[leaves[i]->nodeID] = true;
+							leaves[j]->addNodeToPVS(leaves[i]);
+//							leaves[j]->PVS.push_back(leaves[i]);
+//							leaves[j]->visibleFrom[leaves[i]->nodeID] = true;
 						}
 
 						if(leaves[i]->visibleFrom[leaves[j]->nodeID] == false) {
 							leaves[i]->connectedLeaves.push_back(leaves[j]);
-							leaves[i]->PVS.push_back(leaves[j]);
-							leaves[i]->visibleFrom[leaves[j]->nodeID] = true;
+							leaves[i]->addNodeToPVS(leaves[j]);
+//							leaves[i]->PVS.push_back(leaves[j]);
+//							leaves[i]->visibleFrom[leaves[j]->nodeID] = true;
 						}
 
 						p1 = leaves[i]->pointSet.size();
@@ -490,6 +483,9 @@ C_BspTree::CheckVisibility(C_BspNode *node1, C_BspNode *node2)
 C_BspNode *
 C_BspTree::RayIntersectsSomethingInTree(C_BspNode *node, C_Vertex *start, C_Vertex *end)
 {
+   if(!node)
+      return NULL;
+
    C_BspNode *occluderNode;
 
 	if(node->isLeaf) {
@@ -608,18 +604,20 @@ C_BspTree::Draw_PVS(C_Camera *camera)
 
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
-//	shaderManager->pushShader(bspShader); {
-//      ESMatrix mat = Identity;
-//      esTranslate(&mat, position.x , position.y , position.z);
-//
-//      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
-//      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODEL_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
-//      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+	#ifdef DRAW_BSP_GEOMETRY
+	shaderManager->pushShader(bspShader); {
+      ESMatrix mat = Identity;
+      esTranslate(&mat, position.x , position.y , position.z);
 
+      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
+      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODEL_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
+      bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
+   #endif
       headNode->Draw(camera, this, true);
-//   }
-//   shaderManager->popShader();
-
+   #ifdef DRAW_BSP_GEOMETRY
+   }
+   shaderManager->popShader();
+   #endif
 	return 0;
 }
 
@@ -728,6 +726,16 @@ C_BspTree::closeLeafHoles(void)
       float bestNodeDistances[TOTAL_FACES];
    } nodeAdjacentData_t;
    nodeAdjacentData_t *aData = new nodeAdjacentData_t[leaves.size()];
+
+   /// Initialize variables
+   /// ----------------------
+	for(int i = 0 ; i < nLeaves; i++) {
+		leaves[i]->visibleFrom = new bool[nNodes];
+		leaves[i]->checkedVisibilityWith = new bool[nNodes];
+
+		memset(leaves[i]->visibleFrom, false, nNodes * sizeof(bool));
+		memset(leaves[i]->checkedVisibilityWith, false, nNodes * sizeof(bool));
+	}
 
    int i;
    float dist;
@@ -871,10 +879,20 @@ C_BspTree::closeLeafHoles(void)
 //            if(!cNode->adjacentNodes[i].size()) {
 //               printf("%s ", C_BBox::ADJACENT_FACE_NAMES[i]);
 //               printf("Best candidate: ");
-//               if(cNode->bestNodeToConnect[i])
-//                  printf("%lu\n",cNode->bestNodeToConnect[i]->nodeID);
-//               else
+//
+//               if(cNode->bestNodeToConnect[i]) {
+//                  printf("%lu\n", cNode->bestNodeToConnect[i]->nodeID);
+//               } else {
 //                  printf("none!\n");
+//               }
+//            }
+//         }
+
+//         for(int i = 0; i < TOTAL_FACES; i++) {
+//            if(!cNode->adjacentNodes[i].size()) {
+//               if(cNode->bestNodeToConnect[i]) {
+//                  leaf1->addNodeToPVS(cNode->bestNodeToConnect[i]);
+//               }
 //            }
 //         }
 

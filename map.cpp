@@ -147,9 +147,15 @@ C_Map::load3DObjects(void)
    /// Scale it to fit TILE_SIZE
    ESMatrix matrix = Identity;
    esScale(&matrix, scale, scale, scale);
-   /// Orient it to face down the +z
-   if(zLen > xLen)
+
+   if(zLen > xLen) {
+      esTranslate(&matrix, 0.0f, 0.0f, xLen / 2.0f );
+      /// Orient it to face down the +z
       esRotate(&matrix, 270.0f, 0.0f, 1.0f, 0.0f);
+   } else {
+      esTranslate(&matrix, zLen / 2.0f, 0.0f, 0.0f );
+   }
+
    wallMesh.applyTransformationOnVertices(&matrix);
 
    /// Scale floor mesh

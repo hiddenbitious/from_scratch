@@ -92,12 +92,18 @@ Initializations(void)
    printf("FLT_MIN: %g\n", FLT_MIN);
 
 	/// Set clear color
-//	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
-	glClearColor(0.0, 0.0, 0.0, 1.0f);
+   #ifdef DRAW_BSP_GEOMETRY
+	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
+	#else
+//	glClearColor(0.0, 0.0, 0.0, 1.0f);
+   #endif
 
 	/// Backface culling
-//	glDisable(GL_CULL_FACE);
+	#ifdef DRAW_BSP_GEOMETRY
+	glDisable(GL_CULL_FACE);
+	#else
 	glEnable(GL_CULL_FACE);
+	#endif
 //	glFrontFace(GL_CW);
 //	glCullFace(GL_BACK);
 
@@ -142,14 +148,16 @@ Initializations(void)
 	bspShader = shaderManager->LoadShaderProgram("shaders/metaballs_shader.vert", "shaders/metaballs_shader.frag");
    assert(bspShader->verticesAttribLocation >= 0);
    assert(bspShader->normalsAttribLocation >= 0);
-//
-//   basicShader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
-//   assert(basicShader->verticesAttribLocation >= 0);
-//   assert(basicShader->normalsAttribLocation == -1);
-//
-//   pointShader = shaderManager->LoadShaderProgram("shaders/points_shader.vert", "shaders/points_shader.frag");
-//   assert(pointShader->verticesAttribLocation >= 0);
-//   assert(pointShader->normalsAttribLocation == -1);
+
+#ifdef DRAW_BSP_GEOMETRY
+   basicShader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
+   assert(basicShader->verticesAttribLocation >= 0);
+   assert(basicShader->normalsAttribLocation == -1);
+
+   pointShader = shaderManager->LoadShaderProgram("shaders/points_shader.vert", "shaders/points_shader.frag");
+   assert(pointShader->verticesAttribLocation >= 0);
+   assert(pointShader->normalsAttribLocation == -1);
+#endif
 
    wallShader = shaderManager->LoadShaderProgram("shaders/shader1.vert", "shaders/shader1.frag");
    assert(wallShader->verticesAttribLocation >= 0);

@@ -16,6 +16,8 @@
 //#define PRINT_FUNC_ENTRY   printf("%s\n", __FUNCTION__)
 #define PRINT_FUNC_ENTRY
 
+#define DRAW_BSP_GEOMETRY
+
 #	include <stdint.h>
 #	include <string>
 #	include <limits>

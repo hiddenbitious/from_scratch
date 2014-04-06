@@ -94,9 +94,15 @@ C_BspNode::insertStaticObject(staticTreeObject_t *staticMesh, C_Vertex *point)
       float side = partitionPlane.distanceFromPoint(point);
 
       if(FLOAT_EQ(side, 0.0f) || side >= 0.0f) {
-         return frontNode->insertStaticObject(staticMesh, point);
+         if(frontNode)
+           return frontNode->insertStaticObject(staticMesh, point);
+         else
+            return false;
       } else {
-         return backNode->insertStaticObject(staticMesh, point);
+         if(backNode)
+            return backNode->insertStaticObject(staticMesh, point);
+         else
+            return false;
       }
    } else {
       for(unsigned int i = 0; i < staticObjects.size(); ++i) {
@@ -124,7 +130,7 @@ C_BspNode::BuildBspTree(C_BspTree *tree)
    /// An i geometria dimiourgei kleisto horo
    /// i an ehei ftasei arketa bathia sto dendro
    /// tote einai katalili gia filo sto dentro
-   if((isConvex = IsConvex()) || depth == tree->maxDepth) {
+   if((isConvex = IsConvex()) || depth == tree->maxDepth || nPolys < 5) {
       tree->nConvexRooms += (int)isConvex;
       isLeaf = true;
       tree->nLeaves++;
@@ -138,10 +144,12 @@ C_BspNode::BuildBspTree(C_BspTree *tree)
          tree->lessPolysInNodeFound = nPolys;
       }
 
+
       /// Calculate leaf's bbox
       CalculateBBox();
       return;
    }
+
 
    /// Diaforetika prepei na psaksoume gia epipedo diahorismou
    SelectPartitionfromList(&tempPlane);
@@ -236,6 +244,7 @@ bool
 C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
 {
    unsigned int nFront, nBack, nSplits, bestPlane = 0, bestSplits = INT_MAX;
+   int currentPlane, i, result;
    C_Plane tempPlane;
    bool found = false;
 //   poly_t **geometry = node->geometry;
@@ -248,7 +257,7 @@ C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
    assert(nPolys);
 
    while(!found) {
-      for(int currentPlane = 0; currentPlane < nPolys; currentPlane++) {
+      for(currentPlane = 0; currentPlane < nPolys; currentPlane++) {
          if(geometry[currentPlane]->usedAsDivider == true)
             continue;
 
@@ -262,11 +271,11 @@ C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
 //         geometry[currentPlane]->pVertices[1].x, geometry[currentPlane]->pVertices[1].y, geometry[currentPlane]->pVertices[1].z,
 //         geometry[currentPlane]->pVertices[2].x, geometry[currentPlane]->pVertices[2].y, geometry[currentPlane]->pVertices[2].z);
 
-         for(int i = 0; i < nPolys; i++) {
+         for(i = 0; i < nPolys; i++) {
             if(i == currentPlane)
                continue;
 
-            int result = ClassifyPolygon(&tempPlane , geometry[i]);
+            result = ClassifyPolygon(&tempPlane , geometry[i]);
 
             if(result == FRONT) {
                nFront++;
@@ -286,21 +295,23 @@ C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
 //			printf("minRelation: %f\n", minRelation);
 //			printf("bestRelation: %f\n", bestRelation);
 
-         if((relation > minRelation && nSplits < bestSplits) || (nSplits == bestSplits && relation > bestRelation)) {
+         if((relation > minRelation && nSplits < bestSplits) || (nSplits == bestSplits && relation > bestRelation) ||
+             (!minRelation && nSplits)) {
             finalPlane->setPlane(&tempPlane);
             bestSplits = nSplits;
             bestRelation = relation;
             bestPlane = currentPlane;
             found = true;
-//				printf("****\n");
+//            printf("\n---------------\n");
          }
       }
 
-//      printf("****\n");
-
+//		printf("******************\n");
       /// An ehoun dokimastei ola ta polygona kai den ehei brethei akoma epipedo diahorismou
       /// halarose ligo ta kritiria kai ksanapsakse
       minRelation /= MINIMUMRELATIONSCALE;
+//      if(FLOAT_EQ(minRelation, 0.0f))
+//         printf("Warning!\n");
    }
 
    geometry[bestPlane]->usedAsDivider = true;
@@ -320,22 +331,32 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
       float side = partitionPlane.distanceFromPoint(&cameraPosition);
 
       if(side > 0.0f) {
-         if(!usePVS)
-            backNode->Draw(camera, tree, usePVS);
-         frontNode->Draw(camera, tree, usePVS);
-      } else {
-         if(!usePVS)
+         if(!usePVS) {
+            if(backNode)
+               backNode->Draw(camera, tree, usePVS);
+         }
+         if(frontNode)
             frontNode->Draw(camera, tree, usePVS);
-         backNode->Draw(camera, tree, usePVS);
+      } else {
+         if(!usePVS) {
+            if(frontNode)
+               frontNode->Draw(camera, tree, usePVS);
+         }
+         if(backNode)
+            backNode->Draw(camera, tree, usePVS);
       }
    } else {
       tree->statistics.totalLeaves += PVS.size();
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       Draw(camera);
-//      DrawPointSet();
+      #ifdef DRAW_BSP_GEOMETRY
+      DrawPointSet();
+      #endif
 
 //      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+      printf("nodeID: %lu\n", nodeID);
 
       if(usePVS) {
          for(unsigned int i = 0 ; i < PVS.size() ; i++) {
@@ -349,7 +370,9 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
             }
 
             PVS[i]->Draw(camera);
-//            PVS[i]->bbox.Draw();
+            #ifdef DRAW_BSP_GEOMETRY
+            PVS[i]->bbox.Draw();
+            #endif
          }
       }
    }
@@ -363,34 +386,35 @@ C_BspNode::Draw(C_Camera *camera)
    tree->statistics.leavesDrawn++;
 
    /// Draw bsp geometry
-//   glEnableVertexAttribArray(bspShader->verticesAttribLocation);
-//   glEnableVertexAttribArray(bspShader->normalsAttribLocation);
-//
-//   glVertexAttribPointer(bspShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
-//   glVertexAttribPointer(bspShader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)triangles + 3 * sizeof(float));
-//   glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
-//
-//   glDisableVertexAttribArray(bspShader->verticesAttribLocation);
-//   glDisableVertexAttribArray(bspShader->normalsAttribLocation);
+   #ifdef DRAW_BSP_GEOMETRY
+   glEnableVertexAttribArray(bspShader->verticesAttribLocation);
+   glEnableVertexAttribArray(bspShader->normalsAttribLocation);
 
+   glVertexAttribPointer(bspShader->verticesAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), triangles);
+   glVertexAttribPointer(bspShader->normalsAttribLocation, 3, GL_FLOAT, GL_FALSE, (3 + 3) * sizeof(float), (char *)triangles + 3 * sizeof(float));
+   glDrawArrays(GL_TRIANGLES, 0, nTriangles * 3);
+
+   glDisableVertexAttribArray(bspShader->verticesAttribLocation);
+   glDisableVertexAttribArray(bspShader->normalsAttribLocation);
+   #endif
    /// Draw static meshes
-   for(unsigned int i = 0; i < staticObjects.size(); ++i) {
-      tree->statistics.totalTriangles += staticObjects[i]->mesh.nTriangles;
-
-      if(staticObjects[i]->drawn) {
-         continue;
-      }
-
-      if(!camera->frustum->cubeInFrustum(&staticObjects[i]->mesh.bbox)) {
-         continue;
-      }
-
-      staticObjects[i]->mesh.draw(camera);
-      staticObjects[i]->drawn = true;
-
-      tree->statistics.staticObjectsDrawn++;
-      tree->statistics.trianglesDrawn += staticObjects[i]->mesh.nTriangles;
-   }
+//   for(unsigned int i = 0; i < staticObjects.size(); ++i) {
+//      tree->statistics.totalTriangles += staticObjects[i]->mesh.nTriangles;
+//
+//      if(staticObjects[i]->drawn) {
+//         continue;
+//      }
+//
+//      if(!camera->frustum->cubeInFrustum(&staticObjects[i]->mesh.bbox)) {
+//         continue;
+//      }
+//
+//      staticObjects[i]->mesh.draw(camera);
+//      staticObjects[i]->drawn = true;
+//
+//      tree->statistics.staticObjectsDrawn++;
+//      tree->statistics.trianglesDrawn += staticObjects[i]->mesh.nTriangles;
+//   }
 }
 
 void
@@ -406,6 +430,8 @@ C_BspNode::CalculateBBox(void)
 
    for(int i = 0 ; i < nPolys ; i++) {
       for(int k = 0 ; k < geometry[i]->nVertices; k++) {
+//         printf("%f %f %f\n", geometry[i]->pVertices[k].x, geometry[i]->pVertices[k].y, geometry[i]->pVertices[k].z);
+
          maxX = MAX(maxX , geometry[i]->pVertices[k].x);
          maxY = MAX(maxY , geometry[i]->pVertices[k].y);
          maxZ = MAX(maxZ , geometry[i]->pVertices[k].z);
@@ -425,8 +451,10 @@ void
 C_BspNode::TessellatePolygonsInLeaves(void)
 {
    if(!isLeaf) {
-      backNode->TessellatePolygonsInLeaves();
-      frontNode->TessellatePolygonsInLeaves();
+      if(backNode)
+         backNode->TessellatePolygonsInLeaves();
+      if(frontNode)
+         frontNode->TessellatePolygonsInLeaves();
 
       return;
    }
@@ -543,21 +571,27 @@ C_BspNode::DistributeSamplePoints(vector<C_Vertex>& points)
 
       /// Fill in node's pointset
       DistributePointsAlongPartitionPlane();
-      frontPoints = pointSet;
-      backPoints = pointSet;
+      if(frontNode)
+         frontPoints = pointSet;
+      if(backNode)
+         backPoints = pointSet;
 
       for(unsigned int i = 0 ; i < points.size() ; i++) {
          dist = partitionPlane.distanceFromPoint(&points[i]);
 
          if(dist > 0.0f) {
-            frontPoints.push_back(points[i]);
+            if(frontNode)
+               frontPoints.push_back(points[i]);
          } else {
-            backPoints.push_back(points[i]);
+            if(backNode)
+               backPoints.push_back(points[i]);
          }
       }
 
-      backNode->DistributeSamplePoints(backPoints);
-      frontNode->DistributeSamplePoints(frontPoints);
+      if(backNode)
+         backNode->DistributeSamplePoints(backPoints);
+      if(frontNode)
+         frontNode->DistributeSamplePoints(frontPoints);
    }
 }
 
