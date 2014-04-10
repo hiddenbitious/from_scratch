@@ -330,7 +330,7 @@ main(int argc, char* argv[])
 	glutInit(&argc, argv);
 
 	/// Double buffering with depth buffer
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitDisplayMode(/*GLUT_DOUBLE | */GLUT_RGB | GLUT_DEPTH);
 
 	/// Create window
 	glutInitWindowSize(windowWidth , windowHeight);

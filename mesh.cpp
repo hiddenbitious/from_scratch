@@ -436,8 +436,6 @@ C_MeshGroup::draw(C_Camera *camera)
    if(shader->tangetsAttribLocation >= 0)    glDisableVertexAttribArray(shader->tangetsAttribLocation);
 
    shaderManager->popShader();
-
-   glFlush();
 }
 
 void
