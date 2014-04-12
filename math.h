@@ -15,10 +15,11 @@
 #define EPSILON               1.0e-4f
 //#define EPSILON               std::numeric_limits<float>::epsilon()
 //#define FLOAT_EQ(a,b)         ((((b) - EPSILON) <= (a)) && (((b) + EPSILON)) >= (a))
-#define FLOAT_EQ(a, b)        (fabs((a) - (b)) < EPSILON)
-#define FLOAT_GREATER(a, b)   (!(FLOAT_EQ((a), (b))) && (a) > (b))
-#define FLOAT_SMALLER(a, b)   (!(FLOAT_EQ((a), (b))) && (a) < (b))
-
+#define FLOAT_EQ(a, b)                 (fabs((a) - (b)) < EPSILON)
+#define FLOAT_GREATER(a, b)            (!(FLOAT_EQ((a), (b))) && (a) > (b))
+#define FLOAT_SMALLER(a, b)            (!(FLOAT_EQ((a), (b))) && (a) < (b))
+#define FLOAT_SMALLER_OR_EQUAL(a, b)   ((FLOAT_EQ((a), (b))) || (a) < (b))
+#define FLOAT_GREATER_OR_EQUAL(a, b)   ((FLOAT_EQ((a), (b))) || (a) > (b))
 /// Numeric limts
 #define FLT_MAX numeric_limits<float>::max()
 #define FLT_MIN numeric_limits<float>::min()

@@ -55,7 +55,7 @@ static C_Frustum frustum;
 static int winID;
 static int windowWidth = 800;
 static int windowHeight = 500;
-static int windowPositionX = 100;
+static int windowPositionX = 200;
 static int windowPositionY = 200;
 
 /// movement vars

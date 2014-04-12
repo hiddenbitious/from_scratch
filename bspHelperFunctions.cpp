@@ -12,7 +12,8 @@ PointInTriangle(C_Vertex* point , triangle_vn *triangle)
 
 	float u, v;
 	CalculateUV(&plane , point , &u , &v);
-	return ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.0f));
+//	return ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.0f));
+	return (FLOAT_GREATER_OR_EQUAL(u, 0.0f) && FLOAT_GREATER_OR_EQUAL(v, 0.0f) && FLOAT_SMALLER_OR_EQUAL(u+v, 1.0f));
 }
 
 

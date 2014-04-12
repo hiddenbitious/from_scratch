@@ -326,6 +326,8 @@ C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
 void
 C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
 {
+   static unsigned long leaf = 0;
+
    if(!isLeaf) {
       C_Vector3 cameraPosition = camera->GetPosition();
       float side = partitionPlane.distanceFromPoint(&cameraPosition);
@@ -348,9 +350,16 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
    } else {
       tree->statistics.totalLeaves += PVS.size();
 
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      if(nodeID != leaf) {
+         printf("entered leaf: %lu\n", nodeID);
+         leaf = nodeID;
+      }
+
+//      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       Draw(camera);
       #ifdef DRAW_BSP_GEOMETRY
+      bbox.Draw(1.0f, 1.0f, 0.0f);
       DrawPointSet();
       #endif
 
@@ -359,7 +368,7 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
       if(usePVS) {
          for(unsigned int i = 0 ; i < PVS.size() ; i++) {
             if(PVS[i]->drawn) {
-               assert(0);
+//               assert(0);
                continue;
             }
 
@@ -395,6 +404,8 @@ C_BspNode::Draw(C_Camera *camera)
    glDisableVertexAttribArray(bspShader->verticesAttribLocation);
    glDisableVertexAttribArray(bspShader->normalsAttribLocation);
    #endif
+
+   #ifdef DRAW_TREE_MESHES
    /// Draw static meshes
    for(unsigned int i = 0; i < staticObjects.size(); ++i) {
       tree->statistics.totalTriangles += staticObjects[i]->mesh.nTriangles;
@@ -413,6 +424,7 @@ C_BspNode::Draw(C_Camera *camera)
       tree->statistics.staticObjectsDrawn++;
       tree->statistics.trianglesDrawn += staticObjects[i]->mesh.nTriangles;
    }
+   #endif
 }
 
 void

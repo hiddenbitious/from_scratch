@@ -299,15 +299,28 @@ bool C_BBox::IsInside(const C_Vertex* p)
 {
 //	if ( p->x >= min.x && p->x <= max.x && p->y >= min.y && p->y <= max.y && p->z >= min.z && p->z <= max.z )
 //		 return true;
-	if(p->x < min.x || p->x > max.x) {
-		return false;
-	}
-	if(p->y < min.y || p->y > max.y) {
-		return false;
-	}
-	if(p->z < min.z || p->z > max.z) {
-		return false;
-	}
+
+   if(FLOAT_SMALLER(p->x, min.x) || FLOAT_GREATER(p->x, max.x)) {
+      return false;
+   }
+
+   if(FLOAT_SMALLER(p->y, min.y) || FLOAT_GREATER(p->y, max.y)) {
+      return false;
+   }
+
+   if(FLOAT_SMALLER(p->z, min.z) || FLOAT_GREATER(p->z, max.z)) {
+      return false;
+   }
+
+//	if(p->x < min.x || p->x > max.x) {
+//		return false;
+//	}
+//	if(p->y < min.y || p->y > max.y) {
+//		return false;
+//	}
+//	if(p->z < min.z || p->z > max.z) {
+//		return false;
+//	}
 
 	return true;
 }

@@ -252,7 +252,7 @@ C_BspTree::BuildPVS(void)
 
 	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-	pvsFileFound = this->ReadPVSFile("map_pvs6_perfect.txt");
+//	pvsFileFound = this->ReadPVSFile("map_pvs6_noHoles.txt");
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points... " << flush;
@@ -269,9 +269,9 @@ C_BspTree::BuildPVS(void)
 	cout << "Done!" << endl << endl;
 
 	/// Write PVS into a file
-//	if(!pvsFileFound) {
-//		WritePVSFile("map_pvs6_perfect.txt");
-//	}
+	if(!pvsFileFound) {
+		WritePVSFile("map_pvs6_noHoles.txt");
+	}
 }
 
 typedef struct {
@@ -722,7 +722,7 @@ C_BspTree::closeLeafHoles(void)
 {
    typedef struct {
       vector<C_BspNode *> adjacentNodes[TOTAL_FACES];
-      C_BspNode *bestNodeToConnect[TOTAL_FACES];
+      vector<C_BspNode *> bestNodeToConnect[TOTAL_FACES];
       float bestNodeDistances[TOTAL_FACES];
    } nodeAdjacentData_t;
    nodeAdjacentData_t *aData = new nodeAdjacentData_t[leaves.size()];
@@ -736,6 +736,8 @@ C_BspTree::closeLeafHoles(void)
 		memset(leaves[i]->visibleFrom, false, nNodes * sizeof(bool));
 		memset(leaves[i]->checkedVisibilityWith, false, nNodes * sizeof(bool));
 	}
+
+//	return;
 
    int i;
    float dist;
@@ -751,8 +753,10 @@ C_BspTree::closeLeafHoles(void)
       leaf1->bbox.GetMin(&leaf1Min);
       leaf1->bbox.GetMax(&leaf1Max);
       /// Init node's data
-      memset(cNode->bestNodeToConnect, 0, sizeof(C_BspNode *) * TOTAL_FACES);
-      for(i = 0; i < TOTAL_FACES; i++) cNode->bestNodeDistances[i] = GREATEST_FLOAT;
+//      memset(cNode->bestNodeToConnect, 0, sizeof(C_BspNode *) * TOTAL_FACES);
+      for(i = 0; i < TOTAL_FACES; i++) {
+         cNode->bestNodeDistances[i] = GREATEST_FLOAT;
+      }
 
       /// Take into consideration that a leaf might be at the boundary of the tree
       if(leaf1Min.x == treeMin.x) {cNode->adjacentNodes[X_MINUS].push_back(NULL);}
@@ -788,9 +792,14 @@ C_BspTree::closeLeafHoles(void)
             } else if(FLOAT_GREATER(leaf1Min.x, leaf2Max.x)) {
                /// Else calculate distance
                dist = leaf1Min.x - leaf2Max.x;
-               if(dist < cNode->bestNodeDistances[X_MINUS]) {
+//               if(dist < cNode->bestNodeDistances[X_MINUS]) {
+               if(FLOAT_SMALLER(dist, cNode->bestNodeDistances[X_MINUS])) {
                   cNode->bestNodeDistances[X_MINUS] = dist;
-                  cNode->bestNodeToConnect[X_MINUS] = leaf2;
+//                  cNode->bestNodeToConnect[X_MINUS] = leaf2;
+                  cNode->bestNodeToConnect[X_MINUS].clear();
+                  cNode->bestNodeToConnect[X_MINUS].push_back(leaf2);
+               } else if(FLOAT_EQ(dist, cNode->bestNodeDistances[X_MINUS])) {
+                  cNode->bestNodeToConnect[X_MINUS].push_back(leaf2);
                }
             }
          }
@@ -812,9 +821,13 @@ C_BspTree::closeLeafHoles(void)
             } else if(FLOAT_SMALLER(leaf1Max.x, leaf2Min.x)) {
                /// Else calculate distance
                dist = leaf2Min.x - leaf1Max.x;
-               if(dist < cNode->bestNodeDistances[X_PLUS]) {
+               if(FLOAT_SMALLER(dist, cNode->bestNodeDistances[X_PLUS])) {
                   cNode->bestNodeDistances[X_PLUS] = dist;
-                  cNode->bestNodeToConnect[X_PLUS] = leaf2;
+//                  cNode->bestNodeToConnect[X_PLUS] = leaf2;
+                  cNode->bestNodeToConnect[X_PLUS].clear();
+                  cNode->bestNodeToConnect[X_PLUS].push_back(leaf2);
+               } else if(FLOAT_EQ(dist, cNode->bestNodeDistances[X_PLUS])) {
+                  cNode->bestNodeToConnect[X_PLUS].push_back(leaf2);
                }
             }
          }
@@ -836,9 +849,13 @@ C_BspTree::closeLeafHoles(void)
             } else if(FLOAT_GREATER(leaf1Min.z, leaf2Max.z)) {
                /// Else calculate distance
                dist = leaf1Min.z - leaf2Max.z;
-               if(dist < cNode->bestNodeDistances[Z_MINUS]) {
+               if(FLOAT_SMALLER(dist, cNode->bestNodeDistances[Z_MINUS])) {
                   cNode->bestNodeDistances[Z_MINUS] = dist;
-                  cNode->bestNodeToConnect[Z_MINUS] = leaf2;
+//                  cNode->bestNodeToConnect[Z_MINUS] = leaf2;
+                  cNode->bestNodeToConnect[Z_MINUS].clear();
+                  cNode->bestNodeToConnect[Z_MINUS].push_back(leaf2);
+               } else if(FLOAT_EQ(dist, cNode->bestNodeDistances[Z_MINUS])) {
+                  cNode->bestNodeToConnect[Z_MINUS].push_back(leaf2);
                }
             }
          }
@@ -860,9 +877,13 @@ C_BspTree::closeLeafHoles(void)
             } else if(FLOAT_SMALLER(leaf1Max.z, leaf2Min.z)) {
                /// Else calculate distance
                dist = leaf2Min.z - leaf1Max.z;
-               if(dist < cNode->bestNodeDistances[Z_PLUS]) {
+               if(FLOAT_SMALLER(dist, cNode->bestNodeDistances[Z_PLUS])) {
                   cNode->bestNodeDistances[Z_PLUS] = dist;
-                  cNode->bestNodeToConnect[Z_PLUS] = leaf2;
+//                  cNode->bestNodeToConnect[Z_PLUS] = leaf2;
+                  cNode->bestNodeToConnect[Z_PLUS].clear();
+                  cNode->bestNodeToConnect[Z_PLUS].push_back(leaf2);
+               } else if(FLOAT_EQ(dist, cNode->bestNodeDistances[Z_PLUS])) {
+                  cNode->bestNodeToConnect[Z_PLUS].push_back(leaf2);
                }
             }
          }
@@ -873,28 +894,33 @@ C_BspTree::closeLeafHoles(void)
          !cNode->adjacentNodes[Z_MINUS].size() || !cNode->adjacentNodes[Z_PLUS].size() ||
          !cNode->adjacentNodes[Y_MINUS].size() || !cNode->adjacentNodes[Y_PLUS].size()) {
 
-//         printf("leaf %lu is not tightly packed.", leaf1->nodeID);
-//         printf("Uncovered faces are: ");
-//         for(int i = 0; i < TOTAL_FACES; i++) {
-//            if(!cNode->adjacentNodes[i].size()) {
-//               printf("%s ", C_BBox::ADJACENT_FACE_NAMES[i]);
-//               printf("Best candidate: ");
-//
-//               if(cNode->bestNodeToConnect[i]) {
-//                  printf("%lu\n", cNode->bestNodeToConnect[i]->nodeID);
-//               } else {
-//                  printf("none!\n");
-//               }
-//            }
-//         }
+         printf("leaf %lu is not tightly packed.", leaf1->nodeID);
+         printf("Uncovered faces are: ");
+         for(int i = 0; i < TOTAL_FACES; i++) {
+            if(!cNode->adjacentNodes[i].size()) {
+               printf("%s ", C_BBox::ADJACENT_FACE_NAMES[i]);
+               printf("Best candidates: ");
 
-//         for(int i = 0; i < TOTAL_FACES; i++) {
-//            if(!cNode->adjacentNodes[i].size()) {
-//               if(cNode->bestNodeToConnect[i]) {
-//                  leaf1->addNodeToPVS(cNode->bestNodeToConnect[i]);
-//               }
-//            }
-//         }
+               if(cNode->bestNodeToConnect[i].size()) {
+//                  printf("+_+_+_ %d\n", cNode->bestNodeToConnect[i].size());
+                  for(int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj)
+                    printf("%lu ", cNode->bestNodeToConnect[i][jj]->nodeID);
+                  printf("\n");
+               } else {
+                  printf("none!\n");
+               }
+            }
+         }
+
+         for(int i = 0; i < TOTAL_FACES; i++) {
+            if(!cNode->adjacentNodes[i].size()) {
+               if(cNode->bestNodeToConnect[i].size()) {
+                  for(int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj) {
+                     leaf1->addNodeToPVS(cNode->bestNodeToConnect[i][jj]);
+                  }
+               }
+            }
+         }
 
          /// Use father's node bbox for both leaves!!!!
          leaf1->bbox = leaf1->fatherNode->bbox;
