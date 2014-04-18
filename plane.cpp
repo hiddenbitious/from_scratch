@@ -66,6 +66,30 @@ C_Plane::C_Plane(const C_Vertex* vec1 , const C_Vertex* vec2 , const C_Vertex* v
 	points[2] = *vec3;
 }
 
+void
+C_Plane::createFromPoints(const C_Vertex* vec1 , const C_Vertex* vec2 , const C_Vertex* vec3)
+{
+	// Calculate the plane's normal vector
+	C_Vector3 temp = C_Vector3::CrossProduct2(vec1 , vec2 , vec3);
+	a = temp.x;
+	b = temp.y;
+	c = temp.z;
+
+	C_Vertex vert;
+	vert.x = temp.x; vert.y = temp.y; vert.z = temp.z;
+
+	d = -C_Vector3::DotProduct(&vert , vec1);
+
+	this->normalizePlane();
+
+	pointOnPlane.x = vec1->x;
+	pointOnPlane.y = vec1->y;
+	pointOnPlane.z = vec1->z;
+
+	points[0] = *vec1;
+	points[1] = *vec2;
+	points[2] = *vec3;
+}
 
 C_Plane::C_Plane(void)
 {

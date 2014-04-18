@@ -40,7 +40,7 @@ namespace math {
    void Normalize(float* x , float* y , float* z);
    void Normalize(C_Vertex *vec);
    float Magnitude(float x , float y , float z);
-   float PointToPointDistance(C_Vertex *p1 , C_Vertex *p2);
+   float Distance(C_Vertex *p1 , C_Vertex *p2);
    C_Vertex transformPoint(const ESMatrix *matrix, const C_Vertex *point);
    C_Vertex transformNormal(const ESMatrix *matrix, const C_Vertex *point);
    C_Vector3 transformPoint(const ESMatrix *matrix, const C_Vector3 *point);

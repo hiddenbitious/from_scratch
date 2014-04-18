@@ -31,7 +31,8 @@ RayTriangleIntersection(C_Vertex* p1, C_Vertex* p2, triangle_vn *triangle)
 	/// If ray hits plane check if the iPoint is in Triangle
 	float u , v;
 	CalculateUV(&plane , &interPoint , &u , &v);
-	return ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.0f));
+//	return ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.0f));
+	return (FLOAT_GREATER_OR_EQUAL(u, 0.0f) && FLOAT_GREATER_OR_EQUAL(v, 0.0f) && FLOAT_SMALLER_OR_EQUAL(u+v, 1.0f));
 }
 
 

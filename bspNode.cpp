@@ -10,7 +10,7 @@
 #define MINIMUMRELATIONSCALE	2.0f
 
 #define NPOINTS_U 20
-#define NPOINTS_V 20
+#define NPOINTS_V 10
 
 C_BspNode::C_BspNode(void)
 {
@@ -567,46 +567,72 @@ C_BspNode::CleanUpPointSet(vector<C_Vertex>& points, bool testWithBbox, bool tes
    }
 }
 
-void
-C_BspNode::DistributeSamplePoints(vector<C_Vertex>& points)
+//void
+//C_BspNode::DistributeSamplePoints(vector<C_Vertex>& points)
+//{
+//   /// CLEAN UP POINTS
+//   CleanUpPointSet(points, true, true);
+//
+//   if(isLeaf) {
+//      pointSet = points;
+//   } else {
+//      float dist;
+//      vector<C_Vertex> frontPoints, backPoints;
+//
+//      /// Fill in node's pointset
+//      DistributePointsAlongPlane();
+//      if(frontNode)
+//         frontPoints = pointSet;
+//      if(backNode)
+//         backPoints = pointSet;
+//
+//      for(unsigned int i = 0 ; i < points.size() ; i++) {
+//         dist = partitionPlane.distanceFromPoint(&points[i]);
+//
+//         if(dist > 0.0f) {
+//            if(frontNode)
+//               frontPoints.push_back(points[i]);
+//         } else {
+//            if(backNode)
+//               backPoints.push_back(points[i]);
+//         }
+//      }
+//
+//      if(backNode)
+//         backNode->DistributeSamplePoints(backPoints);
+//      if(frontNode)
+//         frontNode->DistributeSamplePoints(frontPoints);
+//   }
+//}
+
+
+void C_BspNode::DistributePointsAlongBBox(void)
 {
-   /// CLEAN UP POINTS
-   CleanUpPointSet(points, true, true);
+   C_Plane plane;
+   C_Vertex bboxVertices[8];
 
-   if(isLeaf) {
-      pointSet = points;
-   } else {
-      float dist;
-      vector<C_Vertex> frontPoints, backPoints;
+   bbox.GetVertices(bboxVertices);
 
-      /// Fill in node's pointset
-      DistributePointsAlongPartitionPlane();
-      if(frontNode)
-         frontPoints = pointSet;
-      if(backNode)
-         backPoints = pointSet;
+   /// Right
+   plane.createFromPoints(&bboxVertices[0], &bboxVertices[4], &bboxVertices[5]);
+   DistributePointsAlongPlane(&plane);
 
-      for(unsigned int i = 0 ; i < points.size() ; i++) {
-         dist = partitionPlane.distanceFromPoint(&points[i]);
+   /// Left
+   plane.createFromPoints(&bboxVertices[3], &bboxVertices[7], &bboxVertices[2]);
+   DistributePointsAlongPlane(&plane);
 
-         if(dist > 0.0f) {
-            if(frontNode)
-               frontPoints.push_back(points[i]);
-         } else {
-            if(backNode)
-               backPoints.push_back(points[i]);
-         }
-      }
+   /// Up
+   plane.createFromPoints(&bboxVertices[1], &bboxVertices[5], &bboxVertices[2]);
+   DistributePointsAlongPlane(&plane);
 
-      if(backNode)
-         backNode->DistributeSamplePoints(backPoints);
-      if(frontNode)
-         frontNode->DistributeSamplePoints(frontPoints);
-   }
+   /// Down
+   plane.createFromPoints(&bboxVertices[0], &bboxVertices[4], &bboxVertices[3]);
+   DistributePointsAlongPlane(&plane);
 }
 
+
 void
-C_BspNode::DistributePointsAlongPartitionPlane(void)
+C_BspNode::DistributePointsAlongPlane(C_Plane *plane)
 {
    C_Vertex min, max, tmp;
    float maxU, maxV, minU, minV;
@@ -617,10 +643,10 @@ C_BspNode::DistributePointsAlongPartitionPlane(void)
    max.x = max.y = max.z = SMALLEST_FLOAT;
 
    /// Find where the node's partition plane intersects with the node's bounding box
-   vector<C_Vertex> intersectionPoints = FindBBoxPlaneIntersections(&bbox, &partitionPlane);
+   vector<C_Vertex> intersectionPoints = FindBBoxPlaneIntersections(&bbox, plane);
 
    for(USHORT i = 0 ; i < intersectionPoints.size() ; i++) {
-      CalculateUV(&partitionPlane, &intersectionPoints[i], &tmpU, &tmpV);
+      CalculateUV(plane, &intersectionPoints[i], &tmpU, &tmpV);
 
       if(tmpU > maxU) maxU = tmpU;
       if(tmpV > maxV) maxV = tmpV;
@@ -634,9 +660,9 @@ C_BspNode::DistributePointsAlongPartitionPlane(void)
    float stepV = (maxV - minV) / (float)NPOINTS_V;
 
    C_Vector3 P;
-   C_Vector3 A(&partitionPlane.points[0]);
-   C_Vector3 B(&partitionPlane.points[1]);
-   C_Vector3 C(&partitionPlane.points[2]);
+   C_Vector3 A(&plane->points[0]);
+   C_Vector3 B(&plane->points[1]);
+   C_Vector3 C(&plane->points[2]);
    C_Vector3 v0 = C - A;
    C_Vector3 v1 = B - A;
 

@@ -63,8 +63,8 @@ math::Normalize(float* x , float* y , float *z)
    }
 }
 
-inline float
-math::PointToPointDistance(C_Vertex *p1 , C_Vertex *p2)
+float
+math::Distance(C_Vertex *p1 , C_Vertex *p2)
 {
    return sqrt((p2->x - p1->x) * (p2->x - p1->x) + (p2->y - p1->y) * (p2->y - p1->y) + (p2->z - p1->z) * (p2->z - p1->z));
 }

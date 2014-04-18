@@ -246,6 +246,15 @@ C_BspTree::insertStaticObject(C_MeshGroup *staticMesh, ESMatrix *matrix)
 }
 
 void
+C_BspTree::DistributeSamplePoints(void)
+{
+   for(unsigned int i = 0; i < leaves.size(); ++i) {
+      leaves[i]->DistributePointsAlongBBox();
+      leaves[i]->CleanUpPointSet(leaves[i]->pointSet, true, true);
+   }
+}
+
+void
 C_BspTree::BuildPVS(void)
 {
 	printf("%s\n", __FUNCTION__);
@@ -256,7 +265,7 @@ C_BspTree::BuildPVS(void)
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points... " << flush;
-	headNode->DistributeSamplePoints(headNode->pointSet);
+	DistributeSamplePoints();
 	cout << "Done!" << endl;
 
 	if(pvsFileFound) {
@@ -269,9 +278,9 @@ C_BspTree::BuildPVS(void)
 	cout << "Done!" << endl << endl;
 
 	/// Write PVS into a file
-	if(!pvsFileFound) {
-		WritePVSFile("map_pvs6_noHoles.txt");
-	}
+//	if(!pvsFileFound) {
+//		WritePVSFile("map_pvs6_noHoles.txt");
+//	}
 }
 
 typedef struct {
@@ -384,21 +393,18 @@ C_BspTree::TraceVisibility(void)
          /// Loop through point sets
 			for(unsigned int p1 = 0; p1 < leaves[i]->pointSet.size(); p1++) {
 				for(unsigned int p2 = 0; p2 < leaves[j]->pointSet.size(); p2++) {
-					if(FLOAT_EQ(leaves[i]->pointSet[p1].x, leaves[j]->pointSet[p2].x) &&
-                  FLOAT_EQ(leaves[i]->pointSet[p1].y, leaves[j]->pointSet[p2].y) &&
-						FLOAT_EQ(leaves[i]->pointSet[p1].z, leaves[j]->pointSet[p2].z)) {
+				   if(math::Distance(&leaves[i]->pointSet[p1], &leaves[j]->pointSet[p2]) < 5.0f) {
+//					if(FLOAT_EQ(leaves[i]->pointSet[p1].x, leaves[j]->pointSet[p2].x) &&
+//                  FLOAT_EQ(leaves[i]->pointSet[p1].y, leaves[j]->pointSet[p2].y) &&
+//						FLOAT_EQ(leaves[i]->pointSet[p1].z, leaves[j]->pointSet[p2].z)) {
 						if(leaves[j]->visibleFrom[leaves[i]->nodeID] == false) {
 							leaves[j]->connectedLeaves.push_back(leaves[i]);
 							leaves[j]->addNodeToPVS(leaves[i]);
-//							leaves[j]->PVS.push_back(leaves[i]);
-//							leaves[j]->visibleFrom[leaves[i]->nodeID] = true;
 						}
 
 						if(leaves[i]->visibleFrom[leaves[j]->nodeID] == false) {
 							leaves[i]->connectedLeaves.push_back(leaves[j]);
 							leaves[i]->addNodeToPVS(leaves[j]);
-//							leaves[i]->PVS.push_back(leaves[j]);
-//							leaves[i]->visibleFrom[leaves[j]->nodeID] = true;
 						}
 
 						p1 = leaves[i]->pointSet.size();
@@ -431,7 +437,7 @@ C_BspTree::TraceVisibility(void)
    }
    printf("Done!\n");
 
-//   return;
+   return;
 
 /// Trace visibility
 /// ----------------------
@@ -912,24 +918,40 @@ C_BspTree::closeLeafHoles(void)
             }
          }
 
+         /// Connect leaf1 with all candidates nodes
+         C_Vertex min, max;
          for(int i = 0; i < TOTAL_FACES; i++) {
             if(!cNode->adjacentNodes[i].size()) {
                if(cNode->bestNodeToConnect[i].size()) {
+                  leaf1->bbox.GetMax(&max);
+                  leaf1->bbox.GetMin(&min);
                   for(int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj) {
-                     leaf1->addNodeToPVS(cNode->bestNodeToConnect[i][jj]);
+//                     leaf1->addNodeToPVS(cNode->bestNodeToConnect[i][jj]);
+
+                     /// Enlrage bounding boxes
+                     switch(i) {
+                     case X_MINUS:
+                        leaf1->bbox.SetMin(min.x - cNode->bestNodeDistances[X_MINUS], min.y, min.z);
+                        leaf1->bbox.SetVertices();
+                        break;
+                     case X_PLUS:
+                        leaf1->bbox.SetMax(max.x + cNode->bestNodeDistances[X_PLUS], max.y, max.z);
+                        leaf1->bbox.SetVertices();
+                        break;
+                     case Z_PLUS:
+                        leaf1->bbox.SetMax(max.x, max.y, max.z + cNode->bestNodeDistances[Z_PLUS]);
+                        leaf1->bbox.SetVertices();
+                        break;
+                     case Z_MINUS:
+                        leaf1->bbox.SetMin(min.x, min.y, min.z - cNode->bestNodeDistances[Z_MINUS]);
+                        leaf1->bbox.SetVertices();
+                        break;
+                     } ///switch
                   }
                }
             }
          }
-
-         /// Use father's node bbox for both leaves!!!!
-         leaf1->bbox = leaf1->fatherNode->bbox;
-         if(leaf1 != leaf1->fatherNode->frontNode) {
-            leaf1->fatherNode->frontNode->bbox = leaf1->fatherNode->bbox;
-         } else {
-            leaf1->fatherNode->backNode->bbox = leaf1->fatherNode->bbox;
-         }
-      }
+     }
    }
 
 

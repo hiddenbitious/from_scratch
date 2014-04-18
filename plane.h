@@ -36,6 +36,7 @@ class C_Plane {
 		void normalizePlane(void);
 		void setPlane(float , float , float , float);
 		void setPlane(C_Plane* plane);
+		void createFromPoints(const C_Vertex* vec1 , const C_Vertex* vec2 , const C_Vertex* vec3);
 
 		void getPlaneNormal(float* x , float* y , float* z);
 		C_Vertex getPlaneNormal(void);

@@ -16,7 +16,7 @@
 //#define PRINT_FUNC_ENTRY   printf("%s\n", __FUNCTION__)
 #define PRINT_FUNC_ENTRY
 
-//#define DRAW_BSP_GEOMETRY
+#define DRAW_BSP_GEOMETRY
 #define DRAW_TREE_MESHES
 
 #	include <stdint.h>

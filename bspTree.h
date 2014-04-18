@@ -116,6 +116,8 @@ public:
     */
    void closeLeafHoles(void);
 
+   void DistributeSamplePoints(void);
+
    void insertMeshIntoTree(C_MeshGroup *mesh);
 };
 

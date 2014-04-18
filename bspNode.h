@@ -66,7 +66,8 @@ public:
    /// Calculate node's bbox
    void CalculateBBox(void);
 
-   void DistributePointsAlongPartitionPlane(void);
+   void DistributePointsAlongPlane(C_Plane *plane);
+   void DistributePointsAlongBBox(void);
    void DistributeSamplePoints(vector<C_Vertex>& points);
    void CleanUpPointSet(vector<C_Vertex>& points, bool testWithBbox, bool testWithGeometry);
    bool addNodeToPVS(C_BspNode *node);
