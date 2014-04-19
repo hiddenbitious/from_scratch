@@ -9,8 +9,8 @@
 #define MINIMUMRELATION			0.5f
 #define MINIMUMRELATIONSCALE	2.0f
 
-#define NPOINTS_U 20
-#define NPOINTS_V 10
+#define NPOINTS_U 5
+#define NPOINTS_V 5
 
 C_BspNode::C_BspNode(void)
 {
@@ -62,6 +62,9 @@ C_BspNode::~C_BspNode()
    if(visibleFrom != NULL) {
       delete[] visibleFrom;
    }
+
+   if(triangles)
+      delete[] triangles;
 
    /// Empty the vector
    staticObjects.clear();
@@ -405,7 +408,7 @@ C_BspNode::Draw(C_Camera *camera)
    glDisableVertexAttribArray(bspShader->normalsAttribLocation);
    #endif
 
-   #ifdef DRAW_TREE_MESHES
+//   #ifdef DRAW_TREE_MESHES
    /// Draw static meshes
    for(unsigned int i = 0; i < staticObjects.size(); ++i) {
       tree->statistics.totalTriangles += staticObjects[i]->mesh.nTriangles;
@@ -414,17 +417,18 @@ C_BspNode::Draw(C_Camera *camera)
          continue;
       }
 
-      if(!camera->frustum->cubeInFrustum(&staticObjects[i]->mesh.bbox)) {
-         continue;
-      }
+//      if(!camera->frustum->cubeInFrustum(&staticObjects[i]->mesh.bbox)) {
+//         continue;
+//      }
 
-      staticObjects[i]->mesh.draw(camera);
+      if(staticObjects[i]->mesh.draw(camera))
+         tree->statistics.staticObjectsDrawn++;
+
       staticObjects[i]->drawn = true;
 
-      tree->statistics.staticObjectsDrawn++;
       tree->statistics.trianglesDrawn += staticObjects[i]->mesh.nTriangles;
    }
-   #endif
+//   #endif
 }
 
 void
@@ -654,10 +658,18 @@ C_BspNode::DistributePointsAlongPlane(C_Plane *plane)
       if(tmpV < minV) minV = tmpV;
    }
 
+   float nPointsU, nPointsV;
+   C_Vertex bbmin, bbmax;
+   bbox.GetMin(&bbmin);
+   bbox.GetMax(&bbmax);
+   float dist = MAX(bbmax.x - bbmin.x, bbmax.z - bbmin.z);
+   nPointsU = dist > 20.0f ? (dist / 20.0f) * NPOINTS_U : NPOINTS_U;
+   nPointsV = NPOINTS_V;
+
    assert(!FLOAT_EQ(maxU, minU));
    assert(!FLOAT_EQ(maxV, minV));
-   float stepU = (maxU - minU) / (float)NPOINTS_U;
-   float stepV = (maxV - minV) / (float)NPOINTS_V;
+   float stepU = (maxU - minU) / nPointsU;
+   float stepV = (maxV - minV) / nPointsV;
 
    C_Vector3 P;
    C_Vector3 A(&plane->points[0]);
