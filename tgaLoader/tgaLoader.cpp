@@ -287,8 +287,10 @@ C_Texture::LoadCompressedTGA(const char *filename, FILE * fTGA)    // Load COMPR
          }
       }
    }
-
    while(currentpixel < pixelcount);                                       // Loop while there are still pixels left
+
+   if(colorbuffer)
+      free(colorbuffer);
    fclose(fTGA);                                                     // Close the file
    return 1;                                                      // return success
 }

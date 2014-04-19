@@ -26,6 +26,12 @@ C_Map::~C_Map()
       delete bspTree;
       bspTree = NULL;
    }
+
+   for(int x = 0; x < TILES_ON_X; x++) {
+		for(int y = 0; y < TILES_ON_Y; y++) {
+         tiles[x][y].~tile();
+      }
+   }
 }
 
 bool
@@ -181,7 +187,7 @@ C_Map::draw(C_Camera *camera)
 
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-   floorMesh.draw(camera);
+//   floorMesh.draw(camera);
    mapPolys = bspTree->Draw_PVS(camera);
 
 
@@ -263,7 +269,7 @@ C_Map::readMap(const char *filename)
 		if(!c) {
 		   /// fgets doesn't stop at white spaces but it stops at '\n'
 			fgets(buf, MAX_PARAMETER_LENGTH, fd);
-			tiles[_x][_y].setParameter(buf);
+//			tiles[_x][_y].setParameter(buf);
 
 		   /// One loop is lost everytime a parameter is read.
          if(area == AREA_VOID) {
