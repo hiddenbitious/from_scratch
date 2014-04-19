@@ -54,10 +54,11 @@ public:
 
 class C_MeshGroup : public C_BaseMesh  {
 public:
-   C_Mesh         *meshes;       /// Linked list of meshes in group
-   int            nMeshes;       /// Number of meshes in group
+   C_Mesh         *meshes;                /// Linked list of meshes in group
+   int            nMeshes;                /// Number of meshes in group
    C_GLShader     *shader;
    ESMatrix       matrix;
+   bool           applyFrustumCulling;    /// Don't apply frustum culling on low poly meshes
 
    C_MeshGroup(void);
    ~C_MeshGroup(void);
@@ -67,7 +68,7 @@ public:
 
    C_Mesh *addMesh(void);        /// Creates a new mesh, adds it in the linked list and returns
                                  /// a pointer to it
-   void draw(C_Camera *camera);
+   bool draw(C_Camera *camera);
    void drawNormals(C_Camera *camera);
    void calculateBbox(void);
    void applyTransformationOnVertices(const ESMatrix *mat);

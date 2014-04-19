@@ -70,6 +70,7 @@ C_MeshGroup::softCopy(const C_MeshGroup *group)
       bbox = group->bbox;
       position = group->position;
       matrix = group->matrix;
+      applyFrustumCulling = group->applyFrustumCulling;
    }
 }
 
@@ -195,6 +196,7 @@ C_MeshGroup &C_MeshGroup::operator= (const C_MeshGroup &group)
       bbox = group.bbox;
       position = group.position;
       matrix = group.matrix;
+      applyFrustumCulling = group.applyFrustumCulling;
    }
    return *this;
 }
@@ -307,6 +309,7 @@ C_MeshGroup::loadFromFile(const char *filename)
 {
    glmReadOBJ(filename, this);
    calculateBbox();
+   applyFrustumCulling = nTriangles > 10 ? true : false;
 
    return true;
 }
@@ -372,12 +375,14 @@ C_Mesh::drawNormals(void)
    glEnd();
 }
 
-void
+bool
 C_MeshGroup::draw(C_Camera *camera)
 {
-//   if(camera && !camera->frustum->cubeInFrustum(&bbox)) {
-//      return;
-//   }
+   if(applyFrustumCulling) {
+      if(camera && !camera->frustum->cubeInFrustum(&bbox)) {
+         return false;
+      }
+   }
 
 	shaderManager->pushShader(shader);
 	ESMatrix mat;
@@ -436,6 +441,8 @@ C_MeshGroup::draw(C_Camera *camera)
    if(shader->tangetsAttribLocation >= 0)    glDisableVertexAttribArray(shader->tangetsAttribLocation);
 
    shaderManager->popShader();
+
+   return true;
 }
 
 void
