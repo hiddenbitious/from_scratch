@@ -18,6 +18,27 @@ C_Map::C_Map(void)
 	}
 }
 
+C_Vertex
+C_Map::cameraStartPosition(void)
+{
+   C_Vertex cameraPosition;
+   bool found = false;
+   int x, y;
+
+   for(x = 0; x < TILES_ON_X && !found; x++) {
+		for(y = 0; y < TILES_ON_Y && !found; y++) {
+		   if(tiles[x][y].getType() == TILE_4)
+		      found = true;
+		}
+   }
+
+   cameraPosition.x = y * TILE_SIZE - TILE_SIZE / 2.0f;
+   cameraPosition.y = TILE_SIZE / 2.0f;
+   cameraPosition.z = x * TILE_SIZE - TILE_SIZE / 2.0f;
+
+   return cameraPosition;
+}
+
 C_Map::~C_Map()
 {
    PRINT_FUNC_ENTRY;

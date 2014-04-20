@@ -261,7 +261,7 @@ C_BspTree::BuildPVS(void)
 
 	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-//	pvsFileFound = this->ReadPVSFile("map_pvs6_noHoles.txt");
+	pvsFileFound = this->ReadPVSFile("map_pvs6_noHoles.txt");
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points... " << flush;
@@ -278,9 +278,9 @@ C_BspTree::BuildPVS(void)
 	cout << "Done!" << endl << endl;
 
 	/// Write PVS into a file
-//	if(!pvsFileFound) {
-//		WritePVSFile("map_pvs6_noHoles.txt");
-//	}
+	if(!pvsFileFound) {
+		WritePVSFile("map_pvs6_noHoles.txt");
+	}
 }
 
 typedef struct {
@@ -394,9 +394,6 @@ C_BspTree::TraceVisibility(void)
 			for(unsigned int p1 = 0; p1 < leaves[i]->pointSet.size(); p1++) {
 				for(unsigned int p2 = 0; p2 < leaves[j]->pointSet.size(); p2++) {
 				   if(math::Distance(&leaves[i]->pointSet[p1], &leaves[j]->pointSet[p2]) < 5.0f) {
-//					if(FLOAT_EQ(leaves[i]->pointSet[p1].x, leaves[j]->pointSet[p2].x) &&
-//                  FLOAT_EQ(leaves[i]->pointSet[p1].y, leaves[j]->pointSet[p2].y) &&
-//						FLOAT_EQ(leaves[i]->pointSet[p1].z, leaves[j]->pointSet[p2].z)) {
 						if(leaves[j]->visibleFrom[leaves[i]->nodeID] == false) {
 							leaves[j]->connectedLeaves.push_back(leaves[i]);
 							leaves[j]->addNodeToPVS(leaves[i]);
@@ -437,7 +434,7 @@ C_BspTree::TraceVisibility(void)
    }
    printf("Done!\n");
 
-   return;
+//   return;
 
 /// Trace visibility
 /// ----------------------
@@ -619,7 +616,7 @@ C_BspTree::Draw_PVS(C_Camera *camera)
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODEL_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
    #endif
-      headNode->Draw(camera, this, true);
+      headNode->Draw(camera, this, USE_PVS);
    #ifdef DRAW_BSP_GEOMETRY
    }
    shaderManager->popShader();
@@ -947,10 +944,11 @@ C_BspTree::closeLeafHoles(void)
                         leaf1->bbox.SetVertices();
                         break;
                      } ///switch
-                  }
+                  } /// for(int jj
                }
             }
          }
+
      }
    }
 

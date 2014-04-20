@@ -353,10 +353,10 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
    } else {
       tree->statistics.totalLeaves += PVS.size();
 
-      if(nodeID != leaf) {
-         printf("entered leaf: %lu\n", nodeID);
-         leaf = nodeID;
-      }
+//      if(nodeID != leaf) {
+//         printf("entered leaf: %lu\n", nodeID);
+//         leaf = nodeID;
+//      }
 
 //      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 //      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -371,15 +371,17 @@ C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
       if(usePVS) {
          for(unsigned int i = 0 ; i < PVS.size() ; i++) {
             if(PVS[i]->drawn) {
-//               assert(0);
                continue;
             }
 
+            #ifdef ENABLE_BSP_FRUSTUM_CULLING
             if(!camera->frustum->cubeInFrustum(&PVS[i]->bbox)) {
                continue;
             }
+            #endif
 
             PVS[i]->Draw(camera);
+            PVS[i]->drawn = true;
             #ifdef DRAW_BSP_GEOMETRY
             PVS[i]->bbox.Draw();
             #endif
@@ -408,7 +410,7 @@ C_BspNode::Draw(C_Camera *camera)
    glDisableVertexAttribArray(bspShader->normalsAttribLocation);
    #endif
 
-//   #ifdef DRAW_TREE_MESHES
+   #ifdef DRAW_TREE_MESHES
    /// Draw static meshes
    for(unsigned int i = 0; i < staticObjects.size(); ++i) {
       tree->statistics.totalTriangles += staticObjects[i]->mesh.nTriangles;
@@ -428,7 +430,7 @@ C_BspNode::Draw(C_Camera *camera)
 
       tree->statistics.trianglesDrawn += staticObjects[i]->mesh.nTriangles;
    }
-//   #endif
+   #endif
 }
 
 void

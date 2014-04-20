@@ -37,6 +37,18 @@ C_Camera::C_Camera(void)
 	rotation = translation = true;
 }
 
+void
+C_Camera::SetPosition(C_Vertex pos)
+{
+   position.x = pos.x;
+   position.y = pos.y;
+   position.z = pos.z;
+
+   lookAt.x = pos.x;
+   lookAt.y = pos.y;
+   lookAt.z = pos.z - 1.0f;
+}
+
 void C_Camera::Look(void)
 {
 	rotationQuaternion.QuaternionToMatrix16(&globalViewMatrix);

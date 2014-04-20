@@ -167,6 +167,11 @@ Initializations(void)
 
    map.createMap("map.txt");
 
+   C_Vertex cameraPosition = map.cameraStartPosition();
+//   printf("cameraPosition: %f %f %f\n", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+   camera.SetPosition(cameraPosition);
+   camera.Rotate(0.0f, 180.0f);
+
    cube.loadFromFile("objmodels/cube.obj");
    cube.shader = wallShader;
 
@@ -302,21 +307,23 @@ static void
 handle_arrows(int key , int x , int y)
 {
 	switch(key) {
-		case GLUT_KEY_UP:
-			camera.Move(speed);
-			break;
+   case GLUT_KEY_UP:
+      camera.Move(TILE_SIZE);
+      break;
 
-		case GLUT_KEY_DOWN:
-			camera.Move(-speed);
-			break;
+   case GLUT_KEY_DOWN:
+      camera.Move(-TILE_SIZE);
+      break;
 
-		case GLUT_KEY_RIGHT:
-			camera.StrafeRight(speed);
-			break;
+   case GLUT_KEY_RIGHT:
+//			camera.StrafeRight(speed);
+      camera.Rotate(0.0f, -90.0f);
+      break;
 
-		case GLUT_KEY_LEFT:
-			camera.StrafeLeft(speed);
-			break;
+   case GLUT_KEY_LEFT:
+//			camera.StrafeLeft(speed);
+      camera.Rotate(0.0f, 90.0f);
+      break;
 	}
 
 	glutPostRedisplay();

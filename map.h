@@ -15,6 +15,8 @@ public:
 
    bool createMap(const char *filename);
 
+   C_Vertex cameraStartPosition(void);
+
    void draw(C_Camera *camera);
 
 private:

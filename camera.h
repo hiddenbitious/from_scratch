@@ -52,6 +52,7 @@ public:
    void PrintText(int x , int y , float r , float g , float b , float a , const char *text  , ...);
 
    inline C_Vector3 GetPosition(void) const { return position; }
+   void SetPosition(C_Vertex pos);
 };
 
 #endif
