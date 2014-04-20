@@ -217,11 +217,11 @@ Draw(void)
 
 #ifndef JNI_COMPATIBLE
 	/// Print text on screem
-	int line = 1;
-	int lineHeight = 18;
-	camera.PrintText(0 , lineHeight * line++ ,
-					 1.0f , 1.0f , 0.0f , 0.6f ,
-					 "FPS: %d" , (int)fps);
+//	int line = 1;
+//	int lineHeight = 18;
+//	camera.PrintText(0 , lineHeight * line++ ,
+//					 1.0f , 1.0f , 0.0f , 0.6f ,
+//					 "FPS: %d" , (int)fps);
 
 	/// Update timer
 	timer.Update ();
@@ -279,22 +279,42 @@ hande_simple_keys(unsigned char key , int x , int y)
 			exit(0);
 			break;
 
-		case 'a' : case 'A' :
-			camera.MoveUp(speed);
-			break;
-
-		case 'z' : case 'Z' :
-			camera.MoveDown(speed);
+		case 'w' : case 'W' :
+			camera.Move(TILE_SIZE);
 			break;
 
 		case 's' : case 'S' :
-			frustumCulling = !frustumCulling;
+			camera.Move(-TILE_SIZE);
+			break;
+
+		case 'a' : case 'A' :
+         camera.Rotate(0.0f, 90.0f);
+			break;
+
+      case 'd' : case 'D' :
+         camera.Rotate(0.0f, -90.0f);
+			break;
+
+		case 'z' : case 'Z' :
+			camera.MoveUp(speed);
 			break;
 
 		case 'x' : case 'X' :
-			bspRenderingType = (bspRenderingType + 1) % 4;
-			printf("bspRenderingType: %d\n", bspRenderingType);
+			camera.MoveDown(speed);
 			break;
+
+		case 'q' : case 'Q' :
+			camera.StrafeLeft(TILE_SIZE);
+			break;
+
+		case 'e' : case 'E' :
+			camera.StrafeRight(TILE_SIZE);
+			break;
+
+//		case 'x' : case 'X' :
+//			bspRenderingType = (bspRenderingType + 1) % 4;
+//			printf("bspRenderingType: %d\n", bspRenderingType);
+//			break;
 
 		default:
 			cout << int (key) << '\n';
@@ -316,19 +336,35 @@ handle_arrows(int key , int x , int y)
       break;
 
    case GLUT_KEY_RIGHT:
-//			camera.StrafeRight(speed);
-      camera.Rotate(0.0f, -90.0f);
+			camera.StrafeRight(TILE_SIZE);
+//      camera.Rotate(0.0f, -90.0f);
       break;
 
    case GLUT_KEY_LEFT:
-//			camera.StrafeLeft(speed);
-      camera.Rotate(0.0f, 90.0f);
+			camera.StrafeLeft(TILE_SIZE);
+//      camera.Rotate(0.0f, 90.0f);
       break;
 	}
 
 	glutPostRedisplay();
 }
 #endif
+
+void
+CountFPS (void)
+{
+	static ULONG count = 0.0f;
+	float delta = timer.GetTime () - start;
+	count++;
+
+	if(delta >= 1000.0f) {
+		fps = count;
+		start = timer.GetTime ();
+		printf("fps: %d\n", count);
+
+		count = 0;
+	}
+}
 
 int
 main(int argc, char* argv[])
@@ -363,18 +399,4 @@ main(int argc, char* argv[])
 #endif
 
 	return 0;
-}
-
-void
-CountFPS (void)
-{
-	static ULONG count = 0.0f;
-	float delta = timer.GetTime () - start;
-	count++;
-
-	if(delta >= 1000.0f) {
-		fps = count;
-		start = timer.GetTime ();
-		count = 0;
-	}
 }

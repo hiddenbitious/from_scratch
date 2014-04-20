@@ -139,8 +139,38 @@ C_Map::placeObjects(void)
          } else if(tiles[x][y].getArea() == AREA_WALKABLE) {
             esMatrixLoadIdentity(&mat);
 
-            esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
-            bspTree->insertStaticObject(&floorMesh, &mat);
+            /// Choose randomly between all floor tiles
+            switch(rand()%4) {
+            case 0:
+               esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+               bspTree->insertStaticObject(&floorMesh, &mat);
+               break;
+            case 1:
+               esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+               bspTree->insertStaticObject(&floorMesh2, &mat);
+               break;
+            case 2:
+            case 3:
+               esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+               bspTree->insertStaticObject((rand()%2) ? &floorMesh3 : &floorMesh4, &mat);
+               esMatrixLoadIdentity(&mat);
+
+               esTranslate(&mat, (float)(y) * TILE_SIZE + TILE_SIZE / 2.0f, 0.0f, (float)(x) * TILE_SIZE);
+               bspTree->insertStaticObject((rand()%2) ? &floorMesh3 : &floorMesh4, &mat);
+               esMatrixLoadIdentity(&mat);
+
+               esTranslate(&mat, (float)(y) * TILE_SIZE, 0.0f, (float)(x) * TILE_SIZE + TILE_SIZE / 2.0f);
+               bspTree->insertStaticObject((rand()%2) ? &floorMesh3 : &floorMesh4, &mat);
+               esMatrixLoadIdentity(&mat);
+
+               esTranslate(&mat, (float)(y) * TILE_SIZE + TILE_SIZE / 2.0f, 0.0f, (float)(x) * TILE_SIZE + TILE_SIZE / 2.0f);
+               bspTree->insertStaticObject((rand()%2) ? &floorMesh3 : &floorMesh4, &mat);
+               break;
+//            case 4:
+//               esTranslate(&mat, (float)y * TILE_SIZE, 0.0f, (float)x * TILE_SIZE);
+//               bspTree->insertStaticObject(&grating, &mat);
+//               break;
+            }
          }
       }
    }
@@ -157,12 +187,23 @@ C_Map::load3DObjects(void)
    /// Obiously an mesh manager will be needed to avoid loading
    /// the same mesh more than once
 
-//   wallMesh.loadFromFile("objmodels/cube.obj");
    wallMesh.loadFromFile("wallMeshes/wall_01.obj");
    wallMesh.shader = wallShader;
 
    floorMesh.loadFromFile("wallMeshes/floor_01.obj");
    floorMesh.shader = wallShader;
+
+   floorMesh2.loadFromFile("wallMeshes/floor_02.obj");
+   floorMesh2.shader = wallShader;
+
+   floorMesh3.loadFromFile("wallMeshes/floor_03.obj");
+   floorMesh3.shader = wallShader;
+
+   floorMesh4.loadFromFile("wallMeshes/floor_04.obj");
+   floorMesh4.shader = wallShader;
+
+   grating.loadFromFile("wallMeshes/grating.obj");
+   grating.shader = wallShader;
 
    /// Scale wall mesh
    C_Vertex min, max;
@@ -198,6 +239,57 @@ C_Map::load3DObjects(void)
    esScale(&matrix, scale, scale, scale);
    floorMesh.applyTransformationOnVertices(&matrix);
 
+   /// Scale floor2 mesh
+   floorMesh2.bbox.GetMax(&max);
+   floorMesh2.bbox.GetMin(&min);
+   xLen = max.x - min.x;
+   zLen = max.z - min.z;
+   scale = TILE_SIZE / MAX(xLen, zLen);
+   matrix = Identity;
+   /// Translate it a bit
+   esTranslate(&matrix, TILE_SIZE / 2.0f, 0.0f, TILE_SIZE / 2.0f);
+   /// Scale it to fit TILE_SIZE
+   esScale(&matrix, scale, scale, scale);
+   floorMesh2.applyTransformationOnVertices(&matrix);
+
+   /// Scale floor3 mesh
+   floorMesh3.bbox.GetMax(&max);
+   floorMesh3.bbox.GetMin(&min);
+   xLen = max.x - min.x;
+   zLen = max.z - min.z;
+   scale = TILE_SIZE / MAX(xLen, zLen) / 2.0f;
+   matrix = Identity;
+   /// Translate it a bit
+   esTranslate(&matrix, TILE_SIZE / 4.0f, 0.0f, TILE_SIZE / 4.0f);
+   /// Scale it to fit TILE_SIZE
+   esScale(&matrix, scale, scale, scale);
+   floorMesh3.applyTransformationOnVertices(&matrix);
+
+   /// Scale floor4 mesh
+   floorMesh4.bbox.GetMax(&max);
+   floorMesh4.bbox.GetMin(&min);
+   xLen = max.x - min.x;
+   zLen = max.z - min.z;
+   scale = TILE_SIZE / MAX(xLen, zLen) / 2.0f;
+   matrix = Identity;
+   /// Translate it a bit
+   esTranslate(&matrix, TILE_SIZE / 4.0f, 0.0f, TILE_SIZE / 4.0f);
+   /// Scale it to fit TILE_SIZE
+   esScale(&matrix, scale, scale, scale);
+   floorMesh4.applyTransformationOnVertices(&matrix);
+
+   /// Scale grating mesh
+   grating.bbox.GetMax(&max);
+   grating.bbox.GetMin(&min);
+   xLen = max.x - min.x;
+   zLen = max.z - min.z;
+   scale = TILE_SIZE / MAX(xLen, zLen);
+   matrix = Identity;
+   /// Translate it a bit
+   esTranslate(&matrix, TILE_SIZE / 2.0f, 0.0f, TILE_SIZE / 2.0f);
+   /// Scale it to fit TILE_SIZE
+   esScale(&matrix, scale, scale, scale);
+   grating.applyTransformationOnVertices(&matrix);
    return true;
 }
 
@@ -208,24 +300,23 @@ C_Map::draw(C_Camera *camera)
 
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-//   floorMesh.draw(camera);
+   floorMesh4.draw(camera);
    mapPolys = bspTree->Draw_PVS(camera);
 
-
-	int line = 2;
-	int lineHeight = 18;
-
-	camera->PrintText(0, lineHeight * line++,
-					 1.0f, 1.0f, 0.0f, 0.6f,
-					 "total leaves: %d. Drawn: %d" , bspTree->statistics.totalLeaves, bspTree->statistics.leavesDrawn);
-
-	camera->PrintText(0, lineHeight * line++,
-					 1.0f, 1.0f, 0.0f, 0.6f,
-					 "total objects: %d. Drawn: %d" , bspTree->statistics.totalStaticObjects, bspTree->statistics.staticObjectsDrawn);
-
-	camera->PrintText(0, lineHeight * line++,
-					 1.0f, 1.0f, 0.0f, 0.6f,
-					 "total triangles: %d. Drawn: %d" , bspTree->statistics.totalTriangles, bspTree->statistics.trianglesDrawn);
+//	int line = 2;
+//	int lineHeight = 18;
+//
+//	camera->PrintText(0, lineHeight * line++,
+//					 1.0f, 1.0f, 0.0f, 0.6f,
+//					 "total leaves: %d. Drawn: %d" , bspTree->statistics.totalLeaves, bspTree->statistics.leavesDrawn);
+//
+//	camera->PrintText(0, lineHeight * line++,
+//					 1.0f, 1.0f, 0.0f, 0.6f,
+//					 "total objects: %d. Drawn: %d" , bspTree->statistics.totalStaticObjects, bspTree->statistics.staticObjectsDrawn);
+//
+//	camera->PrintText(0, lineHeight * line++,
+//					 1.0f, 1.0f, 0.0f, 0.6f,
+//					 "total triangles: %d. Drawn: %d" , bspTree->statistics.totalTriangles, bspTree->statistics.trianglesDrawn);
 
 //   /// Print statistics
 //   printf("Draw statistics:\n");

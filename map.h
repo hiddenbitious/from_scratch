@@ -23,6 +23,10 @@ private:
    C_BspTree *bspTree;
    C_MeshGroup wallMesh;
    C_MeshGroup floorMesh;
+   C_MeshGroup floorMesh2;
+   C_MeshGroup floorMesh3;
+   C_MeshGroup floorMesh4;
+   C_MeshGroup grating;
 
    /// All map tiles
    tile tiles[TILES_ON_X][TILES_ON_Y];
