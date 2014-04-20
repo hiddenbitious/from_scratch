@@ -22,6 +22,7 @@ public:
 private:
    C_BspTree *bspTree;
    C_MeshGroup wallMesh;
+   C_MeshGroup wallMesh2;
    C_MeshGroup floorMesh;
    C_MeshGroup floorMesh2;
    C_MeshGroup floorMesh3;
