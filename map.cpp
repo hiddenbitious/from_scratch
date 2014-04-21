@@ -272,13 +272,21 @@ C_Map::load3DObjects(void)
    grating.loadFromFile("wallMeshes/grating.obj");
    grating.shader = wallShader;
 
+   corner_inner.loadFromFile("wallMeshes/corner_inner.obj");
+   corner_inner.shader = wallShader;
+
+   corner_outer.loadFromFile("wallMeshes/corner_outer.obj");
+   corner_outer.shader = wallShader;
+
    /// Scale wall mesh
    C_Vertex min, max;
+   float xLen, yLen, zLen, scale;
+
    wallMesh.bbox.GetMax(&max);
    wallMesh.bbox.GetMin(&min);
-   float xLen = max.x - min.x;
-   float zLen = max.z - min.z;
-   float scale = TILE_SIZE / MAX(xLen, zLen);
+   xLen = max.x - min.x;
+   zLen = max.z - min.z;
+   scale = TILE_SIZE / MAX(xLen, zLen);
    /// Scale it to fit TILE_SIZE
    ESMatrix matrix = Identity;
    esScale(&matrix, scale, scale, scale);
@@ -377,6 +385,31 @@ C_Map::load3DObjects(void)
    /// Scale it to fit TILE_SIZE
    esScale(&matrix, scale, scale, scale);
    grating.applyTransformationOnVertices(&matrix);
+
+   /// Scale corner_inner mesh
+   corner_inner.bbox.GetMax(&max);
+   corner_inner.bbox.GetMin(&min);
+   yLen = max.y - min.y;
+   scale = TILE_SIZE / yLen;
+   matrix = Identity;
+   /// Translate it a bit
+   esTranslate(&matrix, TILE_SIZE / 2.0f, 0.0f, TILE_SIZE / 2.0f);
+   /// Scale it to fit TILE_SIZE
+   esScale(&matrix, scale, scale, scale);
+   corner_inner.applyTransformationOnVertices(&matrix);
+
+   /// Scale corner_outer mesh
+   corner_outer.bbox.GetMax(&max);
+   corner_outer.bbox.GetMin(&min);
+   yLen = max.y - min.y;
+   scale = TILE_SIZE / yLen;
+   matrix = Identity;
+   /// Translate it a bit
+   esTranslate(&matrix, TILE_SIZE / 2.0f, 0.0f, TILE_SIZE / 2.0f);
+   /// Scale it to fit TILE_SIZE
+   esScale(&matrix, scale, scale, scale);
+   corner_outer.applyTransformationOnVertices(&matrix);
+
    return true;
 }
 
@@ -387,7 +420,8 @@ C_Map::draw(C_Camera *camera)
 
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-   floorMesh4.draw(camera);
+//   floorMesh4.draw(camera);
+   corner_outer.draw(camera);
    mapPolys = bspTree->Draw_PVS(camera);
 
 //	int line = 2;

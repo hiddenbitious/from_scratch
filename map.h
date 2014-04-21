@@ -28,6 +28,8 @@ private:
    C_MeshGroup floorMesh3;
    C_MeshGroup floorMesh4;
    C_MeshGroup grating;
+   C_MeshGroup corner_inner;
+   C_MeshGroup corner_outer;
 
    /// All map tiles
    tile tiles[TILES_ON_X][TILES_ON_Y];

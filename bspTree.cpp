@@ -943,11 +943,11 @@ C_BspTree::closeLeafHoles(void)
                         leaf1->bbox.SetMin(min.x, min.y, min.z - cNode->bestNodeDistances[Z_MINUS]);
                         leaf1->bbox.SetVertices();
                         break;
-                     } ///switch
-                  } /// for(int jj
-               }
-            }
-         }
+                     } // switch
+                  } // for(int jj
+               } // if
+            } // if
+         } // for
 
      }
    }
