@@ -897,25 +897,25 @@ C_BspTree::closeLeafHoles(void)
          !cNode->adjacentNodes[Z_MINUS].size() || !cNode->adjacentNodes[Z_PLUS].size() ||
          !cNode->adjacentNodes[Y_MINUS].size() || !cNode->adjacentNodes[Y_PLUS].size()) {
 
-         printf("leaf %lu is not tightly packed.", leaf1->nodeID);
-         printf("Uncovered faces are: ");
-         for(int i = 0; i < TOTAL_FACES; i++) {
-            if(!cNode->adjacentNodes[i].size()) {
-               printf("%s ", C_BBox::ADJACENT_FACE_NAMES[i]);
-               printf("Best candidates: ");
+//         printf("leaf %lu is not tightly packed.", leaf1->nodeID);
+//         printf("Uncovered faces are: ");
+//         for(int i = 0; i < TOTAL_FACES; i++) {
+//            if(!cNode->adjacentNodes[i].size()) {
+//               printf("%s ", C_BBox::ADJACENT_FACE_NAMES[i]);
+//               printf("Best candidates: ");
+//
+//               if(cNode->bestNodeToConnect[i].size()) {
+////                  printf("+_+_+_ %d\n", cNode->bestNodeToConnect[i].size());
+//                  for(int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj)
+//                    printf("%lu ", cNode->bestNodeToConnect[i][jj]->nodeID);
+//                  printf("\n");
+//               } else {
+//                  printf("none!\n");
+//               }
+//            }
+//         }
 
-               if(cNode->bestNodeToConnect[i].size()) {
-//                  printf("+_+_+_ %d\n", cNode->bestNodeToConnect[i].size());
-                  for(int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj)
-                    printf("%lu ", cNode->bestNodeToConnect[i][jj]->nodeID);
-                  printf("\n");
-               } else {
-                  printf("none!\n");
-               }
-            }
-         }
-
-         /// Connect leaf1 with all candidates nodes
+         /// Connect leaf1 with all candidate nodes
          C_Vertex min, max;
          for(int i = 0; i < TOTAL_FACES; i++) {
             if(!cNode->adjacentNodes[i].size()) {

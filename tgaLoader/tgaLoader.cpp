@@ -309,6 +309,7 @@ C_TextureManager::~C_TextureManager(void)
    for(unsigned int i = 0; i <= textures.size(); ++i) {
       delete textures[i];
    }
+
    textures.clear();
 }
 
@@ -324,9 +325,10 @@ C_TextureManager::loadTexture(const char *filename, filtering_method_t filtering
 
    /// If it does not exist, create it, load it from disk and return it
    C_Texture *texture = new C_Texture;
-   if(texture->loadGLTexture(filename, filteringMethod))
+   if(texture->loadGLTexture(filename, filteringMethod)) {
+      textures.push_back(texture);
       return texture;
-   else {
+   } else {
       delete texture;
       return NULL;
    }
