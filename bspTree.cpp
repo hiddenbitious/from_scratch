@@ -298,12 +298,13 @@ void *TraceVisibility_Thread(void *data_)
    C_BspTree *tree = data->tree;
    vector<C_BspNode *> &leaves = tree->leaves;
    C_BspNode *leaf1, *leaf2, *leaf3;
+   const int progressBarStars = 20;
 
    C_BspNode *res;
    int load = leaves.size();
    int start = load / MAX_THREADS * tid;
    int end = load / MAX_THREADS * (tid + 1);
-   float step = 20.0f / (float)load;
+   float step = (float)progressBarStars / (float)load;
 
    /// thread 0 prints progress bar
    if(!tid) {
@@ -357,7 +358,7 @@ void *TraceVisibility_Thread(void *data_)
 
   		if(!tid) {
          cout << "\r\t\t   ";
-         for(int k = 0 ; k < (int)progress ; k++)
+         for(int k = 0 ; k < (int)floor(progress + 0.5f); k++)
             cout << "*" << flush;
       }
 	}
