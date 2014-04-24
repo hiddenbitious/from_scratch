@@ -23,6 +23,7 @@
 #include "mesh.h"
 #include "map.h"
 #include "timer.h"
+#include "actor.h"
 #include "glsl/glsl.h"
 #include "metaballs/cubeGrid.h"
 #include "metaballs/metaball.h"
@@ -48,8 +49,9 @@ C_GLShader *pointShader = NULL;
 C_GLShader *wallShader = NULL;
 
 /// Camera and frustum
-static C_Camera camera;
+C_Camera camera;
 static C_Frustum frustum;
+static C_Party party;
 
 /// window stuff
 static int winID;
@@ -211,6 +213,8 @@ Draw(void)
 	angle += .03f;
 	if(angle >= 360.0f) angle = 0.0f;
 
+   party.update();
+
 	cube.draw(&camera);
 
    map.draw(&camera);
@@ -280,19 +284,23 @@ hande_simple_keys(unsigned char key , int x , int y)
 			break;
 
 		case 'w' : case 'W' :
-			camera.Move(TILE_SIZE);
+//			camera.Move(TILE_SIZE);
+			party.move(MOVE_FORWARD);
 			break;
 
 		case 's' : case 'S' :
-			camera.Move(-TILE_SIZE);
+//			camera.Move(-TILE_SIZE);
+			party.move(MOVE_BACKWARDS);
 			break;
 
 		case 'a' : case 'A' :
-         camera.Rotate(0.0f, 90.0f);
+//         camera.Rotate(0.0f, 90.0f);
+         party.move(MOVE_TURN_LEFT);
 			break;
 
       case 'd' : case 'D' :
-         camera.Rotate(0.0f, -90.0f);
+//         camera.Rotate(0.0f, -90.0f);
+         party.move(MOVE_TURN_RIGHT);
 			break;
 
 		case 'z' : case 'Z' :
@@ -304,12 +312,15 @@ hande_simple_keys(unsigned char key , int x , int y)
 			break;
 
 		case 'q' : case 'Q' :
-			camera.StrafeLeft(TILE_SIZE);
+//			camera.StrafeLeft(TILE_SIZE);
+         party.move(MOVE_STRAFE_LEFT);
 			break;
 
 		case 'e' : case 'E' :
-			camera.StrafeRight(TILE_SIZE);
+//			camera.StrafeRight(TILE_SIZE);
+         party.move(MOVE_STRAFE_RIGHT);
 			break;
+
 
 //		case 'x' : case 'X' :
 //			bspRenderingType = (bspRenderingType + 1) % 4;
