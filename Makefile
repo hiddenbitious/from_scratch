@@ -1,5 +1,5 @@
 CXX=clang++
-CFLAGS=-c -Wall -O0 -g
+CFLAGS=-c -Wall -O3
 
 GL_PATH=/usr/lib/x86_64-linux-gnu/mesa/
 GLEW_PATH=/usr/lib/x86_64-linux-gnu/
@@ -14,7 +14,7 @@ SOURCES=main.cpp bbox.cpp metaballs/cubeGrid.cpp quaternion.cpp \
 		  math.cpp frustum.cpp vectors.cpp plane.cpp camera.cpp timer.cpp glsl/glsl.cpp \
 		  bspTree.cpp bspNode.cpp bspHelperFunctions.cpp mesh.cpp \
 		  objreader/objfile.cpp tgaLoader/tgaLoader.cpp \
-		  map.cpp tile.cpp
+		  map.cpp tile.cpp actor.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=from_scratch
 

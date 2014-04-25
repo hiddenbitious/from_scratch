@@ -104,6 +104,18 @@ typedef enum {
 	txTrilinear	= 2,
 } eglTexFilterType;
 
+typedef enum {
+   X_MINUS,
+   Z_MINUS,
+   X_PLUS,
+   Z_PLUS,
+
+   Y_MINUS,
+   Y_PLUS,
+
+   TOTAL_FACES
+} tile_direction_t;
+
 typedef	struct {
 	uint32_t 	TextureID;     // Texture ID Used To Select A Texture
 	eglTexType	TexType;       // Texture Format
@@ -132,5 +144,6 @@ extern C_GLShader *pointShader;
 extern C_GLShader *wallShader;
 extern C_Vertex lightPosition;
 extern char MAX_THREADS;
+extern C_Camera camera;
 
 #endif

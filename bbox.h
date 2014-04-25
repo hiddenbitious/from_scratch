@@ -20,18 +20,6 @@
 #include "glsl/glsl.h"
 #include "bvolumes.h"
 
-typedef enum {
-   X_MINUS,    /// 0
-   Y_MINUS,    /// 1
-   Z_MINUS,    /// 2
-
-   X_PLUS,     /// 3
-   Y_PLUS,     /// 4
-   Z_PLUS,     /// 5
-
-   TOTAL_FACES
-} adjacent_face_t;
-
 class C_BBox : C_BVolumes {
 private:
    C_Vector3 min;
@@ -48,7 +36,7 @@ public:
    C_BBox &operator= (const C_BBox &box);
 
    const static char *ADJACENT_FACE_NAMES[TOTAL_FACES];
-   adjacent_face_t areBboxesAdjacent(const C_BBox *box);
+   tile_direction_t areBboxesAdjacent(const C_BBox *box);
 
    void SetMin(const float x , const float y , const float z);
    void SetMin(const C_Vector3* vec);

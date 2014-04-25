@@ -73,6 +73,8 @@
 		<Unit filename="metaballs/tables.h" />
 		<Unit filename="objreader/objfile.cpp" />
 		<Unit filename="objreader/objfile.h" />
+		<Unit filename="party.cpp" />
+		<Unit filename="party.h" />
 		<Unit filename="plane.cpp" />
 		<Unit filename="plane.h" />
 		<Unit filename="quaternion.cpp" />
