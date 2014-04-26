@@ -42,12 +42,12 @@ C_Map::cameraStartPosition(int *x_, int *y_)
    }
 
    assert(found);
-   *x_ = x - 1;
-   *y_ = y - 1;
+   *x_ = --x;
+   *y_ = --y;
 
-   cameraPosition.x = y * TILE_SIZE - TILE_SIZE / 2.0f;
+   cameraPosition.x = y * TILE_SIZE + TILE_SIZE / 2.0f;
    cameraPosition.y = TILE_SIZE / 2.0f;
-   cameraPosition.z = x * TILE_SIZE - TILE_SIZE / 2.0f;
+   cameraPosition.z = x * TILE_SIZE + TILE_SIZE / 2.0f;
 
    return cameraPosition;
 }
@@ -285,11 +285,11 @@ C_Map::load3DObjects(void)
    grating.loadFromFile("wallMeshes/grating.obj");
    grating.shader = wallShader;
 
-   corner_inner.loadFromFile("wallMeshes/corner_inner.obj");
-   corner_inner.shader = wallShader;
-
-   corner_outer.loadFromFile("wallMeshes/corner_outer.obj");
-   corner_outer.shader = wallShader;
+//   corner_inner.loadFromFile("wallMeshes/corner_inner.obj");
+//   corner_inner.shader = wallShader;
+//
+//   corner_outer.loadFromFile("wallMeshes/corner_outer.obj");
+//   corner_outer.shader = wallShader;
 
    /// Scale wall mesh
    C_Vertex min, max;
@@ -399,29 +399,29 @@ C_Map::load3DObjects(void)
    esScale(&matrix, scale, scale, scale);
    grating.applyTransformationOnVertices(&matrix);
 
-   /// Scale corner_inner mesh
-   corner_inner.bbox.GetMax(&max);
-   corner_inner.bbox.GetMin(&min);
-   yLen = max.y - min.y;
-   scale = TILE_SIZE / yLen;
-   matrix = Identity;
-   /// Translate it a bit
-   esTranslate(&matrix, TILE_SIZE / 2.0f, 0.0f, TILE_SIZE / 2.0f);
-   /// Scale it to fit TILE_SIZE
-   esScale(&matrix, scale, scale, scale);
-   corner_inner.applyTransformationOnVertices(&matrix);
-
-   /// Scale corner_outer mesh
-   corner_outer.bbox.GetMax(&max);
-   corner_outer.bbox.GetMin(&min);
-   yLen = max.y - min.y;
-   scale = TILE_SIZE / yLen;
-   matrix = Identity;
-   /// Translate it a bit
-   esTranslate(&matrix, TILE_SIZE / 2.0f, 0.0f, TILE_SIZE / 2.0f);
-   /// Scale it to fit TILE_SIZE
-   esScale(&matrix, scale, scale, scale);
-   corner_outer.applyTransformationOnVertices(&matrix);
+//   /// Scale corner_inner mesh
+//   corner_inner.bbox.GetMax(&max);
+//   corner_inner.bbox.GetMin(&min);
+//   yLen = max.y - min.y;
+//   scale = TILE_SIZE / yLen;
+//   matrix = Identity;
+//   /// Translate it a bit
+//   esTranslate(&matrix, TILE_SIZE / 2.0f, 0.0f, TILE_SIZE / 2.0f);
+//   /// Scale it to fit TILE_SIZE
+//   esScale(&matrix, scale, scale, scale);
+//   corner_inner.applyTransformationOnVertices(&matrix);
+//
+//   /// Scale corner_outer mesh
+//   corner_outer.bbox.GetMax(&max);
+//   corner_outer.bbox.GetMin(&min);
+//   yLen = max.y - min.y;
+//   scale = TILE_SIZE / yLen;
+//   matrix = Identity;
+//   /// Translate it a bit
+//   esTranslate(&matrix, TILE_SIZE / 2.0f, 0.0f, TILE_SIZE / 2.0f);
+//   /// Scale it to fit TILE_SIZE
+//   esScale(&matrix, scale, scale, scale);
+//   corner_outer.applyTransformationOnVertices(&matrix);
 
    return true;
 }
@@ -434,7 +434,7 @@ C_Map::draw(C_Camera *camera)
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 //   floorMesh4.draw(camera);
-   corner_outer.draw(camera);
+//   corner_outer.draw(camera);
    mapPolys = bspTree->Draw_PVS(camera);
 
 //	int line = 2;
