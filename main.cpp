@@ -169,13 +169,17 @@ Initializations(void)
 
    map.createMap("map.txt");
 
-   C_Vertex cameraPosition = map.cameraStartPosition();
+   int tileStartx, tileStarty;
+   C_Vertex cameraPosition = map.cameraStartPosition(&tileStartx, &tileStarty);
 //   printf("cameraPosition: %f %f %f\n", cameraPosition.x, cameraPosition.y, cameraPosition.z);
    camera.SetPosition(cameraPosition);
    camera.Rotate(0.0f, 180.0f);
 
    cube.loadFromFile("objmodels/cube.obj");
    cube.shader = wallShader;
+
+   party.setMap(&map);
+   party.setCoordinates(tileStartx, tileStarty);
 
 	/// timer initialization
 	timer.Initialize ();
@@ -371,6 +375,7 @@ CountFPS (void)
 	if(delta >= 1000.0f) {
 		fps = count;
 		start = timer.GetTime ();
+
 		printf("fps: %d\n", count);
 
 		count = 0;

@@ -39,6 +39,8 @@
 		<Unit filename="C_logFile/logFile.cpp" />
 		<Unit filename="C_logFile/logFile.h" />
 		<Unit filename="Makefile" />
+		<Unit filename="actor.cpp" />
+		<Unit filename="actor.h" />
 		<Unit filename="bbox.cpp" />
 		<Unit filename="bbox.h" />
 		<Unit filename="box.cpp" />
@@ -73,8 +75,6 @@
 		<Unit filename="metaballs/tables.h" />
 		<Unit filename="objreader/objfile.cpp" />
 		<Unit filename="objreader/objfile.h" />
-		<Unit filename="party.cpp" />
-		<Unit filename="party.h" />
 		<Unit filename="plane.cpp" />
 		<Unit filename="plane.h" />
 		<Unit filename="quaternion.cpp" />

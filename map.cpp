@@ -18,8 +18,17 @@ C_Map::C_Map(void)
 	}
 }
 
+tile *
+C_Map::getTile(int x, int y)
+{
+   assert(x >= 0 && x < TILES_ON_X);
+   assert(y >= 0 && y < TILES_ON_Y);
+
+   return &tiles[x][y];
+}
+
 C_Vertex
-C_Map::cameraStartPosition(void)
+C_Map::cameraStartPosition(int *x_, int *y_)
 {
    C_Vertex cameraPosition;
    bool found = false;
@@ -31,6 +40,10 @@ C_Map::cameraStartPosition(void)
 		      found = true;
 		}
    }
+
+   assert(found);
+   *x_ = x - 1;
+   *y_ = y - 1;
 
    cameraPosition.x = y * TILE_SIZE - TILE_SIZE / 2.0f;
    cameraPosition.y = TILE_SIZE / 2.0f;
