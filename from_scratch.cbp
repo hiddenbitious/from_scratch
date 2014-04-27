@@ -62,6 +62,8 @@
 		<Unit filename="globals.h" />
 		<Unit filename="glsl/glsl.cpp" />
 		<Unit filename="glsl/glsl.h" />
+		<Unit filename="input.cpp" />
+		<Unit filename="input.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="map.cpp" />
 		<Unit filename="map.h" />

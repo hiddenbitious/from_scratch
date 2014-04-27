@@ -23,6 +23,7 @@
 #include "mesh.h"
 #include "map.h"
 #include "timer.h"
+#include "input.h"
 #include "actor.h"
 #include "glsl/glsl.h"
 #include "metaballs/cubeGrid.h"
@@ -52,6 +53,7 @@ C_GLShader *wallShader = NULL;
 C_Camera camera;
 static C_Frustum frustum;
 static C_Party party;
+C_InputHandler inputHandler;
 
 /// window stuff
 static int winID;
@@ -64,7 +66,6 @@ static int windowPositionY = 200;
 static float speed = 7.0f;
 
 static bool frustumCulling = true;
-static int bspRenderingType = 0;
 
 static C_Vector3 center(0.0f , 0.0f , 0.0f);
 
@@ -282,60 +283,30 @@ mouse_look(int x , int y)
 static void
 hande_simple_keys(unsigned char key , int x , int y)
 {
-	switch(key) {
-		case 27 : case 13 :	//ESC
-		   shutdown();
-			exit(0);
-			break;
+//   printf("%c pressed\n", key);
 
-		case 'w' : case 'W' :
-//			camera.Move(TILE_SIZE);
-			party.move(MOVE_FORWARD);
-			break;
-
-		case 's' : case 'S' :
-//			camera.Move(-TILE_SIZE);
-			party.move(MOVE_BACKWARDS);
-			break;
-
-		case 'a' : case 'A' :
-//         camera.Rotate(0.0f, 90.0f);
-         party.move(MOVE_TURN_LEFT);
-			break;
-
-      case 'd' : case 'D' :
-//         camera.Rotate(0.0f, -90.0f);
-         party.move(MOVE_TURN_RIGHT);
-			break;
-
-		case 'z' : case 'Z' :
-			camera.MoveUp(speed);
-			break;
-
-		case 'x' : case 'X' :
-			camera.MoveDown(speed);
-			break;
-
-		case 'q' : case 'Q' :
-//			camera.StrafeLeft(TILE_SIZE);
-         party.move(MOVE_STRAFE_LEFT);
-			break;
-
-		case 'e' : case 'E' :
-//			camera.StrafeRight(TILE_SIZE);
-         party.move(MOVE_STRAFE_RIGHT);
-			break;
-
-
-//		case 'x' : case 'X' :
-//			bspRenderingType = (bspRenderingType + 1) % 4;
-//			printf("bspRenderingType: %d\n", bspRenderingType);
-//			break;
-
-		default:
-			cout << int (key) << '\n';
-			break;
+   if(key >= 'A' && key <= 'w') {
+      inputHandler.pressKey(key);
+   } else {
+      switch(key) {
+         case 27 : case 13 :	//ESC
+            shutdown();
+            exit(0);
+            break;
+         default:
+            cout << int (key) << '\n';
+            break;
+      }
    }
+}
+
+static void
+release_simple_keys(unsigned char key,int x,int y)
+{
+//   printf("%c released\n", key);
+
+   if(key >= 'A' && key <= 'w')
+      inputHandler.releaseKey(key);
 }
 
 /// arrow keys handling
@@ -375,7 +346,7 @@ CountFPS (void)
 		fps = count;
 		start = timer.GetTime ();
 
-		printf("fps: %d\n", count);
+		printf("fps: %lu\n", count);
 
 		count = 0;
 	}
@@ -398,10 +369,13 @@ main(int argc, char* argv[])
 
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(Draw);
-	glutPassiveMotionFunc(mouse_look);
-	glutSpecialFunc(handle_arrows);
-	glutKeyboardFunc(hande_simple_keys);
 	glutIdleFunc(idle);
+
+	glutPassiveMotionFunc(mouse_look);
+
+   glutKeyboardUpFunc(release_simple_keys);
+	glutKeyboardFunc(hande_simple_keys);
+	glutSpecialFunc(handle_arrows);
 
 	InitGLExtensions();
 	CheckGLSL();

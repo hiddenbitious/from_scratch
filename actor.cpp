@@ -1,4 +1,5 @@
 #include "actor.h"
+#include "input.h"
 
 C_Actor::C_Actor(void)
 {
@@ -146,6 +147,11 @@ C_Actor::update(void)
    static float change = 0.0f;
    static const float rotationSpeed = 4.0f;
    static const float moveSpeed = 2.0f;
+
+   C_Command *command = inputHandler.handleInput();
+   if(command) {
+      command->execute(this);
+   }
 
    if(moving) {
       switch(movement) {

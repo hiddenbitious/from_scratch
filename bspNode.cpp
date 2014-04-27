@@ -329,7 +329,7 @@ C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
 void
 C_BspNode::Draw(C_Camera *camera, C_BspTree* tree, bool usePVS)
 {
-   static unsigned long leaf = 0;
+//   static unsigned long leaf = 0;
 
    if(!isLeaf) {
       C_Vector3 cameraPosition = camera->GetPosition();
