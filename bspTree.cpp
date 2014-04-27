@@ -261,7 +261,7 @@ C_BspTree::BuildPVS(void)
 
 	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-	pvsFileFound = this->ReadPVSFile("map_pvs6_noHoles.txt");
+	pvsFileFound = this->ReadPVSFile("newmap_pvs.txt");
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points... " << flush;
@@ -279,7 +279,7 @@ C_BspTree::BuildPVS(void)
 
 	/// Write PVS into a file
 	if(!pvsFileFound) {
-		WritePVSFile("map_pvs6_noHoles.txt");
+		WritePVSFile("newmap_pvs.txt");
 	}
 }
 
@@ -607,20 +607,22 @@ C_BspTree::Draw_PVS(C_Camera *camera)
 
    /// Pass matrices to shader
 	/// Keep a copy of global movelview matrix
-	#ifdef DRAW_BSP_GEOMETRY
-	shaderManager->pushShader(bspShader); {
+	if(DRAW_BSP_GEOMETRY) {
+   	shaderManager->pushShader(bspShader);
       ESMatrix mat = Identity;
       esTranslate(&mat, position.x , position.y , position.z);
 
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_VIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&globalViewMatrix.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODEL_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
       bspShader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
-   #endif
-      headNode->Draw(camera, this, USE_PVS);
-   #ifdef DRAW_BSP_GEOMETRY
    }
-   shaderManager->popShader();
-   #endif
+
+   headNode->Draw(camera, this, USE_PVS);
+
+   if(DRAW_BSP_GEOMETRY) {
+      shaderManager->popShader();
+   }
+
 	return 0;
 }
 
@@ -740,7 +742,7 @@ C_BspTree::closeLeafHoles(void)
 		memset(leaves[i]->checkedVisibilityWith, false, nNodes * sizeof(bool));
 	}
 
-//	return;
+	return;
 
    int i;
    float dist;

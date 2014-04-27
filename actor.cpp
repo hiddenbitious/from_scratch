@@ -256,8 +256,9 @@ C_Actor::move(movements_t movement)
 
    this->movement = movement;
    updateDirections();
+
    if(movement != MOVE_TURN_LEFT && movement != MOVE_TURN_RIGHT)
-      if(checkCollision())
+      if(ENABLE_COLLISION_DETECTION && checkCollision())
          return;
 
    moving = true;
