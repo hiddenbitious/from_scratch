@@ -29,6 +29,16 @@ C_InputHandler::C_InputHandler(void)
    buttonE_->setMovement(MOVE_STRAFE_RIGHT);
 }
 
+C_InputHandler::~C_InputHandler(void)
+{
+   delete buttonW_;
+   delete buttonS_;
+   delete buttonA_;
+   delete buttonD_;
+   delete buttonQ_;
+   delete buttonE_;
+}
+
 void
 C_InputHandler::pressKey(char key)
 {

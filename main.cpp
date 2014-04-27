@@ -73,7 +73,7 @@ static C_Vector3 center(0.0f , 0.0f , 0.0f);
 C_Timer timer;
 float start = timer.GetTime ();
 static float timeElapsed = 0.0f;
-static float fps;
+static float fps = 60.0f;
 
 /// Metaballs
 static C_CubeGrid *grid;
@@ -219,7 +219,7 @@ Draw(void)
 	angle += .03f;
 	if(angle >= 360.0f) angle = 0.0f;
 
-   party.update();
+   party.update(fps);
 
 	cube.draw(&camera);
 
@@ -234,8 +234,10 @@ Draw(void)
 //					 "FPS: %d" , (int)fps);
 
 	/// Update timer
-	timer.Update ();
-	timeElapsed = timer.GetDelta () / 1000.0f;
+//	timer.Update ();
+//	timeElapsed = timer.GetDelta () / 1000.0f;
+//	printf("tileElapsed: %f\n", timeElapsed);
+//	printf("fps: %f\n", fps);
 
 	CountFPS ();
 
@@ -293,6 +295,15 @@ hande_simple_keys(unsigned char key , int x , int y)
             shutdown();
             exit(0);
             break;
+
+		case 'z' : case 'Z' :
+			camera.MoveUp(speed);
+			break;
+
+		case 'x' : case 'X' :
+			camera.MoveDown(speed);
+			break;
+
          default:
             cout << int (key) << '\n';
             break;

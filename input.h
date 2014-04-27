@@ -27,6 +27,7 @@ class C_InputHandler
 {
 public:
    C_InputHandler(void);
+   ~C_InputHandler(void);
 
    C_Command *handleInput();
 

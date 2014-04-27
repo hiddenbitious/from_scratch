@@ -142,11 +142,11 @@ C_Actor::checkCollision(void)
 }
 
 void
-C_Actor::update(void)
+C_Actor::update(float fps)
 {
    static float change = 0.0f;
-   static const float rotationSpeed = 4.0f;
-   static const float moveSpeed = 2.0f;
+   static const float rotationSpeed = 220.0f * 1.0f / fps;
+   static const float moveSpeed = 60.0f * 1.0f / fps;
 
    C_Command *command = inputHandler.handleInput();
    if(command) {

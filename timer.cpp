@@ -1,23 +1,4 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #include "timer.h"
-
-C_Timer::C_Timer () {
-}
 
 void C_Timer::Initialize(void)
 {

@@ -21,7 +21,7 @@ public:
    void setMap(C_Map *map_) { assert(map_); map = map_; }
    void setCoordinates(int x, int y) { mapCoordinateX = x; mapCoordinateY = y; }
 
-   void update();
+   void update(float fps);
 
 protected:
    int mapCoordinateX;
