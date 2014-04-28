@@ -53,8 +53,8 @@ C_Actor::updateDirections(void)
          facingDirection = Z_PLUS;
          movingDirection = Z_PLUS;
       } else {
-         --facingDirection;
-         --movingDirection;
+         facingDirection = (tile_direction_t)((int)facingDirection - 1);
+         movingDirection = (tile_direction_t)((int)movingDirection - 1);
       }
       break;
 
@@ -63,8 +63,8 @@ C_Actor::updateDirections(void)
          facingDirection = X_MINUS;
          movingDirection = X_MINUS;
       } else {
-         ++facingDirection;
-         ++movingDirection;
+         facingDirection = (tile_direction_t)((int)facingDirection + 1);
+         movingDirection = (tile_direction_t)((int)movingDirection + 1);
       }
       break;
 
