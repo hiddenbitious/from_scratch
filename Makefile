@@ -14,7 +14,7 @@ SOURCES=main.cpp bbox.cpp metaballs/cubeGrid.cpp quaternion.cpp \
 		  math.cpp frustum.cpp vectors.cpp plane.cpp camera.cpp timer.cpp glsl/glsl.cpp \
 		  bspTree.cpp bspNode.cpp bspHelperFunctions.cpp mesh.cpp \
 		  objreader/objfile.cpp tgaLoader/tgaLoader.cpp \
-		  map.cpp tile.cpp actor.cpp
+		  map.cpp tile.cpp actor.cpp input.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=from_scratch
 

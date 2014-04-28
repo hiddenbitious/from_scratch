@@ -378,13 +378,13 @@ C_Mesh::drawNormals(void)
 bool
 C_MeshGroup::draw(C_Camera *camera)
 {
-   #ifdef ENABLE_MESH_FRUSTUM_CULLING
-   if(applyFrustumCulling) {
-      if(camera && !camera->frustum->cubeInFrustum(&bbox)) {
-         return false;
+   if(ENABLE_MESH_FRUSTUM_CULLING) {
+      if(applyFrustumCulling) {
+         if(camera && !camera->frustum->cubeInFrustum(&bbox)) {
+            return false;
+         }
       }
    }
-   #endif
 
 	shaderManager->pushShader(shader);
 	ESMatrix mat;

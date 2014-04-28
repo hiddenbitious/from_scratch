@@ -15,7 +15,8 @@ public:
 
    bool createMap(const char *filename);
 
-   C_Vertex cameraStartPosition(void);
+   C_Vertex cameraStartPosition(int *x, int *y);
+   tile *getTile(int x, int y);
 
    void draw(C_Camera *camera);
 

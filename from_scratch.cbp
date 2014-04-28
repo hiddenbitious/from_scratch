@@ -39,6 +39,8 @@
 		<Unit filename="C_logFile/logFile.cpp" />
 		<Unit filename="C_logFile/logFile.h" />
 		<Unit filename="Makefile" />
+		<Unit filename="actor.cpp" />
+		<Unit filename="actor.h" />
 		<Unit filename="bbox.cpp" />
 		<Unit filename="bbox.h" />
 		<Unit filename="box.cpp" />
@@ -60,6 +62,8 @@
 		<Unit filename="globals.h" />
 		<Unit filename="glsl/glsl.cpp" />
 		<Unit filename="glsl/glsl.h" />
+		<Unit filename="input.cpp" />
+		<Unit filename="input.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="map.cpp" />
 		<Unit filename="map.h" />
@@ -73,8 +77,6 @@
 		<Unit filename="metaballs/tables.h" />
 		<Unit filename="objreader/objfile.cpp" />
 		<Unit filename="objreader/objfile.h" />
-		<Unit filename="party.cpp" />
-		<Unit filename="party.h" />
 		<Unit filename="plane.cpp" />
 		<Unit filename="plane.h" />
 		<Unit filename="quaternion.cpp" />

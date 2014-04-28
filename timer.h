@@ -1,19 +1,3 @@
-/****************************************
-*     ***************************       *
-*         Diplomatiki Ergasia:			*
-*                                       *
-*		  Meleti kai Ylopoiish			*
-*		  Algorithmon Grafikon			*
-*                                       *
-*     ***************************       *
-*                                       *
-*			  Syggrafeas:               *
-*                                       *
-*		  Apostolou Panagiotis			*
-*                                       *
-*     ***************************       *
-****************************************/
-
 #ifndef _C_TIMER_H_
 #define _C_TIMER_H_
 
@@ -45,23 +29,24 @@ BOOL QueryPerformanceFrequency (LARGE_INTEGER *lpFrequency)
 This class uses the performance counter and if it's not available uses the multimedia timer (timeGetTime) instead.
 */
 
-class C_Timer {
-private:
-	float timeFactor;				//To convert the time received
-	int64_t freq;					//Timer frequency
+class C_Timer
+{
+   private:
+      float timeFactor;          //To convert the time received
+      int64_t freq;              //Timer frequency
 
-	float delta, d0, d1;			//Used to calculate delta
-	timeval mmTimeStart;			//Multimedia timer start value
+      float delta, d0, d1;       //Used to calculate delta
+      timeval mmTimeStart;       //Multimedia timer start value
 
-public:
-	C_Timer(void);					//CTor
-	void Initialize(void);			//Initializes timer
-	float GetTime(void);			//Returns since the timer initialization
+   public:
+      C_Timer(void) {}           //CTor
+      void Initialize(void);     //Initializes timer
+      float GetTime(void);       //Returns since the timer initialization
 
-	void Update(void);				//Updates the delta variable
+      void Update(void);         //Updates the delta variable
 
-	/// Returns the delta variable
-	inline float GetDelta(void) { return delta; }
+      /// Returns the delta variable
+      inline float GetDelta(void) { return delta; }
 };
 
 #endif

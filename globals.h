@@ -1,6 +1,14 @@
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
+#define DRAW_BSP_GEOMETRY              false
+#define DRAW_TREE_MESHES               true
+#define ENABLE_MESH_FRUSTUM_CULLING    true
+#define ENABLE_BSP_FRUSTUM_CULLING     true
+#define USE_PVS                        true
+
+#define ENABLE_COLLISION_DETECTION     true
+
 //#define JNI_COMPATIBLE
 
 #ifdef JNI_COMPATIBLE
@@ -15,12 +23,6 @@
 
 //#define PRINT_FUNC_ENTRY   printf("%s\n", __FUNCTION__)
 #define PRINT_FUNC_ENTRY
-
-//#define DRAW_BSP_GEOMETRY
-#define DRAW_TREE_MESHES
-#define ENABLE_MESH_FRUSTUM_CULLING
-#define ENABLE_BSP_FRUSTUM_CULLING
-#define USE_PVS true
 
 #	include <stdint.h>
 #	include <string>
@@ -134,6 +136,7 @@ class C_Vector3;
 class C_GLShaderManager;
 class C_TextureManager;
 class C_GLShader;
+class C_InputHandler;
 
 extern ESMatrix globalViewMatrix, globalProjectionMatrix, globalMVPMatrix;
 extern C_GLShaderManager *shaderManager;
@@ -145,5 +148,6 @@ extern C_GLShader *wallShader;
 extern C_Vertex lightPosition;
 extern char MAX_THREADS;
 extern C_Camera camera;
+extern C_InputHandler inputHandler;
 
 #endif

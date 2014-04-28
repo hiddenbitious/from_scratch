@@ -23,6 +23,7 @@
 #include "mesh.h"
 #include "map.h"
 #include "timer.h"
+#include "input.h"
 #include "actor.h"
 #include "glsl/glsl.h"
 #include "metaballs/cubeGrid.h"
@@ -52,6 +53,7 @@ C_GLShader *wallShader = NULL;
 C_Camera camera;
 static C_Frustum frustum;
 static C_Party party;
+C_InputHandler inputHandler;
 
 /// window stuff
 static int winID;
@@ -64,7 +66,6 @@ static int windowPositionY = 200;
 static float speed = 7.0f;
 
 static bool frustumCulling = true;
-static int bspRenderingType = 0;
 
 static C_Vector3 center(0.0f , 0.0f , 0.0f);
 
@@ -72,7 +73,7 @@ static C_Vector3 center(0.0f , 0.0f , 0.0f);
 C_Timer timer;
 float start = timer.GetTime ();
 static float timeElapsed = 0.0f;
-static float fps;
+static float fps = 60.0f;
 
 /// Metaballs
 static C_CubeGrid *grid;
@@ -94,18 +95,19 @@ Initializations(void)
    printf("FLT_MIN: %g\n", FLT_MIN);
 
 	/// Set clear color
-   #ifdef DRAW_BSP_GEOMETRY
-	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
-	#else
-//	glClearColor(0.0, 0.0, 0.0, 1.0f);
-   #endif
+   if(DRAW_BSP_GEOMETRY) {
+   	glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
+	} else {
+   	glClearColor(0.0, 0.0, 0.0, 1.0f);
+   }
 
 	/// Backface culling
-	#ifdef DRAW_BSP_GEOMETRY
-	glDisable(GL_CULL_FACE);
-	#else
-	glEnable(GL_CULL_FACE);
-	#endif
+	if(DRAW_BSP_GEOMETRY) {
+   	glDisable(GL_CULL_FACE);
+	} else {
+   	glEnable(GL_CULL_FACE);
+	}
+
 //	glFrontFace(GL_CW);
 //	glCullFace(GL_BACK);
 
@@ -151,15 +153,15 @@ Initializations(void)
    assert(bspShader->verticesAttribLocation >= 0);
    assert(bspShader->normalsAttribLocation >= 0);
 
-#ifdef DRAW_BSP_GEOMETRY
-   basicShader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
-   assert(basicShader->verticesAttribLocation >= 0);
-   assert(basicShader->normalsAttribLocation == -1);
+   if(DRAW_BSP_GEOMETRY) {
+      basicShader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
+      assert(basicShader->verticesAttribLocation >= 0);
+      assert(basicShader->normalsAttribLocation == -1);
 
-   pointShader = shaderManager->LoadShaderProgram("shaders/points_shader.vert", "shaders/points_shader.frag");
-   assert(pointShader->verticesAttribLocation >= 0);
-   assert(pointShader->normalsAttribLocation == -1);
-#endif
+      pointShader = shaderManager->LoadShaderProgram("shaders/points_shader.vert", "shaders/points_shader.frag");
+      assert(pointShader->verticesAttribLocation >= 0);
+      assert(pointShader->normalsAttribLocation == -1);
+   }
 
    wallShader = shaderManager->LoadShaderProgram("shaders/shader1.vert", "shaders/shader1.frag");
    assert(wallShader->verticesAttribLocation >= 0);
@@ -169,13 +171,17 @@ Initializations(void)
 
    map.createMap("map.txt");
 
-   C_Vertex cameraPosition = map.cameraStartPosition();
+   int tileStartx, tileStarty;
+   C_Vertex cameraPosition = map.cameraStartPosition(&tileStartx, &tileStarty);
 //   printf("cameraPosition: %f %f %f\n", cameraPosition.x, cameraPosition.y, cameraPosition.z);
    camera.SetPosition(cameraPosition);
    camera.Rotate(0.0f, 180.0f);
 
    cube.loadFromFile("objmodels/cube.obj");
    cube.shader = wallShader;
+
+   party.setMap(&map);
+   party.setCoordinates(tileStartx, tileStarty);
 
 	/// timer initialization
 	timer.Initialize ();
@@ -213,7 +219,7 @@ Draw(void)
 	angle += .03f;
 	if(angle >= 360.0f) angle = 0.0f;
 
-   party.update();
+   party.update(fps);
 
 	cube.draw(&camera);
 
@@ -228,8 +234,10 @@ Draw(void)
 //					 "FPS: %d" , (int)fps);
 
 	/// Update timer
-	timer.Update ();
-	timeElapsed = timer.GetDelta () / 1000.0f;
+//	timer.Update ();
+//	timeElapsed = timer.GetDelta () / 1000.0f;
+//	printf("tileElapsed: %f\n", timeElapsed);
+//	printf("fps: %f\n", fps);
 
 	CountFPS ();
 
@@ -277,31 +285,16 @@ mouse_look(int x , int y)
 static void
 hande_simple_keys(unsigned char key , int x , int y)
 {
-	switch(key) {
-		case 27 : case 13 :	//ESC
-		   shutdown();
-			exit(0);
-			break;
+//   printf("%c pressed\n", key);
 
-		case 'w' : case 'W' :
-//			camera.Move(TILE_SIZE);
-			party.move(MOVE_FORWARD);
-			break;
-
-		case 's' : case 'S' :
-//			camera.Move(-TILE_SIZE);
-			party.move(MOVE_BACKWARDS);
-			break;
-
-		case 'a' : case 'A' :
-//         camera.Rotate(0.0f, 90.0f);
-         party.move(MOVE_TURN_LEFT);
-			break;
-
-      case 'd' : case 'D' :
-//         camera.Rotate(0.0f, -90.0f);
-         party.move(MOVE_TURN_RIGHT);
-			break;
+   if(key >= 'A' && key <= 'w') {
+      inputHandler.pressKey(key);
+   } else {
+      switch(key) {
+         case 27 : case 13 :	//ESC
+            shutdown();
+            exit(0);
+            break;
 
 		case 'z' : case 'Z' :
 			camera.MoveUp(speed);
@@ -311,26 +304,20 @@ hande_simple_keys(unsigned char key , int x , int y)
 			camera.MoveDown(speed);
 			break;
 
-		case 'q' : case 'Q' :
-//			camera.StrafeLeft(TILE_SIZE);
-         party.move(MOVE_STRAFE_LEFT);
-			break;
-
-		case 'e' : case 'E' :
-//			camera.StrafeRight(TILE_SIZE);
-         party.move(MOVE_STRAFE_RIGHT);
-			break;
-
-
-//		case 'x' : case 'X' :
-//			bspRenderingType = (bspRenderingType + 1) % 4;
-//			printf("bspRenderingType: %d\n", bspRenderingType);
-//			break;
-
-		default:
-			cout << int (key) << '\n';
-			break;
+         default:
+            cout << int (key) << '\n';
+            break;
+      }
    }
+}
+
+static void
+release_simple_keys(unsigned char key,int x,int y)
+{
+//   printf("%c released\n", key);
+
+   if(key >= 'A' && key <= 'w')
+      inputHandler.releaseKey(key);
 }
 
 /// arrow keys handling
@@ -339,21 +326,19 @@ handle_arrows(int key , int x , int y)
 {
 	switch(key) {
    case GLUT_KEY_UP:
-      camera.Move(TILE_SIZE);
+      party.move(MOVE_FORWARD);
       break;
 
    case GLUT_KEY_DOWN:
-      camera.Move(-TILE_SIZE);
+      party.move(MOVE_BACKWARDS);
       break;
 
    case GLUT_KEY_RIGHT:
-			camera.StrafeRight(TILE_SIZE);
-//      camera.Rotate(0.0f, -90.0f);
+			party.move(MOVE_TURN_RIGHT);
       break;
 
    case GLUT_KEY_LEFT:
-			camera.StrafeLeft(TILE_SIZE);
-//      camera.Rotate(0.0f, 90.0f);
+			party.move(MOVE_TURN_LEFT);
       break;
 	}
 
@@ -371,7 +356,8 @@ CountFPS (void)
 	if(delta >= 1000.0f) {
 		fps = count;
 		start = timer.GetTime ();
-		printf("fps: %d\n", count);
+
+		printf("fps: %lu\n", count);
 
 		count = 0;
 	}
@@ -394,10 +380,13 @@ main(int argc, char* argv[])
 
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(Draw);
-	glutPassiveMotionFunc(mouse_look);
-	glutSpecialFunc(handle_arrows);
-	glutKeyboardFunc(hande_simple_keys);
 	glutIdleFunc(idle);
+
+	glutPassiveMotionFunc(mouse_look);
+
+   glutKeyboardUpFunc(release_simple_keys);
+	glutKeyboardFunc(hande_simple_keys);
+	glutSpecialFunc(handle_arrows);
 
 	InitGLExtensions();
 	CheckGLSL();
