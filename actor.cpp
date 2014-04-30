@@ -161,7 +161,7 @@ void
 C_Mob::loadModel(void)
 {
    model.loadFromFile("objmodels/cube.obj");
-   model.shader = wallShader;
+   model.shader = simple_texture_shader;
 
    ESMatrix matrix = Identity;
    float scale = 5.0f;

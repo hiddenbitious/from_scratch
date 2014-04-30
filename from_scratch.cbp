@@ -95,6 +95,8 @@
 		<Unit filename="shaders/points_shader.vert" />
 		<Unit filename="shaders/shader1.frag" />
 		<Unit filename="shaders/shader1.vert" />
+		<Unit filename="shaders/simple_texture.frag" />
+		<Unit filename="shaders/simple_texture.vert" />
 		<Unit filename="shaders/wire_shader.frag" />
 		<Unit filename="shaders/wire_shader.vert" />
 		<Unit filename="tgaLoader/texture.h" />

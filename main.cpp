@@ -48,6 +48,7 @@ C_GLShader *bspShader = NULL;
 C_GLShader *basicShader = NULL;
 C_GLShader *pointShader = NULL;
 C_GLShader *wallShader = NULL;
+C_GLShader *simple_texture_shader = NULL;
 
 /// Camera and frustum
 C_Camera camera;
@@ -167,6 +168,9 @@ Initializations(void)
    wallShader = shaderManager->LoadShaderProgram("shaders/shader1.vert", "shaders/shader1.frag");
    assert(wallShader->verticesAttribLocation >= 0);
 
+   simple_texture_shader = shaderManager->LoadShaderProgram("shaders/simple_texture.vert", "shaders/simple_texture.frag");
+   assert(simple_texture_shader->verticesAttribLocation >= 0);
+
    /// Texture manager
    textureManager = C_TextureManager::getSingleton();
 
@@ -178,8 +182,8 @@ Initializations(void)
    camera.SetPosition(cameraPosition);
    camera.Rotate(0.0f, 180.0f);
 
-//   cube.loadFromFile("objmodels/cube.obj");
-//   cube.shader = wallShader;
+   cube.loadFromFile("objmodels/cube.obj");
+   cube.shader = simple_texture_shader;
 
    party.setMap(&map);
    party.setCoordinates(tileStartx, tileStarty);
@@ -225,7 +229,7 @@ Draw(void)
 
    party.update(fps);
 
-//	cube.draw(&camera);
+	cube.draw(&camera);
 
 	mob.Draw(&camera);
 
