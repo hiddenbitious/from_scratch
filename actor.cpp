@@ -142,11 +142,58 @@ C_Actor::checkCollision(void)
 }
 
 void
-C_Actor::update(float fps)
+C_Actor::move(movements_t movement)
+{
+   if(moving)
+      return;
+
+   this->movement = movement;
+   updateDirections();
+
+   if(movement != MOVE_TURN_LEFT && movement != MOVE_TURN_RIGHT)
+      if(ENABLE_COLLISION_DETECTION && checkCollision())
+         return;
+
+   moving = true;
+}
+
+void
+C_Mob::loadModel(void)
+{
+   model.loadFromFile("objmodels/cube.obj");
+   model.shader = wallShader;
+
+   ESMatrix matrix = Identity;
+   float scale = 5.0f;
+   esScale(&matrix, scale, scale, scale);
+   model.applyTransformationOnVertices(&matrix);
+}
+
+C_Mob::C_Mob(void)
+{
+   mapCoordinateX = 1;
+   mapCoordinateY = 1;
+}
+
+void
+C_Mob::Draw(C_Camera *camera)
+{
+   model.position.x = mapCoordinateX * TILE_SIZE + TILE_SIZE / 2.0f;
+   model.position.y = TILE_SIZE / 4.f;
+   model.position.z = mapCoordinateY * TILE_SIZE + TILE_SIZE / 2.0f;
+
+
+   model.draw(camera);
+}
+
+void
+C_Party::update(float fps)
 {
    static float change = 0.0f;
    static const float rotationSpeed = 220.0f * 1.0f / fps;
    static const float moveSpeed = 60.0f * 1.0f / fps;
+//   static const float rotationSpeed = 5.0f;
+//   static const float moveSpeed = 1.6f;
 
    C_Command *command = inputHandler.handleInput();
    if(command) {
@@ -252,20 +299,4 @@ C_Actor::update(float fps)
          break;
       }
    }
-}
-
-void
-C_Actor::move(movements_t movement)
-{
-   if(moving)
-      return;
-
-   this->movement = movement;
-   updateDirections();
-
-   if(movement != MOVE_TURN_LEFT && movement != MOVE_TURN_RIGHT)
-      if(ENABLE_COLLISION_DETECTION && checkCollision())
-         return;
-
-   moving = true;
 }

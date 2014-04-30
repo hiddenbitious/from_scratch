@@ -21,15 +21,15 @@ public:
    void setMap(C_Map *map_) { assert(map_); map = map_; }
    void setCoordinates(int x, int y) { mapCoordinateX = x; mapCoordinateY = y; }
 
-   void update(float fps);
+   virtual void update(float fps) = 0;
 
 protected:
    int mapCoordinateX;
    int mapCoordinateY;
    tile_direction_t facingDirection;
    tile_direction_t movingDirection;
-   bool moving;
    movements_t movement;
+   bool moving;
 
    void updateDirections(void);
    void updateTileCoordinates(void);
@@ -38,10 +38,27 @@ protected:
    C_Map *map;
 };
 
+class C_Mob : public C_Actor {
+private:
+   C_MeshGroup model;
+
+public:
+   C_Mob(void);
+   ~C_Mob(void) {}
+
+   void loadModel(void);
+
+   void update(float fps) {}
+   void Draw(C_Camera *camera);
+
+};
+
 class C_Party : public C_Actor {
 public:
    C_Party(void) {}
    ~C_Party(void) {}
+
+   void update(float fps);
 };
 
 #endif

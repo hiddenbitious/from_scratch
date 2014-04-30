@@ -53,6 +53,7 @@ C_GLShader *wallShader = NULL;
 C_Camera camera;
 static C_Frustum frustum;
 static C_Party party;
+static C_Mob mob;
 C_InputHandler inputHandler;
 
 /// window stuff
@@ -177,11 +178,14 @@ Initializations(void)
    camera.SetPosition(cameraPosition);
    camera.Rotate(0.0f, 180.0f);
 
-   cube.loadFromFile("objmodels/cube.obj");
-   cube.shader = wallShader;
+//   cube.loadFromFile("objmodels/cube.obj");
+//   cube.shader = wallShader;
 
    party.setMap(&map);
    party.setCoordinates(tileStartx, tileStarty);
+
+   mob.setMap(&map);
+   mob.loadModel();
 
 	/// timer initialization
 	timer.Initialize ();
@@ -221,7 +225,9 @@ Draw(void)
 
    party.update(fps);
 
-	cube.draw(&camera);
+//	cube.draw(&camera);
+
+	mob.Draw(&camera);
 
    map.draw(&camera);
 
