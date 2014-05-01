@@ -21,11 +21,15 @@ public:
    void setMap(C_Map *map_) { assert(map_); map = map_; }
    void setCoordinates(int x, int y) { mapCoordinateX = x; mapCoordinateY = y; }
 
-   virtual void update(float fps) = 0;
+   virtual void update(float fps);
 
 protected:
    int mapCoordinateX;
    int mapCoordinateY;
+
+   float yAngle;
+   C_Vertex cartesianCoordinates;
+
    tile_direction_t facingDirection;
    tile_direction_t movingDirection;
    movements_t movement;
@@ -48,7 +52,7 @@ public:
 
    void loadModel(void);
 
-   void update(float fps) {}
+   virtual void update(float fps) {}
    void Draw(C_Camera *camera);
 
 };
@@ -58,7 +62,7 @@ public:
    C_Party(void) {}
    ~C_Party(void) {}
 
-   void update(float fps);
+   virtual void update(float fps);
 };
 
 #endif

@@ -8,6 +8,12 @@ C_Actor::C_Actor(void)
    map = NULL;
    facingDirection = Z_PLUS;
    movingDirection = Z_PLUS;
+
+   moving = false;
+   yAngle = 0.0f;
+   cartesianCoordinates.x = 0.0f;
+   cartesianCoordinates.y = 0.0f;
+   cartesianCoordinates.z = 0.0f;
 }
 
 void
@@ -187,18 +193,11 @@ C_Mob::Draw(C_Camera *camera)
 }
 
 void
-C_Party::update(float fps)
+C_Actor::update(float fps)
 {
    static float change = 0.0f;
    static const float rotationSpeed = 220.0f * 1.0f / fps;
    static const float moveSpeed = 60.0f * 1.0f / fps;
-//   static const float rotationSpeed = 5.0f;
-//   static const float moveSpeed = 1.6f;
-
-   C_Command *command = inputHandler.handleInput();
-   if(command) {
-      command->execute(this);
-   }
 
    if(moving) {
       switch(movement) {
@@ -206,13 +205,12 @@ C_Party::update(float fps)
          change += rotationSpeed;
 
          if(change >= 90.0f) {
-            camera.Rotate(0.0f, rotationSpeed - (change - 90.0f));
-
+            yAngle += rotationSpeed - (change - 90.0f);
             moving = false;
             change = 0.0f;
             movement = MOVE_MAX_MOVES;
          } else {
-            camera.Rotate(0.0f, rotationSpeed);
+            yAngle += rotationSpeed;
          }
          break;
 
@@ -220,13 +218,13 @@ C_Party::update(float fps)
          change -= rotationSpeed;
 
          if(change <= -90.0f) {
-            camera.Rotate(0.0f, -rotationSpeed - (change + 90.0f));
+            yAngle += -rotationSpeed - (change + 90.0f);
 
             moving = false;
             movement = MOVE_MAX_MOVES;
             change = 0.0f;
          } else {
-            camera.Rotate(0.0f, -rotationSpeed);
+            yAngle -= rotationSpeed;
          }
          break;
 
@@ -234,7 +232,12 @@ C_Party::update(float fps)
          change += moveSpeed;
 
          if(change >= TILE_SIZE) {
-            camera.Move(moveSpeed - (change - TILE_SIZE));
+            switch(movingDirection) {
+            case X_PLUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
+            case X_MINUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
+            case Z_PLUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            case Z_MINUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            }
 
             updateTileCoordinates();
 
@@ -242,7 +245,12 @@ C_Party::update(float fps)
             movement = MOVE_MAX_MOVES;
             change = 0.0f;
          } else {
-            camera.Move(moveSpeed);
+            switch(movingDirection) {
+            case X_PLUS: cartesianCoordinates.x += moveSpeed; break;
+            case X_MINUS: cartesianCoordinates.x += moveSpeed; break;
+            case Z_PLUS: cartesianCoordinates.z += moveSpeed; break;
+            case Z_MINUS: cartesianCoordinates.z += moveSpeed; break;
+            }
          }
          break;
 
@@ -250,7 +258,12 @@ C_Party::update(float fps)
          change -= moveSpeed;
 
          if(change <= -TILE_SIZE) {
-            camera.Move(-moveSpeed - (change + TILE_SIZE));
+            switch(movingDirection) {
+            case X_PLUS: cartesianCoordinates.x += -moveSpeed - (change + TILE_SIZE); break;
+            case X_MINUS: cartesianCoordinates.x += -moveSpeed - (change + TILE_SIZE); break;
+            case Z_PLUS: cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
+            case Z_MINUS: cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
+            }
 
             updateTileCoordinates();
 
@@ -258,31 +271,26 @@ C_Party::update(float fps)
             movement = MOVE_MAX_MOVES;
             change = 0.0f;
          } else {
-            camera.Move(-moveSpeed);
+            switch(movingDirection) {
+            case X_PLUS: cartesianCoordinates.x -= moveSpeed; break;
+            case X_MINUS: cartesianCoordinates.x -= moveSpeed; break;
+            case Z_PLUS: cartesianCoordinates.z -= moveSpeed; break;
+            case Z_MINUS: cartesianCoordinates.z -= moveSpeed; break;
+            }
          }
          break;
 
       case MOVE_STRAFE_LEFT:
-         change += moveSpeed;
-
-         if(change >= TILE_SIZE) {
-            camera.StrafeLeft(moveSpeed - (change - TILE_SIZE));
-
-            updateTileCoordinates();
-
-            moving = false;
-            movement = MOVE_MAX_MOVES;
-            change = 0.0f;
-         } else {
-            camera.StrafeLeft(moveSpeed);
-         }
-         break;
-
       case MOVE_STRAFE_RIGHT:
          change += moveSpeed;
 
          if(change >= TILE_SIZE) {
-            camera.StrafeRight(moveSpeed - (change - TILE_SIZE));
+            switch(movingDirection) {
+            case X_PLUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
+            case X_MINUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
+            case Z_PLUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            case Z_MINUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            }
 
             updateTileCoordinates();
 
@@ -290,8 +298,74 @@ C_Party::update(float fps)
             movement = MOVE_MAX_MOVES;
             change = 0.0f;
          } else {
-            camera.StrafeRight(moveSpeed);
+            switch(movingDirection) {
+            case X_PLUS: cartesianCoordinates.x += moveSpeed; break;
+            case X_MINUS: cartesianCoordinates.x += moveSpeed; break;
+            case Z_PLUS: cartesianCoordinates.z += moveSpeed; break;
+            case Z_MINUS: cartesianCoordinates.z += moveSpeed; break;
+            }
          }
+         break;
+
+      default:
+         assert(0);
+         break;
+      }
+   }
+}
+
+void
+C_Party::update(float fps)
+{
+   C_Command *command = inputHandler.handleInput();
+
+   if(command) {
+      command->execute(this);
+   }
+
+   if(moving) {
+      float yAngle_old;
+      C_Vertex cartesianCoordinates_old;
+
+      switch(movement) {
+      case MOVE_TURN_LEFT:
+         yAngle_old = yAngle;
+         C_Actor::update(fps);
+         camera.Rotate(0.0f, yAngle - yAngle_old);
+         break;
+
+      case MOVE_TURN_RIGHT:
+         yAngle_old = yAngle;
+         C_Actor::update(fps);
+         camera.Rotate(0.0f, yAngle - yAngle_old);
+         break;
+
+      case MOVE_FORWARD:
+      case MOVE_BACKWARDS:
+         cartesianCoordinates_old = cartesianCoordinates;
+         C_Actor::update(fps);
+         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+            camera.Move(cartesianCoordinates.x - cartesianCoordinates_old.x);
+         else
+            camera.Move(cartesianCoordinates.z - cartesianCoordinates_old.z);
+         break;
+
+      case MOVE_STRAFE_LEFT:
+         cartesianCoordinates_old = cartesianCoordinates;
+         C_Actor::update(fps);
+         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+            camera.StrafeLeft(cartesianCoordinates.x - cartesianCoordinates_old.x);
+         else
+            camera.StrafeLeft(cartesianCoordinates.z - cartesianCoordinates_old.z);
+         break;
+
+      case MOVE_STRAFE_RIGHT:
+         cartesianCoordinates_old = cartesianCoordinates;
+         C_Actor::update(fps);
+         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+            camera.StrafeRight(cartesianCoordinates.x - cartesianCoordinates_old.x);
+         else
+            camera.StrafeRight(cartesianCoordinates.z - cartesianCoordinates_old.z);
          break;
 
       default:
