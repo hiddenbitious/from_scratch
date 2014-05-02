@@ -9,16 +9,18 @@
 
 class C_BaseMesh {
 public:
-   int      nVertices;
-   int      nTriangles;
-   C_Vertex position;
-   C_BBox   bbox;
+   int            nVertices;
+   int            nTriangles;
+   C_BBox         bbox;
 
    virtual ~C_BaseMesh(void) {};
    C_BaseMesh(void);
 
    virtual void calculateBbox(void) = 0;
    virtual void applyTransformationOnVertices(const ESMatrix *mat) = 0;
+
+   virtual void translate(float x, float y, float z) = 0;
+   virtual void translate(C_Vertex *translation) = 0;
 };
 
 class C_Mesh : public C_BaseMesh {
@@ -46,6 +48,9 @@ public:
    C_Mesh *refMesh(void);
    int unRefMesh(void);
 
+   virtual void translate(float x, float y, float z);
+   virtual void translate(C_Vertex *translation);
+
    void draw(C_GLShader *shader);
    void drawNormals(void);
    void calculateBbox(void);
@@ -58,6 +63,8 @@ public:
    int            nMeshes;                /// Number of meshes in group
    C_GLShader     *shader;
    ESMatrix       matrix;
+   C_Quaternion   rotation;
+   C_Vertex       position;
    bool           applyFrustumCulling;    /// Don't apply frustum culling on low poly meshes
 
    C_MeshGroup(void);
@@ -73,6 +80,9 @@ public:
    void calculateBbox(void);
    void applyTransformationOnVertices(const ESMatrix *mat);
    bool loadFromFile(const char *filename);
+
+   virtual void translate(float x, float y, float z);
+   virtual void translate(C_Vertex *translation);
 };
 
 #endif

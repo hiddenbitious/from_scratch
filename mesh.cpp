@@ -10,7 +10,6 @@ C_BaseMesh::C_BaseMesh(void)
 
    nVertices = 0;
    nTriangles = 0;
-   position.x = position.y = position.z = 0.0f;
 }
 
 C_Mesh::C_Mesh(void)
@@ -112,7 +111,6 @@ C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
       assert(!indices);
 
       bbox = mesh.bbox;
-      position = mesh.position;
       nVertices = mesh.nVertices;
       nTriangles = mesh.nTriangles;
       refCounter = mesh.refCounter;
@@ -155,6 +153,7 @@ C_MeshGroup::C_MeshGroup(void)
    meshes = NULL;
    nMeshes = 0;
    matrix = Identity;
+   position.x = position.y = position.z = 0.0f;
 }
 
 C_MeshGroup::~C_MeshGroup(void)
@@ -373,6 +372,60 @@ C_Mesh::drawNormals(void)
       glVertex3f(vertices[3 * i + 2].x + binormals[3 * i + 2].x, vertices[3 * i + 2].y + binormals[3 * i + 2].y, vertices[3 * i + 2].z + binormals[3 * i + 2].z);
    }
    glEnd();
+}
+
+void
+C_Mesh::translate(C_Vertex *translation)
+{
+   translate(translation->x, translation->y, translation->z);
+}
+
+void
+C_Mesh::translate(float x, float y, float z)
+{
+   /// Update group's bbox
+   C_Vertex min, max;
+   bbox.GetMax(&max);
+   bbox.GetMin(&min);
+
+   max.x += x; max.y += y; max.z += z;
+   min.x += x; min.y += y; min.z += z;
+
+   bbox.SetMax(max.x, max.y, max.z);
+   bbox.SetMin(min.x, min.y, min.z);
+   bbox.SetVertices();
+}
+
+void
+C_MeshGroup::translate(C_Vertex *translation)
+{
+   translate(translation->x, translation->y, translation->z);
+}
+
+void
+C_MeshGroup::translate(float x, float y, float z)
+{
+   position.x += x;
+   position.y += y;
+   position.z += z;
+
+   C_Mesh *mesh = meshes;
+   while(mesh) {
+      mesh->translate(x, y, z);
+      mesh = mesh->next;
+   }
+
+   /// Update group's bbox
+   C_Vertex min, max;
+   bbox.GetMax(&max);
+   bbox.GetMin(&min);
+
+   max.x += x; max.y += y; max.z += z;
+   min.x += x; min.y += y; min.z += z;
+
+   bbox.SetMax(max.x, max.y, max.z);
+   bbox.SetMin(min.x, min.y, min.z);
+   bbox.SetVertices();
 }
 
 bool
