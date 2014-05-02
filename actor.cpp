@@ -196,8 +196,8 @@ void
 C_Actor::update(float fps)
 {
    static float change = 0.0f;
-   static const float rotationSpeed = 220.0f * 1.0f / fps;
-   static const float moveSpeed = 60.0f * 1.0f / fps;
+   const float rotationSpeed = 220.0f * 1.0f / fps;
+   const float moveSpeed = 60.0f * 1.0f / fps;
 
    if(moving) {
       switch(movement) {
