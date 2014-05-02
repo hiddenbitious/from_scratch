@@ -237,6 +237,7 @@ C_Actor::update(float fps)
             case X_MINUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
             case Z_PLUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
             case Z_MINUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            default: assert(0); break;
             }
 
             updateTileCoordinates();
@@ -250,6 +251,7 @@ C_Actor::update(float fps)
             case X_MINUS: cartesianCoordinates.x += moveSpeed; break;
             case Z_PLUS: cartesianCoordinates.z += moveSpeed; break;
             case Z_MINUS: cartesianCoordinates.z += moveSpeed; break;
+            default: assert(0); break;
             }
          }
          break;
@@ -263,6 +265,7 @@ C_Actor::update(float fps)
             case X_MINUS: cartesianCoordinates.x += -moveSpeed - (change + TILE_SIZE); break;
             case Z_PLUS: cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
             case Z_MINUS: cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
+            default: assert(0); break;
             }
 
             updateTileCoordinates();
@@ -276,6 +279,7 @@ C_Actor::update(float fps)
             case X_MINUS: cartesianCoordinates.x -= moveSpeed; break;
             case Z_PLUS: cartesianCoordinates.z -= moveSpeed; break;
             case Z_MINUS: cartesianCoordinates.z -= moveSpeed; break;
+            default: assert(0); break;
             }
          }
          break;
@@ -290,6 +294,7 @@ C_Actor::update(float fps)
             case X_MINUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
             case Z_PLUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
             case Z_MINUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            default: assert(0); break;
             }
 
             updateTileCoordinates();
@@ -303,6 +308,7 @@ C_Actor::update(float fps)
             case X_MINUS: cartesianCoordinates.x += moveSpeed; break;
             case Z_PLUS: cartesianCoordinates.z += moveSpeed; break;
             case Z_MINUS: cartesianCoordinates.z += moveSpeed; break;
+            default: assert(0); break;
             }
          }
          break;
