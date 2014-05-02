@@ -1,13 +1,5 @@
 #include "input.h"
 
-void
-C_MoveCommand::execute(C_Actor *actor)
-{
-   assert(movement < MOVE_MAX_MOVES);
-
-   actor->move(movement);
-}
-
 C_InputHandler::C_InputHandler(void)
 {
    buttonW_ = new C_MoveCommand();
@@ -27,6 +19,15 @@ C_InputHandler::C_InputHandler(void)
 
    buttonE_ = new C_MoveCommand();
    buttonE_->setMovement(MOVE_STRAFE_RIGHT);
+}
+
+void
+C_MoveCommand::execute(C_Actor *actor)
+{
+   assert(movement < MOVE_MAX_MOVES);
+
+   actor->move(movement);
+//   mob->move(MOVE_FORWARD);
 }
 
 C_InputHandler::~C_InputHandler(void)

@@ -233,9 +233,9 @@ C_Actor::update(int fps)
 
          if(change >= TILE_SIZE) {
             switch(movingDirection) {
-            case X_PLUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
+            case X_PLUS:  cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
             case X_MINUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
-            case Z_PLUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            case Z_PLUS:  cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
             case Z_MINUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
             default: assert(0); break;
             }
@@ -247,9 +247,9 @@ C_Actor::update(int fps)
             change = 0.0f;
          } else {
             switch(movingDirection) {
-            case X_PLUS: cartesianCoordinates.x += moveSpeed; break;
+            case X_PLUS:  cartesianCoordinates.x += moveSpeed; break;
             case X_MINUS: cartesianCoordinates.x += moveSpeed; break;
-            case Z_PLUS: cartesianCoordinates.z += moveSpeed; break;
+            case Z_PLUS:  cartesianCoordinates.z += moveSpeed; break;
             case Z_MINUS: cartesianCoordinates.z += moveSpeed; break;
             default: assert(0); break;
             }
@@ -261,9 +261,9 @@ C_Actor::update(int fps)
 
          if(change <= -TILE_SIZE) {
             switch(movingDirection) {
-            case X_PLUS: cartesianCoordinates.x += -moveSpeed - (change + TILE_SIZE); break;
+            case X_PLUS:  cartesianCoordinates.x += -moveSpeed - (change + TILE_SIZE); break;
             case X_MINUS: cartesianCoordinates.x += -moveSpeed - (change + TILE_SIZE); break;
-            case Z_PLUS: cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
+            case Z_PLUS:  cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
             case Z_MINUS: cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
             default: assert(0); break;
             }
@@ -275,9 +275,9 @@ C_Actor::update(int fps)
             change = 0.0f;
          } else {
             switch(movingDirection) {
-            case X_PLUS: cartesianCoordinates.x -= moveSpeed; break;
+            case X_PLUS:  cartesianCoordinates.x -= moveSpeed; break;
             case X_MINUS: cartesianCoordinates.x -= moveSpeed; break;
-            case Z_PLUS: cartesianCoordinates.z -= moveSpeed; break;
+            case Z_PLUS:  cartesianCoordinates.z -= moveSpeed; break;
             case Z_MINUS: cartesianCoordinates.z -= moveSpeed; break;
             default: assert(0); break;
             }
@@ -290,9 +290,9 @@ C_Actor::update(int fps)
 
          if(change >= TILE_SIZE) {
             switch(movingDirection) {
-            case X_PLUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
+            case X_PLUS:  cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
             case X_MINUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
-            case Z_PLUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            case Z_PLUS:  cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
             case Z_MINUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
             default: assert(0); break;
             }
@@ -304,9 +304,9 @@ C_Actor::update(int fps)
             change = 0.0f;
          } else {
             switch(movingDirection) {
-            case X_PLUS: cartesianCoordinates.x += moveSpeed; break;
+            case X_PLUS:  cartesianCoordinates.x += moveSpeed; break;
             case X_MINUS: cartesianCoordinates.x += moveSpeed; break;
-            case Z_PLUS: cartesianCoordinates.z += moveSpeed; break;
+            case Z_PLUS:  cartesianCoordinates.z += moveSpeed; break;
             case Z_MINUS: cartesianCoordinates.z += moveSpeed; break;
             default: assert(0); break;
             }

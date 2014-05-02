@@ -137,6 +137,7 @@ class C_GLShaderManager;
 class C_TextureManager;
 class C_GLShader;
 class C_InputHandler;
+class C_Mob;
 
 extern ESMatrix globalViewMatrix, globalProjectionMatrix, globalMVPMatrix;
 extern C_GLShaderManager *shaderManager;
@@ -150,5 +151,5 @@ extern C_Vertex lightPosition;
 extern char MAX_THREADS;
 extern C_Camera camera;
 extern C_InputHandler inputHandler;
-
+extern C_Mob mob;
 #endif

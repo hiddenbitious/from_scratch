@@ -54,7 +54,7 @@ C_GLShader *simple_texture_shader = NULL;
 C_Camera camera;
 static C_Frustum frustum;
 static C_Party party;
-static C_Mob mob;
+C_Mob mob;
 C_InputHandler inputHandler;
 
 /// window stuff
