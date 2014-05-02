@@ -21,7 +21,7 @@ public:
    void setMap(C_Map *map_) { assert(map_); map = map_; }
    void setCoordinates(int x, int y) { mapCoordinateX = x; mapCoordinateY = y; }
 
-   virtual void update(float fps);
+   virtual void update(int fps);
 
 protected:
    int mapCoordinateX;
@@ -52,7 +52,7 @@ public:
 
    void loadModel(void);
 
-   virtual void update(float fps) {}
+   virtual void update(int fps) {}
    void Draw(C_Camera *camera);
 
 };
@@ -62,7 +62,7 @@ public:
    C_Party(void) {}
    ~C_Party(void) {}
 
-   virtual void update(float fps);
+   virtual void update(int fps);
 };
 
 #endif

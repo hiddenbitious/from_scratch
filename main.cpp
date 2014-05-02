@@ -75,7 +75,7 @@ static C_Vector3 center(0.0f , 0.0f , 0.0f);
 C_Timer timer;
 float start = timer.GetTime ();
 static float timeElapsed = 0.0f;
-static float fps = 60.0f;
+static int fps = 60;
 
 /// Metaballs
 static C_CubeGrid *grid;
@@ -110,12 +110,8 @@ Initializations(void)
    	glEnable(GL_CULL_FACE);
 	}
 
-//	glFrontFace(GL_CW);
-//	glCullFace(GL_BACK);
-
 	glEnable(GL_DEPTH_TEST);
 	glPointSize(10.0f);
-//	glShadeModel(GL_SMOOTH);
 
 	/// XXX: Disable normalizing ???
 	glDisable(GL_NORMALIZE);
@@ -363,11 +359,11 @@ CountFPS (void)
 	float delta = timer.GetTime () - start;
 	count++;
 
-	if(delta >= 1000.0f) {
-		fps = count;
+	if(delta >= 200.0f) {
+		fps = count * 5;
 		start = timer.GetTime ();
 
-		printf("fps: %lu\n", count);
+		printf("fps: %d\n", fps);
 
 		count = 0;
 	}

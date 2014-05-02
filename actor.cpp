@@ -193,11 +193,11 @@ C_Mob::Draw(C_Camera *camera)
 }
 
 void
-C_Actor::update(float fps)
+C_Actor::update(int fps)
 {
    static float change = 0.0f;
-   const float rotationSpeed = 220.0f * 1.0f / fps;
-   const float moveSpeed = 60.0f * 1.0f / fps;
+   const float rotationSpeed = 220.0f * 1.0f / (float)fps;
+   const float moveSpeed = 60.0f * 1.0f / (float)fps;
 
    if(moving) {
       switch(movement) {
@@ -321,7 +321,7 @@ C_Actor::update(float fps)
 }
 
 void
-C_Party::update(float fps)
+C_Party::update(int fps)
 {
    C_Command *command = inputHandler.handleInput();
 
