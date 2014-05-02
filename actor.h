@@ -19,7 +19,7 @@ public:
 
    void move(movements_t movement);
    void setMap(C_Map *map_) { assert(map_); map = map_; }
-   void setCoordinates(int x, int y) { mapCoordinateX = x; mapCoordinateY = y; }
+   virtual void setCoordinates(int x, int y);
 
    virtual void update(int fps);
 
@@ -52,6 +52,7 @@ public:
    ~C_Mob(void) {}
 
    void loadModel(void);
+   void setCoordinates(int x, int y);
 
    virtual void update(int fps);
    void Draw(C_Camera *camera);

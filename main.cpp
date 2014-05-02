@@ -186,6 +186,7 @@ Initializations(void)
 
    mob.setMap(&map);
    mob.loadModel();
+   mob.setCoordinates(tileStartx, tileStarty);
 
 	/// timer initialization
 	timer.Initialize ();
@@ -223,14 +224,13 @@ Draw(void)
 	angle += .03f;
 	if(angle >= 360.0f) angle = 0.0f;
 
-   party.update(fps);
-   mob.update(fps);
-
 	cube.draw(&camera);
-
-	mob.Draw(&camera);
-
    map.draw(&camera);
+
+   party.update(fps);
+
+   mob.update(fps);
+	mob.Draw(&camera);
 
 #ifndef JNI_COMPATIBLE
 	/// Print text on screem

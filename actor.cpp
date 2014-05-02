@@ -13,8 +13,28 @@ C_Actor::C_Actor(void)
    yAngle = 0.0f;
    change = 0.0f;
    cartesianCoordinates.x = 0.0f;
-   cartesianCoordinates.y = 0.0f;
+   cartesianCoordinates.y = TILE_SIZE / 4.0f;
    cartesianCoordinates.z = 0.0f;
+}
+
+void
+C_Actor::setCoordinates(int x, int y)
+{
+   mapCoordinateX = x;
+   mapCoordinateY = y;
+
+   cartesianCoordinates.x = x * TILE_SIZE + TILE_SIZE / 2.0f;
+   cartesianCoordinates.z = y * TILE_SIZE + TILE_SIZE / 2.0f;
+}
+
+void
+C_Mob::setCoordinates(int x, int y)
+{
+   model.translate(x * TILE_SIZE + TILE_SIZE / 2.0f - cartesianCoordinates.x,
+                   0.0f,
+                   y * TILE_SIZE + TILE_SIZE / 2.0f - cartesianCoordinates.y);
+
+   C_Actor::setCoordinates(x, y);
 }
 
 void
@@ -185,10 +205,7 @@ C_Mob::C_Mob(void)
 void
 C_Mob::Draw(C_Camera *camera)
 {
-   model.position.x = mapCoordinateX * TILE_SIZE + TILE_SIZE / 2.0f;
-   model.position.y = TILE_SIZE / 4.f;
-   model.position.z = mapCoordinateY * TILE_SIZE + TILE_SIZE / 2.0f;
-
+   model.position = cartesianCoordinates;
 
    model.draw(camera);
 }
@@ -324,12 +341,6 @@ C_Actor::update(int fps)
 void
 C_Mob::update(int fps)
 {
-   C_Command *command = inputHandler.handleInput();
-
-   if(command) {
-      command->execute(this);
-   }
-
    if(moving) {
       float yAngle_old;
       C_Vertex cartesianCoordinates_old;
