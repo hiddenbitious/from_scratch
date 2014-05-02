@@ -24,10 +24,14 @@ C_InputHandler::C_InputHandler(void)
 void
 C_MoveCommand::execute(C_Actor *actor)
 {
+   static int c = 0;
+
    assert(movement < MOVE_MAX_MOVES);
 
    actor->move(movement);
-//   mob->move(MOVE_FORWARD);
+
+   if(c++ > 10)
+      mob.move(MOVE_FORWARD);
 }
 
 C_InputHandler::~C_InputHandler(void)

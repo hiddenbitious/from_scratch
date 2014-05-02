@@ -224,6 +224,7 @@ Draw(void)
 	if(angle >= 360.0f) angle = 0.0f;
 
    party.update(fps);
+   mob.update(fps);
 
 	cube.draw(&camera);
 

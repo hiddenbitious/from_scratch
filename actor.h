@@ -26,6 +26,7 @@ public:
 protected:
    int mapCoordinateX;
    int mapCoordinateY;
+   float change;
 
    float yAngle;
    C_Vertex cartesianCoordinates;
@@ -52,7 +53,7 @@ public:
 
    void loadModel(void);
 
-   virtual void update(int fps) {}
+   virtual void update(int fps);
    void Draw(C_Camera *camera);
 
 };

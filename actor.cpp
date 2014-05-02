@@ -11,6 +11,7 @@ C_Actor::C_Actor(void)
 
    moving = false;
    yAngle = 0.0f;
+   change = 0.0f;
    cartesianCoordinates.x = 0.0f;
    cartesianCoordinates.y = 0.0f;
    cartesianCoordinates.z = 0.0f;
@@ -195,7 +196,6 @@ C_Mob::Draw(C_Camera *camera)
 void
 C_Actor::update(int fps)
 {
-   static float change = 0.0f;
    const float rotationSpeed = 220.0f * 1.0f / (float)fps;
    const float moveSpeed = 60.0f * 1.0f / (float)fps;
 
@@ -319,6 +319,69 @@ C_Actor::update(int fps)
       }
    }
 }
+
+
+void
+C_Mob::update(int fps)
+{
+   C_Command *command = inputHandler.handleInput();
+
+   if(command) {
+      command->execute(this);
+   }
+
+   if(moving) {
+      float yAngle_old;
+      C_Vertex cartesianCoordinates_old;
+
+      switch(movement) {
+      case MOVE_TURN_LEFT:
+         yAngle_old = yAngle;
+         C_Actor::update(fps);
+//         camera.Rotate(0.0f, yAngle - yAngle_old);
+         break;
+
+      case MOVE_TURN_RIGHT:
+         yAngle_old = yAngle;
+         C_Actor::update(fps);
+//         camera.Rotate(0.0f, yAngle - yAngle_old);
+         break;
+
+      case MOVE_FORWARD:
+      case MOVE_BACKWARDS:
+         cartesianCoordinates_old = cartesianCoordinates;
+         C_Actor::update(fps);
+         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+            model.translate(cartesianCoordinates.x - cartesianCoordinates_old.x, 0.0f, 0.0f);
+         else
+            model.translate(0.0f, 0.0f, cartesianCoordinates.z - cartesianCoordinates_old.z);
+         break;
+
+      case MOVE_STRAFE_LEFT:
+         cartesianCoordinates_old = cartesianCoordinates;
+         C_Actor::update(fps);
+//         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+//            camera.StrafeLeft(cartesianCoordinates.x - cartesianCoordinates_old.x);
+//         else
+//            camera.StrafeLeft(cartesianCoordinates.z - cartesianCoordinates_old.z);
+         break;
+
+      case MOVE_STRAFE_RIGHT:
+         cartesianCoordinates_old = cartesianCoordinates;
+         C_Actor::update(fps);
+//         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+//            camera.StrafeRight(cartesianCoordinates.x - cartesianCoordinates_old.x);
+//         else
+//            camera.StrafeRight(cartesianCoordinates.z - cartesianCoordinates_old.z);
+         break;
+
+      default:
+         assert(0);
+         break;
+      }
+   }
+}
+
 
 void
 C_Party::update(int fps)
