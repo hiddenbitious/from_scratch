@@ -13,7 +13,7 @@ C_Actor::C_Actor(void)
    yAngle = 0.0f;
    change = 0.0f;
    cartesianCoordinates.x = 0.0f;
-   cartesianCoordinates.y = TILE_SIZE / 4.0f;
+   cartesianCoordinates.y = 0.0f;
    cartesianCoordinates.z = 0.0f;
 }
 
@@ -25,16 +25,6 @@ C_Actor::setCoordinates(int x, int y)
 
    cartesianCoordinates.x = x * TILE_SIZE + TILE_SIZE / 2.0f;
    cartesianCoordinates.z = y * TILE_SIZE + TILE_SIZE / 2.0f;
-}
-
-void
-C_Mob::setCoordinates(int x, int y)
-{
-   model.translate(x * TILE_SIZE + TILE_SIZE / 2.0f - cartesianCoordinates.x,
-                   0.0f,
-                   y * TILE_SIZE + TILE_SIZE / 2.0f - cartesianCoordinates.y);
-
-   C_Actor::setCoordinates(x, y);
 }
 
 void
@@ -185,32 +175,6 @@ C_Actor::move(movements_t movement)
 }
 
 void
-C_Mob::loadModel(void)
-{
-   model.loadFromFile("objmodels/cube.obj");
-   model.shader = simple_texture_shader;
-
-   ESMatrix matrix = Identity;
-   float scale = 5.0f;
-   esScale(&matrix, scale, scale, scale);
-   model.applyTransformationOnVertices(&matrix);
-}
-
-C_Mob::C_Mob(void)
-{
-   mapCoordinateX = 1;
-   mapCoordinateY = 1;
-}
-
-void
-C_Mob::Draw(C_Camera *camera)
-{
-   model.position = cartesianCoordinates;
-
-   model.draw(camera);
-}
-
-void
 C_Actor::update(int fps)
 {
    const float rotationSpeed = 220.0f * 1.0f / (float)fps;
@@ -337,63 +301,6 @@ C_Actor::update(int fps)
    }
 }
 
-
-void
-C_Mob::update(int fps)
-{
-   if(moving) {
-      float yAngle_old;
-      C_Vertex cartesianCoordinates_old;
-
-      switch(movement) {
-      case MOVE_TURN_LEFT:
-         yAngle_old = yAngle;
-         C_Actor::update(fps);
-//         camera.Rotate(0.0f, yAngle - yAngle_old);
-         break;
-
-      case MOVE_TURN_RIGHT:
-         yAngle_old = yAngle;
-         C_Actor::update(fps);
-//         camera.Rotate(0.0f, yAngle - yAngle_old);
-         break;
-
-      case MOVE_FORWARD:
-      case MOVE_BACKWARDS:
-         cartesianCoordinates_old = cartesianCoordinates;
-         C_Actor::update(fps);
-         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-            model.translate(cartesianCoordinates.x - cartesianCoordinates_old.x, 0.0f, 0.0f);
-         else
-            model.translate(0.0f, 0.0f, cartesianCoordinates.z - cartesianCoordinates_old.z);
-         break;
-
-      case MOVE_STRAFE_LEFT:
-         cartesianCoordinates_old = cartesianCoordinates;
-         C_Actor::update(fps);
-//         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-//            camera.StrafeLeft(cartesianCoordinates.x - cartesianCoordinates_old.x);
-//         else
-//            camera.StrafeLeft(cartesianCoordinates.z - cartesianCoordinates_old.z);
-         break;
-
-      case MOVE_STRAFE_RIGHT:
-         cartesianCoordinates_old = cartesianCoordinates;
-         C_Actor::update(fps);
-//         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-//            camera.StrafeRight(cartesianCoordinates.x - cartesianCoordinates_old.x);
-//         else
-//            camera.StrafeRight(cartesianCoordinates.z - cartesianCoordinates_old.z);
-         break;
-
-      default:
-         assert(0);
-         break;
-      }
-   }
-}
-
-
 void
 C_Party::update(int fps)
 {
@@ -446,6 +353,98 @@ C_Party::update(int fps)
             camera.StrafeRight(cartesianCoordinates.x - cartesianCoordinates_old.x);
          else
             camera.StrafeRight(cartesianCoordinates.z - cartesianCoordinates_old.z);
+         break;
+
+      default:
+         assert(0);
+         break;
+      }
+   }
+}
+
+C_Mob::C_Mob(void)
+{
+   mapCoordinateX = 1;
+   mapCoordinateY = 1;
+}
+
+void
+C_Mob::setCoordinates(int x, int y)
+{
+   model.translate(x * TILE_SIZE + TILE_SIZE / 2.0f - cartesianCoordinates.x,
+                   0.0f,
+                   y * TILE_SIZE + TILE_SIZE / 2.0f - cartesianCoordinates.y);
+
+   C_Actor::setCoordinates(x, y);
+}
+
+void
+C_Mob::loadModel(void)
+{
+   model.loadFromFile("objmodels/cube.obj");
+   model.shader = simple_texture_shader;
+
+   ESMatrix matrix = Identity;
+   float scale = 5.0f;
+   esTranslate(&matrix, 0.0f, TILE_SIZE / 4.0f, 0.0f);
+   esScale(&matrix, scale, scale, scale);
+   model.applyTransformationOnVertices(&matrix);
+}
+
+void
+C_Mob::Draw(C_Camera *camera)
+{
+   model.position = cartesianCoordinates;
+
+   model.draw(camera);
+}
+
+void
+C_Mob::update(int fps)
+{
+   if(moving) {
+      float yAngle_old;
+      C_Vertex cartesianCoordinates_old;
+
+      switch(movement) {
+      case MOVE_TURN_LEFT:
+         yAngle_old = yAngle;
+         C_Actor::update(fps);
+//         camera.Rotate(0.0f, yAngle - yAngle_old);
+         break;
+
+      case MOVE_TURN_RIGHT:
+         yAngle_old = yAngle;
+         C_Actor::update(fps);
+//         camera.Rotate(0.0f, yAngle - yAngle_old);
+         break;
+
+      case MOVE_FORWARD:
+      case MOVE_BACKWARDS:
+         cartesianCoordinates_old = cartesianCoordinates;
+         C_Actor::update(fps);
+         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+            model.translate(cartesianCoordinates.x - cartesianCoordinates_old.x, 0.0f, 0.0f);
+         else
+            model.translate(0.0f, 0.0f, cartesianCoordinates.z - cartesianCoordinates_old.z);
+         break;
+
+      case MOVE_STRAFE_LEFT:
+         cartesianCoordinates_old = cartesianCoordinates;
+         C_Actor::update(fps);
+//         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+//            camera.StrafeLeft(cartesianCoordinates.x - cartesianCoordinates_old.x);
+//         else
+//            camera.StrafeLeft(cartesianCoordinates.z - cartesianCoordinates_old.z);
+         break;
+
+      case MOVE_STRAFE_RIGHT:
+         cartesianCoordinates_old = cartesianCoordinates;
+         C_Actor::update(fps);
+//         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+//            camera.StrafeRight(cartesianCoordinates.x - cartesianCoordinates_old.x);
+//         else
+//            camera.StrafeRight(cartesianCoordinates.z - cartesianCoordinates_old.z);
          break;
 
       default:

@@ -151,15 +151,13 @@ Initializations(void)
    assert(bspShader->verticesAttribLocation >= 0);
    assert(bspShader->normalsAttribLocation >= 0);
 
-   if(DRAW_BSP_GEOMETRY) {
-      basicShader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
-      assert(basicShader->verticesAttribLocation >= 0);
-      assert(basicShader->normalsAttribLocation == -1);
+   basicShader = shaderManager->LoadShaderProgram("shaders/wire_shader.vert", "shaders/wire_shader.frag");
+   assert(basicShader->verticesAttribLocation >= 0);
+   assert(basicShader->normalsAttribLocation == -1);
 
-      pointShader = shaderManager->LoadShaderProgram("shaders/points_shader.vert", "shaders/points_shader.frag");
-      assert(pointShader->verticesAttribLocation >= 0);
-      assert(pointShader->normalsAttribLocation == -1);
-   }
+   pointShader = shaderManager->LoadShaderProgram("shaders/points_shader.vert", "shaders/points_shader.frag");
+   assert(pointShader->verticesAttribLocation >= 0);
+   assert(pointShader->normalsAttribLocation == -1);
 
    wallShader = shaderManager->LoadShaderProgram("shaders/shader1.vert", "shaders/shader1.frag");
    assert(wallShader->verticesAttribLocation >= 0);

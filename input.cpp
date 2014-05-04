@@ -24,14 +24,11 @@ C_InputHandler::C_InputHandler(void)
 void
 C_MoveCommand::execute(C_Actor *actor)
 {
-   static int c = 0;
-
    assert(movement < MOVE_MAX_MOVES);
 
    actor->move(movement);
 
-   if(c++ > 10)
-      mob.move(MOVE_FORWARD);
+   mob.move(MOVE_FORWARD);
 }
 
 C_InputHandler::~C_InputHandler(void)
@@ -56,6 +53,7 @@ void
 C_InputHandler::releaseKey(char key)
 {
    assert(key >= 65 && key <= 119);
+   assert(keysPressed[key - 65]);
 
    keysPressed[key - 65] = false;
 }
@@ -71,12 +69,12 @@ C_InputHandler::isPressed(char key)
 C_Command *
 C_InputHandler::handleInput()
 {
-  if (isPressed('w'))   return buttonW_;
-  if (isPressed('a'))   return buttonA_;
-  if (isPressed('s'))   return buttonS_;
-  if (isPressed('d'))   return buttonD_;
-  if (isPressed('q'))   return buttonQ_;
-  if (isPressed('e'))   return buttonE_;
+  if (isPressed('w')) return buttonW_;
+  if (isPressed('a')) return buttonA_;
+  if (isPressed('s')) return buttonS_;
+  if (isPressed('d')) return buttonD_;
+  if (isPressed('q')) return buttonQ_;
+  if (isPressed('e')) return buttonE_;
 
   return NULL;
 }
