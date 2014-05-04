@@ -75,6 +75,14 @@ C_Vector3 &C_Vector3::operator= (const C_Vector3 &vec)
    return *this;
 }
 
+C_Vector3 &C_Vector3::operator= (const C_Vertex &vec)
+{
+   x = vec.x;
+   y = vec.y;
+   z = vec.z;
+   return *this;
+}
+
 C_Vector3 C_Vector3::operator + (C_Vector3 vec)
 {
 	C_Vector3 temp;

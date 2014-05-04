@@ -38,15 +38,21 @@ C_Camera::C_Camera(void)
 }
 
 void
+C_Camera::SetPosition(float x, float y, float z)
+{
+   position.x = x;
+   position.y = y;
+   position.z = z;
+
+   lookAt.x = x;
+   lookAt.y = y;
+   lookAt.z = z + 1.0f;
+}
+
+void
 C_Camera::SetPosition(C_Vertex pos)
 {
-   position.x = pos.x;
-   position.y = pos.y;
-   position.z = pos.z;
-
-   lookAt.x = pos.x;
-   lookAt.y = pos.y;
-   lookAt.z = pos.z - 1.0f;
+   SetPosition(pos.x, pos.y, pos.z);
 }
 
 void C_Camera::Look(void)

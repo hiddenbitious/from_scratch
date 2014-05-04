@@ -49,13 +49,14 @@ class C_Vector3 {
 		// Default constructor. Sets all values to 0;
 		C_Vector3(void);
 		// Constructor
-		C_Vector3(float x , float y , float z);
-		C_Vector3(C_Vertex* point);
+		C_Vector3(float x, float y, float z);
+		C_Vector3(C_Vertex *point);
 
 		bool operator < (C_Vector3* vec) const;
 		bool operator > (C_Vector3* vec) const;
 
       C_Vector3 &operator= (const C_Vector3 &vec);
+      C_Vector3 &operator= (const C_Vertex &vec);
 
 		C_Vector3 operator + (C_Vector3);
 		C_Vector3& operator += (C_Vector3);

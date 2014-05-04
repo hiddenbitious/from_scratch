@@ -15,7 +15,7 @@ vec4 lightColorDiffuse  = vec4(255.0f / 255.0f,
 
 //vec4 lightColorDiffuse = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 vec4 lightColorSpecular = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-float lightPower = 40.0;
+float lightPower = 20.0;
 
 void main(void) {
    vec3 normal_ts = normalize(2.0 * texture2D (u_texture_normal_map, v_texCoords).rgb - 1.0);
@@ -35,6 +35,6 @@ void main(void) {
 
    gl_FragColor = ambientColor +
                   diffuseColor * lightColorDiffuse * lamberFactor * lightPower / (distance) +
-                  specularColor * lightColorSpecular * pow(cosAlpha, 5) * lightPower / (distance * distance);
+                  specularColor * lightColorSpecular * pow(cosAlpha, 5) * lightPower / distance;
 //   gl_FragColor += specularMaterial * lightColorSpecular * shininess;
 }

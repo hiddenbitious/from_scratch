@@ -172,8 +172,9 @@ Initializations(void)
 
    int tileStartx, tileStarty;
    C_Vertex cameraPosition = map.cameraStartPosition(&tileStartx, &tileStarty);
+   printf("****\nx: %d, y: %d\n", tileStartx, tileStarty);
 //   printf("cameraPosition: %f %f %f\n", cameraPosition.x, cameraPosition.y, cameraPosition.z);
-   camera.SetPosition(cameraPosition);
+//   camera.SetPosition(cameraPosition);
    camera.Rotate(0.0f, 180.0f);
 
    cube.loadFromFile("objmodels/cube.obj");
@@ -184,7 +185,7 @@ Initializations(void)
 
    mob.setMap(&map);
    mob.loadModel();
-   mob.setCoordinates(tileStartx, tileStarty);
+   mob.setCoordinates(tileStartx + 5, tileStarty);
 
 	/// timer initialization
 	timer.Initialize ();
@@ -362,7 +363,7 @@ CountFPS (void)
 		fps = count * 5;
 		start = timer.GetTime ();
 
-		printf("fps: %d\n", fps);
+//		printf("fps: %d\n", fps);
 
 		count = 0;
 	}

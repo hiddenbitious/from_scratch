@@ -9,6 +9,8 @@
 
 #define ENABLE_COLLISION_DETECTION     true
 
+#define ROTATE_MESH_BBOXES             true;
+
 //#define JNI_COMPATIBLE
 
 #ifdef JNI_COMPATIBLE
@@ -116,7 +118,7 @@ typedef enum {
    Y_PLUS,
 
    TOTAL_FACES
-} tile_direction_t;
+} world_direction_t;
 
 typedef	struct {
 	uint32_t 	TextureID;     // Texture ID Used To Select A Texture
@@ -138,6 +140,8 @@ class C_TextureManager;
 class C_GLShader;
 class C_InputHandler;
 class C_Mob;
+class C_Mesh;
+class C_MeshGroup;
 
 extern ESMatrix globalViewMatrix, globalProjectionMatrix, globalMVPMatrix;
 extern C_GLShaderManager *shaderManager;

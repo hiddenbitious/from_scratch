@@ -7,6 +7,15 @@
 
 #define TILE_SIZE 20.0f
 
+typedef enum {
+   TILE_X_MINUS,
+   TILE_Y_MINUS,
+   TILE_X_PLUS,
+   TILE_Y_PLUS,
+
+   TOTAL_TILE_DIRECTIONS
+} tile_direction_t;
+
 class C_Map {
 
 public:

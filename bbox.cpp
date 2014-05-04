@@ -326,7 +326,7 @@ bool C_BBox::IsInside(const C_Vertex* p)
 }
 
 /// XXX: Bad hard float comparing goes on in this function
-tile_direction_t
+world_direction_t
 C_BBox::areBboxesAdjacent(const C_BBox *box)
 {
    if(FLOAT_EQ(min.x, box->max.x) &&

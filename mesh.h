@@ -21,6 +21,9 @@ public:
 
    virtual void translate(float x, float y, float z) = 0;
    virtual void translate(C_Vertex *translation) = 0;
+
+   virtual void rotate(float x, float y, float z) = 0;
+   virtual void rotate(C_Vertex *rotation) = 0;
 };
 
 class C_Mesh : public C_BaseMesh {
@@ -34,6 +37,7 @@ public:
    int            *indices;            /// Vertex indices
    int            nIndices;
    C_Mesh         *next;               /// Pointer to next mesh in meshGroup
+   C_MeshGroup    *group;
 
    int            refCounter;
 
@@ -50,6 +54,8 @@ public:
 
    virtual void translate(float x, float y, float z);
    virtual void translate(C_Vertex *translation);
+   virtual void rotate(float x, float y, float z);
+   virtual void rotate(C_Vertex *rotation);
 
    void draw(C_GLShader *shader);
    void drawNormals(void);
@@ -62,9 +68,8 @@ public:
    C_Mesh         *meshes;                /// Linked list of meshes in group
    int            nMeshes;                /// Number of meshes in group
    C_GLShader     *shader;
-   ESMatrix       matrix;
-   C_Quaternion   rotation;
    C_Vertex       position;
+   ESMatrix       matrix;
    bool           applyFrustumCulling;    /// Don't apply frustum culling on low poly meshes
 
    C_MeshGroup(void);
@@ -83,6 +88,13 @@ public:
 
    virtual void translate(float x, float y, float z);
    virtual void translate(C_Vertex *translation);
+
+   virtual void rotate(float x, float y, float z);
+   virtual void rotate(C_Vertex *rotation);
+
+private:
+   C_Quaternion   rotationQuat;
+   bool           rotated;
 };
 
 #endif

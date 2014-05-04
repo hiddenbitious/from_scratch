@@ -6,8 +6,8 @@ C_Actor::C_Actor(void)
    mapCoordinateX = 0;
    mapCoordinateY = 0;
    map = NULL;
-   facingDirection = Z_PLUS;
-   movingDirection = Z_PLUS;
+   facingDirection = TILE_X_PLUS;
+   movingDirection = TILE_X_PLUS;
 
    moving = false;
    yAngle = 0.0f;
@@ -23,74 +23,33 @@ C_Actor::setCoordinates(int x, int y)
    mapCoordinateX = x;
    mapCoordinateY = y;
 
-   cartesianCoordinates.x = x * TILE_SIZE + TILE_SIZE / 2.0f;
-   cartesianCoordinates.z = y * TILE_SIZE + TILE_SIZE / 2.0f;
+   cartesianCoordinates.z = x * TILE_SIZE + TILE_SIZE / 2.0f;
+   cartesianCoordinates.y = TILE_SIZE / 2.0f;
+   cartesianCoordinates.x = y * TILE_SIZE + TILE_SIZE / 2.0f;
 }
 
 void
 C_Actor::updateDirections(void)
 {
-//   printf("facing: %d moving: %d\n", facingDirection, movingDirection);
-//
-//   tile *tile_;
-//
-//   printf("map neighbour tiles:\n");
-//
-//   tile_ = map->getTile(mapCoordinateX + 1, mapCoordinateY);
-//   printf("\t x+1, y: %d\n", tile_->getType());
-//
-//   tile_ = map->getTile(mapCoordinateX - 1, mapCoordinateY);
-//   printf("\t x-1, y: %d\n", tile_->getType());
-//
-//   tile_ = map->getTile(mapCoordinateX, mapCoordinateY + 1);
-//   printf("\t x, y+1: %d\n", tile_->getType());
-//
-//   tile_ = map->getTile(mapCoordinateX + 1, mapCoordinateY - 1);
-//   printf("\t x, y-1: %d\n", tile_->getType());
-
    switch(movement) {
    case MOVE_STRAFE_LEFT:
-      if(facingDirection == X_MINUS) {
-         movingDirection = Z_PLUS;
-      } else {
-         movingDirection = (tile_direction_t)((int)facingDirection - 1);
-      }
+      movingDirection = (tile_direction_t)(((int)facingDirection + 1) % TOTAL_TILE_DIRECTIONS);
       break;
 
    case MOVE_STRAFE_RIGHT:
-      if(facingDirection == Z_PLUS) {
-         movingDirection = X_MINUS;
-      } else {
-         movingDirection = (tile_direction_t)((int)facingDirection + 1);
-      }
+      movingDirection = (tile_direction_t)(((int)facingDirection + TOTAL_TILE_DIRECTIONS - 1) % TOTAL_TILE_DIRECTIONS);
       break;
 
    case MOVE_TURN_LEFT:
-      if(facingDirection == X_MINUS) {
-         facingDirection = Z_PLUS;
-         movingDirection = Z_PLUS;
-      } else {
-         facingDirection = (tile_direction_t)((int)facingDirection - 1);
-         movingDirection = (tile_direction_t)((int)movingDirection - 1);
-      }
+      facingDirection = movingDirection = (tile_direction_t)(((int)facingDirection + 1) % TOTAL_TILE_DIRECTIONS);
       break;
 
    case MOVE_TURN_RIGHT:
-      if(facingDirection == Z_PLUS) {
-         facingDirection = X_MINUS;
-         movingDirection = X_MINUS;
-      } else {
-         facingDirection = (tile_direction_t)((int)facingDirection + 1);
-         movingDirection = (tile_direction_t)((int)movingDirection + 1);
-      }
+      facingDirection = movingDirection = (tile_direction_t)(((int)facingDirection + TOTAL_TILE_DIRECTIONS - 1) % TOTAL_TILE_DIRECTIONS);
       break;
 
    case MOVE_BACKWARDS:
-      if(facingDirection == X_MINUS || facingDirection == Z_MINUS) {
-         movingDirection = (tile_direction_t)((int)facingDirection + 2);
-      } else {
-         movingDirection = (tile_direction_t)((int)facingDirection - 2);
-      }
+      movingDirection = (tile_direction_t)(((int)facingDirection + 2) % TOTAL_TILE_DIRECTIONS);
       break;
 
    case MOVE_FORWARD:
@@ -102,29 +61,31 @@ C_Actor::updateDirections(void)
       break;
    }
 
-//   printf("facing: %d moving: %d\n", facingDirection, movingDirection);
+   printf("facing: %d moving: %d\n", facingDirection, movingDirection);
 }
 
 void
 C_Actor::updateTileCoordinates(void)
 {
    switch(movingDirection) {
-   case X_PLUS:
-      ++mapCoordinateY;
-      break;
-   case X_MINUS:
-      --mapCoordinateY;
-      break;
-   case Z_PLUS:
+   case TILE_X_PLUS:
       ++mapCoordinateX;
       break;
-   case Z_MINUS:
+   case TILE_X_MINUS:
       --mapCoordinateX;
+      break;
+   case TILE_Y_PLUS:
+      ++mapCoordinateY;
+      break;
+   case TILE_Y_MINUS:
+      --mapCoordinateY;
       break;
    default:
       assert(0);
       break;
    }
+
+   printf("coordx: %d coordy: %d\n\n", mapCoordinateX, mapCoordinateY);
 }
 
 bool
@@ -134,26 +95,32 @@ C_Actor::checkCollision(void)
    tile *tile_;
 
    switch(movingDirection) {
-   case X_PLUS:
-      tile_ = map->getTile(mapCoordinateX, mapCoordinateY + 1);
-      break;
-
-   case X_MINUS:
-      tile_ = map->getTile(mapCoordinateX, mapCoordinateY - 1);
-      break;
-
-   case Z_PLUS:
+   case TILE_X_PLUS:
       tile_ = map->getTile(mapCoordinateX + 1, mapCoordinateY);
+      printf("X_PLUS tile type: %d\n", tile_->getType());
       break;
 
-   case Z_MINUS:
+   case TILE_X_MINUS:
       tile_ = map->getTile(mapCoordinateX - 1, mapCoordinateY);
+      printf("X_MINUS tile type: %d\n", tile_->getType());
+      break;
+
+   case TILE_Y_PLUS:
+      tile_ = map->getTile(mapCoordinateX, mapCoordinateY + 1);
+      printf("Z_PLUS tile type: %d\n", tile_->getType());
+      break;
+
+   case TILE_Y_MINUS:
+      tile_ = map->getTile(mapCoordinateX, mapCoordinateY - 1);
+      printf("Z_MINUS tile type: %d\n", tile_->getType());
       break;
 
    default:
       assert(0);
       break;
    }
+
+   assert(tile_->getType() != TILE_WALL);
 
    return tile_->getType() == TILE_WALL;
 }
@@ -214,10 +181,10 @@ C_Actor::update(int fps)
 
          if(change >= TILE_SIZE) {
             switch(movingDirection) {
-            case X_PLUS:  cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
-            case X_MINUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
-            case Z_PLUS:  cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
-            case Z_MINUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            case TILE_X_PLUS:  cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            case TILE_X_MINUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            case TILE_Y_PLUS:  cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
+            case TILE_Y_MINUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
             default: assert(0); break;
             }
 
@@ -228,10 +195,10 @@ C_Actor::update(int fps)
             change = 0.0f;
          } else {
             switch(movingDirection) {
-            case X_PLUS:  cartesianCoordinates.x += moveSpeed; break;
-            case X_MINUS: cartesianCoordinates.x += moveSpeed; break;
-            case Z_PLUS:  cartesianCoordinates.z += moveSpeed; break;
-            case Z_MINUS: cartesianCoordinates.z += moveSpeed; break;
+            case TILE_X_PLUS:  cartesianCoordinates.z += moveSpeed; break;
+            case TILE_X_MINUS: cartesianCoordinates.z += moveSpeed; break;
+            case TILE_Y_PLUS:  cartesianCoordinates.x += moveSpeed; break;
+            case TILE_Y_MINUS: cartesianCoordinates.x += moveSpeed; break;
             default: assert(0); break;
             }
          }
@@ -242,10 +209,10 @@ C_Actor::update(int fps)
 
          if(change <= -TILE_SIZE) {
             switch(movingDirection) {
-            case X_PLUS:  cartesianCoordinates.x += -moveSpeed - (change + TILE_SIZE); break;
-            case X_MINUS: cartesianCoordinates.x += -moveSpeed - (change + TILE_SIZE); break;
-            case Z_PLUS:  cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
-            case Z_MINUS: cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
+            case TILE_X_PLUS:  cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
+            case TILE_X_MINUS: cartesianCoordinates.z += -moveSpeed - (change + TILE_SIZE); break;
+            case TILE_Y_PLUS:  cartesianCoordinates.x += -moveSpeed - (change + TILE_SIZE); break;
+            case TILE_Y_MINUS: cartesianCoordinates.x += -moveSpeed - (change + TILE_SIZE); break;
             default: assert(0); break;
             }
 
@@ -256,10 +223,10 @@ C_Actor::update(int fps)
             change = 0.0f;
          } else {
             switch(movingDirection) {
-            case X_PLUS:  cartesianCoordinates.x -= moveSpeed; break;
-            case X_MINUS: cartesianCoordinates.x -= moveSpeed; break;
-            case Z_PLUS:  cartesianCoordinates.z -= moveSpeed; break;
-            case Z_MINUS: cartesianCoordinates.z -= moveSpeed; break;
+            case TILE_X_PLUS:  cartesianCoordinates.z -= moveSpeed; break;
+            case TILE_X_MINUS: cartesianCoordinates.z -= moveSpeed; break;
+            case TILE_Y_PLUS:  cartesianCoordinates.x -= moveSpeed; break;
+            case TILE_Y_MINUS: cartesianCoordinates.x -= moveSpeed; break;
             default: assert(0); break;
             }
          }
@@ -271,10 +238,10 @@ C_Actor::update(int fps)
 
          if(change >= TILE_SIZE) {
             switch(movingDirection) {
-            case X_PLUS:  cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
-            case X_MINUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
-            case Z_PLUS:  cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
-            case Z_MINUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            case TILE_X_PLUS:  cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            case TILE_X_MINUS: cartesianCoordinates.z += moveSpeed - (change - TILE_SIZE); break;
+            case TILE_Y_PLUS:  cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
+            case TILE_Y_MINUS: cartesianCoordinates.x += moveSpeed - (change - TILE_SIZE); break;
             default: assert(0); break;
             }
 
@@ -285,10 +252,10 @@ C_Actor::update(int fps)
             change = 0.0f;
          } else {
             switch(movingDirection) {
-            case X_PLUS:  cartesianCoordinates.x += moveSpeed; break;
-            case X_MINUS: cartesianCoordinates.x += moveSpeed; break;
-            case Z_PLUS:  cartesianCoordinates.z += moveSpeed; break;
-            case Z_MINUS: cartesianCoordinates.z += moveSpeed; break;
+            case TILE_X_PLUS:  cartesianCoordinates.z += moveSpeed; break;
+            case TILE_X_MINUS: cartesianCoordinates.z += moveSpeed; break;
+            case TILE_Y_PLUS:  cartesianCoordinates.x += moveSpeed; break;
+            case TILE_Y_MINUS: cartesianCoordinates.x += moveSpeed; break;
             default: assert(0); break;
             }
          }
@@ -299,6 +266,8 @@ C_Actor::update(int fps)
          break;
       }
    }
+
+//   printf("cartesianCoordinates: %f %f %f\n", cartesianCoordinates.x, cartesianCoordinates.y, cartesianCoordinates.z);
 }
 
 void
@@ -316,11 +285,6 @@ C_Party::update(int fps)
 
       switch(movement) {
       case MOVE_TURN_LEFT:
-         yAngle_old = yAngle;
-         C_Actor::update(fps);
-         camera.Rotate(0.0f, yAngle - yAngle_old);
-         break;
-
       case MOVE_TURN_RIGHT:
          yAngle_old = yAngle;
          C_Actor::update(fps);
@@ -331,28 +295,28 @@ C_Party::update(int fps)
       case MOVE_BACKWARDS:
          cartesianCoordinates_old = cartesianCoordinates;
          C_Actor::update(fps);
-         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-            camera.Move(cartesianCoordinates.x - cartesianCoordinates_old.x);
-         else
+         if(movingDirection == TILE_X_PLUS || movingDirection == TILE_X_MINUS)
             camera.Move(cartesianCoordinates.z - cartesianCoordinates_old.z);
+         else
+            camera.Move(cartesianCoordinates.x - cartesianCoordinates_old.x);
          break;
 
       case MOVE_STRAFE_LEFT:
          cartesianCoordinates_old = cartesianCoordinates;
          C_Actor::update(fps);
-         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-            camera.StrafeLeft(cartesianCoordinates.x - cartesianCoordinates_old.x);
-         else
+         if(movingDirection == TILE_X_PLUS || movingDirection == TILE_X_MINUS)
             camera.StrafeLeft(cartesianCoordinates.z - cartesianCoordinates_old.z);
+         else
+            camera.StrafeLeft(cartesianCoordinates.x - cartesianCoordinates_old.x);
          break;
 
       case MOVE_STRAFE_RIGHT:
          cartesianCoordinates_old = cartesianCoordinates;
          C_Actor::update(fps);
-         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-            camera.StrafeRight(cartesianCoordinates.x - cartesianCoordinates_old.x);
-         else
+         if(movingDirection == TILE_X_PLUS || movingDirection == TILE_X_MINUS)
             camera.StrafeRight(cartesianCoordinates.z - cartesianCoordinates_old.z);
+         else
+            camera.StrafeRight(cartesianCoordinates.x - cartesianCoordinates_old.x);
          break;
 
       default:
@@ -360,6 +324,16 @@ C_Party::update(int fps)
          break;
       }
    }
+}
+
+void
+C_Party::setCoordinates(int x, int y)
+{
+   camera.SetPosition(y * TILE_SIZE + TILE_SIZE / 2.0f,
+                      TILE_SIZE / 2.0f,
+                      x * TILE_SIZE + TILE_SIZE / 2.0f);
+
+   C_Actor::setCoordinates(x, y);
 }
 
 C_Mob::C_Mob(void)
@@ -371,9 +345,9 @@ C_Mob::C_Mob(void)
 void
 C_Mob::setCoordinates(int x, int y)
 {
-   model.translate(x * TILE_SIZE + TILE_SIZE / 2.0f - cartesianCoordinates.x,
+   model.translate(y * TILE_SIZE + TILE_SIZE / 2.0f - cartesianCoordinates.x,
                    0.0f,
-                   y * TILE_SIZE + TILE_SIZE / 2.0f - cartesianCoordinates.y);
+                   x * TILE_SIZE + TILE_SIZE / 2.0f - cartesianCoordinates.y);
 
    C_Actor::setCoordinates(x, y);
 }
@@ -394,7 +368,7 @@ C_Mob::loadModel(void)
 void
 C_Mob::Draw(C_Camera *camera)
 {
-   model.position = cartesianCoordinates;
+//   model.position = cartesianCoordinates;
 
    model.draw(camera);
 }
@@ -408,44 +382,41 @@ C_Mob::update(int fps)
 
       switch(movement) {
       case MOVE_TURN_LEFT:
-         yAngle_old = yAngle;
-         C_Actor::update(fps);
-//         camera.Rotate(0.0f, yAngle - yAngle_old);
-         break;
-
       case MOVE_TURN_RIGHT:
          yAngle_old = yAngle;
          C_Actor::update(fps);
-//         camera.Rotate(0.0f, yAngle - yAngle_old);
+         model.rotate(0.0f, yAngle - yAngle_old, 0.0f);
          break;
 
       case MOVE_FORWARD:
       case MOVE_BACKWARDS:
-         cartesianCoordinates_old = cartesianCoordinates;
-         C_Actor::update(fps);
-         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-            model.translate(cartesianCoordinates.x - cartesianCoordinates_old.x, 0.0f, 0.0f);
-         else
-            model.translate(0.0f, 0.0f, cartesianCoordinates.z - cartesianCoordinates_old.z);
-         break;
-
       case MOVE_STRAFE_LEFT:
-         cartesianCoordinates_old = cartesianCoordinates;
-         C_Actor::update(fps);
-//         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-//            camera.StrafeLeft(cartesianCoordinates.x - cartesianCoordinates_old.x);
-//         else
-//            camera.StrafeLeft(cartesianCoordinates.z - cartesianCoordinates_old.z);
-         break;
-
       case MOVE_STRAFE_RIGHT:
          cartesianCoordinates_old = cartesianCoordinates;
          C_Actor::update(fps);
-//         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-//            camera.StrafeRight(cartesianCoordinates.x - cartesianCoordinates_old.x);
-//         else
-//            camera.StrafeRight(cartesianCoordinates.z - cartesianCoordinates_old.z);
+         if(movingDirection == TILE_X_PLUS || movingDirection == TILE_X_MINUS)
+            model.translate(cartesianCoordinates.z - cartesianCoordinates_old.z, 0.0f, 0.0f);
+         else
+            model.translate(0.0f, 0.0f, cartesianCoordinates.x - cartesianCoordinates_old.x);
          break;
+
+//      case MOVE_STRAFE_LEFT:
+//         cartesianCoordinates_old = cartesianCoordinates;
+//         C_Actor::update(fps);
+////         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+////            camera.StrafeLeft(cartesianCoordinates.x - cartesianCoordinates_old.x);
+////         else
+////            camera.StrafeLeft(cartesianCoordinates.z - cartesianCoordinates_old.z);
+//         break;
+//
+//      case MOVE_STRAFE_RIGHT:
+//         cartesianCoordinates_old = cartesianCoordinates;
+//         C_Actor::update(fps);
+////         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
+////            camera.StrafeRight(cartesianCoordinates.x - cartesianCoordinates_old.x);
+////         else
+////            camera.StrafeRight(cartesianCoordinates.z - cartesianCoordinates_old.z);
+//         break;
 
       default:
          assert(0);

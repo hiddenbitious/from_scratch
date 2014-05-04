@@ -10,7 +10,8 @@ typedef enum {MOVE_FORWARD,
               MOVE_TURN_LEFT,
               MOVE_STRAFE_RIGHT,
               MOVE_STRAFE_LEFT,
-              MOVE_MAX_MOVES} movements_t;
+              MOVE_MAX_MOVES
+              } movements_t;
 
 class C_Actor {
 public:
@@ -65,6 +66,7 @@ public:
    ~C_Party(void) {}
 
    virtual void update(int fps);
+   virtual void setCoordinates(int x, int y);
 };
 
 #endif

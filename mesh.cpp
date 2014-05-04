@@ -24,6 +24,7 @@ C_Mesh::C_Mesh(void)
    binormals = NULL;
    indices = NULL;
    next = NULL;
+   group = NULL;
    refCounter = 1;
    texture_diffuse = NULL;
    texture_specular = NULL;
@@ -154,6 +155,9 @@ C_MeshGroup::C_MeshGroup(void)
    nMeshes = 0;
    matrix = Identity;
    position.x = position.y = position.z = 0.0f;
+
+   rotationQuat.Identity();
+   rotated = false;
 }
 
 C_MeshGroup::~C_MeshGroup(void)
@@ -178,7 +182,7 @@ C_MeshGroup &C_MeshGroup::operator= (const C_MeshGroup &group)
 {
    PRINT_FUNC_ENTRY;
 
-   if(this != &group){
+   if(this != &group) {
       C_Mesh *mesh = group.meshes;
       C_Mesh *newMesh;
 
@@ -197,6 +201,7 @@ C_MeshGroup &C_MeshGroup::operator= (const C_MeshGroup &group)
       matrix = group.matrix;
       applyFrustumCulling = group.applyFrustumCulling;
    }
+
    return *this;
 }
 
@@ -208,6 +213,7 @@ C_MeshGroup::addMesh(void)
    C_Mesh *newMesh = new C_Mesh();
    newMesh->next = meshes;
    meshes = newMesh;
+   newMesh->group = this;
    nMeshes++;
 
    return newMesh;
@@ -384,16 +390,25 @@ void
 C_Mesh::translate(float x, float y, float z)
 {
    /// Update group's bbox
-   C_Vertex min, max;
-   bbox.GetMax(&max);
-   bbox.GetMin(&min);
+   bbox.Translate(x, y, z);
+}
 
-   max.x += x; max.y += y; max.z += z;
-   min.x += x; min.y += y; min.z += z;
+void
+C_Mesh::rotate(C_Vertex *rotation)
+{
+   rotate(rotation->x, rotation->y, rotation->z);
+}
 
-   bbox.SetMax(max.x, max.y, max.z);
-   bbox.SetMin(min.x, min.y, min.z);
-   bbox.SetVertices();
+void
+C_Mesh::rotate(float x, float y, float z)
+{
+   C_Vector3 position;
+
+   if(group) {
+      position = group->position;
+   }
+
+   bbox.Rotate(x, y, z, &position);
 }
 
 void
@@ -416,16 +431,33 @@ C_MeshGroup::translate(float x, float y, float z)
    }
 
    /// Update group's bbox
-   C_Vertex min, max;
-   bbox.GetMax(&max);
-   bbox.GetMin(&min);
+   bbox.Translate(x, y, z);
+}
 
-   max.x += x; max.y += y; max.z += z;
-   min.x += x; min.y += y; min.z += z;
+void
+C_MeshGroup::rotate(C_Vertex *rotation)
+{
+   rotate(rotation->x, rotation->y, rotation->z);
+}
 
-   bbox.SetMax(max.x, max.y, max.z);
-   bbox.SetMin(min.x, min.y, min.z);
-   bbox.SetVertices();
+void
+C_MeshGroup::rotate(float x, float y, float z)
+{
+   C_Quaternion tempQuat;
+   tempQuat.Rotate(x, y, z);
+
+   rotationQuat.Mult(&tempQuat);
+   rotated = true;
+
+   C_Mesh *mesh = meshes;
+   while(mesh) {
+      mesh->rotate(x, y, z);
+      mesh = mesh->next;
+   }
+
+   /// Rotate bbox
+   C_Vector3 rotPoint(&position);
+   bbox.Rotate(x, y, z, &rotPoint);
 }
 
 bool
@@ -441,8 +473,20 @@ C_MeshGroup::draw(C_Camera *camera)
 
 	shaderManager->pushShader(shader);
 	ESMatrix mat;
+	ESMatrix rotMat;
+	rotationQuat.QuaternionToMatrix16(&rotMat);
+
+   /// Apply camera transformation
 	esMatrixMultiply(&mat, &matrix, &globalViewMatrix);
+	/// Apply model translation
 	esTranslate(&mat, position.x, position.y, position.z);
+	/// Apply model rotation
+	if(rotated) {
+   	esMatrixMultiply(&mat, &rotMat, &mat);
+      rotated = false;
+   }
+
+   /// Compute MVP matrix
 	esMatrixMultiply(&globalMVPMatrix, &mat, &globalProjectionMatrix);
 
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MODELVIEW_MATRIX, 1, GL_FALSE, (GLfloat *)&mat.m[0][0]);
@@ -466,19 +510,21 @@ C_MeshGroup::draw(C_Camera *camera)
          glActiveTexture(GL_TEXTURE0);
          glBindTexture(GL_TEXTURE_2D, mesh->texture_diffuse->getGLtextureID());
          shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_DIFFUSE, 0);
+      }
 
-         if(mesh->texture_normal) {
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, mesh->texture_normal->getGLtextureID());
-            shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_NORMAL_MAP, 1);
-         }
+      if(mesh->texture_normal) {
+         glActiveTexture(GL_TEXTURE1);
+         glBindTexture(GL_TEXTURE_2D, mesh->texture_normal->getGLtextureID());
+         shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_NORMAL_MAP, 1);
+      }
 
-//         if(mesh->texture_specular) {
-//            glActiveTexture(GL_TEXTURE1);
-//            glBindTexture(GL_TEXTURE_2D, mesh->texture_specular->getGLtextureID());
-//            shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_SPECULAR, 2);
-//         }
-      } else {
+      if(mesh->texture_specular) {
+         glActiveTexture(GL_TEXTURE2);
+         glBindTexture(GL_TEXTURE_2D, mesh->texture_specular->getGLtextureID());
+         shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_SPECULAR, 2);
+      }
+
+      if(!mesh->texture_diffuse && !mesh->texture_normal && !mesh->texture_specular) {
          glBindTexture(GL_TEXTURE_2D, 0);
       }
 
@@ -486,7 +532,7 @@ C_MeshGroup::draw(C_Camera *camera)
       mesh = mesh->next;
    }
 
-//   bbox.Draw();
+   bbox.Draw();
 
    if(shader->verticesAttribLocation >= 0)   glDisableVertexAttribArray(shader->verticesAttribLocation);
    if(shader->colorsAttribLocation >= 0)     glDisableVertexAttribArray(shader->colorsAttribLocation);

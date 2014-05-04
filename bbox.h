@@ -36,7 +36,7 @@ public:
    C_BBox &operator= (const C_BBox &box);
 
    const static char *ADJACENT_FACE_NAMES[TOTAL_FACES];
-   tile_direction_t areBboxesAdjacent(const C_BBox *box);
+   world_direction_t areBboxesAdjacent(const C_BBox *box);
 
    void SetMin(const float x , const float y , const float z);
    void SetMin(const C_Vector3* vec);

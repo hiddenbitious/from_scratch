@@ -53,6 +53,7 @@ public:
 
    inline C_Vector3 GetPosition(void) const { return position; }
    void SetPosition(C_Vertex pos);
+   void SetPosition(float x, float y, float z);
 };
 
 #endif
