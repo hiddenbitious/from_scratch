@@ -28,7 +28,7 @@ C_MoveCommand::execute(C_Actor *actor)
 
    actor->move(movement);
 
-//   mob.move(MOVE_STRAFE_LEFT);
+   mob.move(MOVE_FORWARD);
 }
 
 C_InputHandler::~C_InputHandler(void)

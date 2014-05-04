@@ -23,9 +23,9 @@ C_Actor::setCoordinates(int x, int y)
    mapCoordinateX = x;
    mapCoordinateY = y;
 
-   cartesianCoordinates.z = x * TILE_SIZE + TILE_SIZE / 2.0f;
-   cartesianCoordinates.y = TILE_SIZE / 2.0f;
    cartesianCoordinates.x = y * TILE_SIZE + TILE_SIZE / 2.0f;
+   cartesianCoordinates.y = TILE_SIZE / 2.0f;
+   cartesianCoordinates.z = x * TILE_SIZE + TILE_SIZE / 2.0f;
 }
 
 void
@@ -61,7 +61,7 @@ C_Actor::updateDirections(void)
       break;
    }
 
-   printf("facing: %d moving: %d\n", facingDirection, movingDirection);
+//   printf("facing: %d moving: %d\n", facingDirection, movingDirection);
 }
 
 void
@@ -85,7 +85,7 @@ C_Actor::updateTileCoordinates(void)
       break;
    }
 
-   printf("coordx: %d coordy: %d\n\n", mapCoordinateX, mapCoordinateY);
+//   printf("coordx: %d coordy: %d\n\n", mapCoordinateX, mapCoordinateY);
 }
 
 bool
@@ -97,22 +97,22 @@ C_Actor::checkCollision(void)
    switch(movingDirection) {
    case TILE_X_PLUS:
       tile_ = map->getTile(mapCoordinateX + 1, mapCoordinateY);
-      printf("X_PLUS tile type: %d\n", tile_->getType());
+//      printf("X_PLUS tile type: %d\n", tile_->getType());
       break;
 
    case TILE_X_MINUS:
       tile_ = map->getTile(mapCoordinateX - 1, mapCoordinateY);
-      printf("X_MINUS tile type: %d\n", tile_->getType());
+//      printf("X_MINUS tile type: %d\n", tile_->getType());
       break;
 
    case TILE_Y_PLUS:
       tile_ = map->getTile(mapCoordinateX, mapCoordinateY + 1);
-      printf("Z_PLUS tile type: %d\n", tile_->getType());
+//      printf("Z_PLUS tile type: %d\n", tile_->getType());
       break;
 
    case TILE_Y_MINUS:
       tile_ = map->getTile(mapCoordinateX, mapCoordinateY - 1);
-      printf("Z_MINUS tile type: %d\n", tile_->getType());
+//      printf("Z_MINUS tile type: %d\n", tile_->getType());
       break;
 
    default:
@@ -120,7 +120,7 @@ C_Actor::checkCollision(void)
       break;
    }
 
-   assert(tile_->getType() != TILE_WALL);
+//   assert(tile_->getType() != TILE_WALL);
 
    return tile_->getType() == TILE_WALL;
 }
@@ -395,28 +395,10 @@ C_Mob::update(int fps)
          cartesianCoordinates_old = cartesianCoordinates;
          C_Actor::update(fps);
          if(movingDirection == TILE_X_PLUS || movingDirection == TILE_X_MINUS)
-            model.translate(cartesianCoordinates.z - cartesianCoordinates_old.z, 0.0f, 0.0f);
+            model.translate(0.0f, 0.0f, cartesianCoordinates.z - cartesianCoordinates_old.z);
          else
-            model.translate(0.0f, 0.0f, cartesianCoordinates.x - cartesianCoordinates_old.x);
+            model.translate(cartesianCoordinates.x - cartesianCoordinates_old.x, 0.0f, 0.0f);
          break;
-
-//      case MOVE_STRAFE_LEFT:
-//         cartesianCoordinates_old = cartesianCoordinates;
-//         C_Actor::update(fps);
-////         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-////            camera.StrafeLeft(cartesianCoordinates.x - cartesianCoordinates_old.x);
-////         else
-////            camera.StrafeLeft(cartesianCoordinates.z - cartesianCoordinates_old.z);
-//         break;
-//
-//      case MOVE_STRAFE_RIGHT:
-//         cartesianCoordinates_old = cartesianCoordinates;
-//         C_Actor::update(fps);
-////         if(movingDirection == X_PLUS || movingDirection == X_MINUS)
-////            camera.StrafeRight(cartesianCoordinates.x - cartesianCoordinates_old.x);
-////         else
-////            camera.StrafeRight(cartesianCoordinates.z - cartesianCoordinates_old.z);
-//         break;
 
       default:
          assert(0);

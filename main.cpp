@@ -181,7 +181,7 @@ Initializations(void)
    cube.shader = simple_texture_shader;
 
    party.setMap(&map);
-   party.setCoordinates(tileStartx, tileStarty);
+   party.setCoordinates(tileStartx + 5, tileStarty);
 
    mob.setMap(&map);
    mob.loadModel();
