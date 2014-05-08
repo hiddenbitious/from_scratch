@@ -27,8 +27,6 @@ C_MoveCommand::execute(C_Actor *actor)
    assert(movement < MOVE_MAX_MOVES);
 
    actor->move(movement);
-
-   mob.move(MOVE_FORWARD);
 }
 
 C_InputHandler::~C_InputHandler(void)

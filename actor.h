@@ -18,7 +18,7 @@ public:
    C_Actor(void);
    ~C_Actor(void) {}
 
-   void move(movements_t movement);
+   bool move(movements_t movement);
    void setMap(C_Map *map_) { assert(map_); map = map_; }
    virtual void setCoordinates(int x, int y);
 
