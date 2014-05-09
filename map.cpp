@@ -265,25 +265,25 @@ C_Map::load3DObjects(void)
    /// the same mesh more than once
 
    wallMesh.loadFromFile("wallMeshes/wall_01.obj");
-   wallMesh.shader = wallShader;
+   wallMesh.shader = USE_HIGH_QUALITY_SHADERS ? wallShader : simple_texture_shader;
 
    wallMesh2.loadFromFile("wallMeshes/wall_02.obj");
-   wallMesh2.shader = wallShader;
+   wallMesh2.shader = USE_HIGH_QUALITY_SHADERS ? wallShader : simple_texture_shader;
 
    floorMesh.loadFromFile("wallMeshes/floor_01.obj");
-   floorMesh.shader = wallShader;
+   floorMesh.shader = USE_HIGH_QUALITY_SHADERS ? wallShader : simple_texture_shader;
 
    floorMesh2.loadFromFile("wallMeshes/floor_02.obj");
-   floorMesh2.shader = wallShader;
+   floorMesh2.shader = USE_HIGH_QUALITY_SHADERS ? wallShader : simple_texture_shader;
 
    floorMesh3.loadFromFile("wallMeshes/floor_03.obj");
-   floorMesh3.shader = wallShader;
+   floorMesh3.shader = USE_HIGH_QUALITY_SHADERS ? wallShader : simple_texture_shader;
 
    floorMesh4.loadFromFile("wallMeshes/floor_04.obj");
-   floorMesh4.shader = wallShader;
+   floorMesh4.shader = USE_HIGH_QUALITY_SHADERS ? wallShader : simple_texture_shader;
 
    grating.loadFromFile("wallMeshes/grating.obj");
-   grating.shader = wallShader;
+   grating.shader = USE_HIGH_QUALITY_SHADERS ? wallShader : simple_texture_shader;
 
 //   corner_inner.loadFromFile("wallMeshes/corner_inner.obj");
 //   corner_inner.shader = wallShader;

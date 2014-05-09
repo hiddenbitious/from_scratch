@@ -363,7 +363,7 @@ CountFPS (void)
 		fps = count * 5;
 		start = timer.GetTime ();
 
-//		printf("fps: %d\n", fps);
+		printf("fps: %d\n", fps);
 
 		count = 0;
 	}

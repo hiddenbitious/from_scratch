@@ -92,6 +92,8 @@ public:
    void Begin(void);
    void End(void);
 
+   GLint GetUniLoc(const GLcharARB *name);
+
    /// Uniform Variables
    bool setUniform1f(const char* varname, GLfloat v0);  //!< set float uniform to program
    bool setUniform2f(const char* varname, GLfloat v0, GLfloat v1); //!< set vec2 uniform to program
@@ -147,8 +149,6 @@ private:
    GLuint programObject;
    bool isLinked;
    bool inUse;
-
-   GLint GetUniLoc(const GLcharARB *name);
 };
 
 class C_GLShaderManager

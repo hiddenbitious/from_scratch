@@ -434,7 +434,7 @@ bool C_GLShader::setUniform1i(const char* varname, GLint v0)
 //    if (!_noshader) return true;
 
 	GLint loc = GetUniLoc(varname);
-	if(loc == -1) { assert(0); return false; } // can't find variable
+//	if(loc == -1) { assert(0); return false; } // can't find variable
 
 	glUniform1i(loc, v0);
 
@@ -626,14 +626,7 @@ bool C_GLShader::setUniformMatrix4fv(const char* varname, GLsizei count, GLboole
 
 GLint C_GLShader::GetUniLoc(const GLcharARB *name)
 {
-	GLint loc;
-
-	loc = glGetUniformLocation(programObject, name);
-//	if(loc == -1) {
-//		LOGE("Error: can't find uniform variable \"%s\"\n", name);
-//	}
-//    CHECK_GL_ERROR();
-	return loc;
+	return glGetUniformLocation(programObject, name);
 }
 
 void C_GLShader::GetUniformfv(char* name, GLfloat* values)
