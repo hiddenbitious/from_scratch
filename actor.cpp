@@ -267,41 +267,15 @@ C_Party::update(int fps)
          break;
 
       case MOVE_FORWARD:
-         cartesianCoordinates_old = cartesianCoordinates;
-         C_Actor::update(fps);
-//         printf("%f -> %f\n",cartesianCoordinates_old.z, cartesianCoordinates.z);
-         if(movingDirection == TILE_X_PLUS || movingDirection == TILE_X_MINUS)
-            camera.Move(fabs(cartesianCoordinates.z - cartesianCoordinates_old.z));
-         else
-            camera.Move(fabs(cartesianCoordinates.x - cartesianCoordinates_old.x));
-         break;
-
       case MOVE_BACKWARDS:
-         cartesianCoordinates_old = cartesianCoordinates;
-         C_Actor::update(fps);
-//         printf("%f -> %f\n",cartesianCoordinates_old.z, cartesianCoordinates.z);
-         if(movingDirection == TILE_X_PLUS || movingDirection == TILE_X_MINUS)
-            camera.Move(-fabs(cartesianCoordinates.z - cartesianCoordinates_old.z));
-         else
-            camera.Move(-fabs(cartesianCoordinates.x - cartesianCoordinates_old.x));
-         break;
-
       case MOVE_STRAFE_LEFT:
-         cartesianCoordinates_old = cartesianCoordinates;
-         C_Actor::update(fps);
-         if(movingDirection == TILE_X_PLUS || movingDirection == TILE_X_MINUS)
-            camera.StrafeLeft(fabs(cartesianCoordinates.z - cartesianCoordinates_old.z));
-         else
-            camera.StrafeLeft(fabs(cartesianCoordinates.x - cartesianCoordinates_old.x));
-         break;
-
       case MOVE_STRAFE_RIGHT:
          cartesianCoordinates_old = cartesianCoordinates;
          C_Actor::update(fps);
          if(movingDirection == TILE_X_PLUS || movingDirection == TILE_X_MINUS)
-            camera.StrafeRight(fabs(cartesianCoordinates.z - cartesianCoordinates_old.z));
+            camera.Move(0.0f, 0.0f, cartesianCoordinates.z - cartesianCoordinates_old.z);
          else
-            camera.StrafeRight(fabs(cartesianCoordinates.x - cartesianCoordinates_old.x));
+            camera.Move(cartesianCoordinates.x - cartesianCoordinates_old.x, 0.0f, 0.0f);
          break;
 
       default:
@@ -392,7 +366,7 @@ C_Mob::update(int fps)
       }
    } else {
       if(!move(MOVE_FORWARD)) {
-         if(dir%2)
+         if((dir%2))
             move(MOVE_TURN_LEFT);
          else
             move(MOVE_TURN_RIGHT);
