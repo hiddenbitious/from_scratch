@@ -10,7 +10,7 @@
 #define ENABLE_COLLISION_DETECTION     true
 #define USE_HIGH_QUALITY_SHADERS       false
 
-#define ROTATE_MESH_BBOXES             true;
+#define ROTATE_MESH_BBOXES             true
 
 //#define JNI_COMPATIBLE
 
