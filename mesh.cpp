@@ -494,20 +494,15 @@ C_MeshGroup::draw(C_Camera *camera)
 //   shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_PROJECTION_MATRIX, 1, GL_FALSE, (GLfloat *)&globalProjectionMatrix.m[0][0]);
    shader->setUniformMatrix4fv(UNIFORM_VARIABLE_NAME_MVP_MATRIX, 1, GL_FALSE, (GLfloat *)&globalMVPMatrix.m[0][0]);
 
-   wallShader->setUniform3f("u_lightPosition_es", lightPosition.x, lightPosition.y, lightPosition.z);
+   if(shader->GetUniLoc(UNIFORM_VARIABLE_LIGHT_POSITION) >= 0)
+      shader->setUniform3f(UNIFORM_VARIABLE_LIGHT_POSITION, lightPosition.x, lightPosition.y, lightPosition.z);
 
-   if(shader->verticesAttribLocation >= 0)
-      glEnableVertexAttribArray(shader->verticesAttribLocation);
-   if(shader->colorsAttribLocation >= 0)
-      glEnableVertexAttribArray(shader->colorsAttribLocation);
-   if(shader->texCoordsAttribLocation >= 0)
-      glEnableVertexAttribArray(shader->texCoordsAttribLocation);
-   if(shader->normalsAttribLocation >= 0)
-      glEnableVertexAttribArray(shader->normalsAttribLocation);
-   if(shader->binormalsAttribLocation >= 0)
-      glEnableVertexAttribArray(shader->binormalsAttribLocation);
-   if(shader->tangetsAttribLocation >= 0)
-      glEnableVertexAttribArray(shader->tangetsAttribLocation);
+   if(shader->verticesAttribLocation >= 0)   glEnableVertexAttribArray(shader->verticesAttribLocation);
+   if(shader->colorsAttribLocation >= 0)     glEnableVertexAttribArray(shader->colorsAttribLocation);
+   if(shader->texCoordsAttribLocation >= 0)  glEnableVertexAttribArray(shader->texCoordsAttribLocation);
+   if(shader->normalsAttribLocation >= 0)    glEnableVertexAttribArray(shader->normalsAttribLocation);
+   if(shader->binormalsAttribLocation >= 0)  glEnableVertexAttribArray(shader->binormalsAttribLocation);
+   if(shader->tangetsAttribLocation >= 0)    glEnableVertexAttribArray(shader->tangetsAttribLocation);
 
    C_Mesh *mesh = meshes;
    while(mesh) {
@@ -555,18 +550,12 @@ C_MeshGroup::draw(C_Camera *camera)
 void
 C_Mesh::draw(C_GLShader *shader)
 {
-   if(shader->verticesAttribLocation >= 0)
-      glVertexAttribPointer(shader->verticesAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, vertices);
-   if(shader->colorsAttribLocation >= 0)
-      glVertexAttribPointer(shader->colorsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
-   if(shader->texCoordsAttribLocation >= 0)
-      glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, textCoords);
-   if(shader->normalsAttribLocation >= 0)
-      glVertexAttribPointer(shader->normalsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, normals);
-   if(shader->binormalsAttribLocation >= 0)
-      glVertexAttribPointer(shader->binormalsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, binormals);
-   if(shader->tangetsAttribLocation >= 0)
-      glVertexAttribPointer(shader->tangetsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, tangents);
+   if(shader->verticesAttribLocation >= 0)   glVertexAttribPointer(shader->verticesAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, vertices);
+   if(shader->colorsAttribLocation >= 0)     glVertexAttribPointer(shader->colorsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
+   if(shader->texCoordsAttribLocation >= 0)  glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, textCoords);
+   if(shader->normalsAttribLocation >= 0)    glVertexAttribPointer(shader->normalsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, normals);
+   if(shader->binormalsAttribLocation >= 0)  glVertexAttribPointer(shader->binormalsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, binormals);
+   if(shader->tangetsAttribLocation >= 0)    glVertexAttribPointer(shader->tangetsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, tangents);
 
    if(!indices) {
       glDrawArrays(GL_TRIANGLES, 0, nVertices);

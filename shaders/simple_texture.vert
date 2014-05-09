@@ -16,8 +16,8 @@ void main(void) {
    vertexPosition_es = vec3(u_modelviewMatrix * vec4(a_vertices, 1.0));
 
    v_lightVec_es = normalize(u_lightPosition_es - vertexPosition_es);
+   v_normals_es = vec3(normalize(u_modelviewMatrix * vec4(a_normals, 0.0)));
 
    v_texCoords = a_texCoords;
-   v_normals_es = vec3((u_modelviewMatrix * vec4(a_normals, 0.0)));
    gl_Position = u_mvpMatrix * vec4(a_vertices, 1.0);
 }

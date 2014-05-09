@@ -41,6 +41,8 @@
 #define UNIFORM_VARIABLE_NAME_TEXTURE_NORMAL_MAP   "u_texture_normal_map"
 #define UNIFORM_VARIABLE_NAME_TEXTURE_SPECULAR     "u_texture_specular"
 
+#define UNIFORM_VARIABLE_LIGHT_POSITION            "u_lightPosition_es"
+
 using namespace std;
 class C_GLShader;
 typedef enum {NO_SHADER, VERTEX_SHADER, FRAGMENT_SHADER} shader_type_t;
@@ -92,7 +94,7 @@ public:
    void Begin(void);
    void End(void);
 
-   GLint GetUniLoc(const GLcharARB *name);
+   inline GLint GetUniLoc(const GLcharARB *name) { return glGetUniformLocation(programObject, name); }
 
    /// Uniform Variables
    bool setUniform1f(const char* varname, GLfloat v0);  //!< set float uniform to program
