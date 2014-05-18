@@ -60,21 +60,19 @@ C_InputHandler inputHandler;
 /// window stuff
 static int winID;
 static int windowWidth = 800;
-static int windowHeight = 500;
+static int windowHeight = 600;
 static int windowPositionX = 200;
 static int windowPositionY = 200;
 
 /// movement vars
 static float speed = 7.0f;
 
-static bool frustumCulling = true;
-
 static C_Vector3 center(0.0f , 0.0f , 0.0f);
 
 /// Timer vars
 C_Timer timer;
 float start = timer.GetTime ();
-static float timeElapsed = 0.0f;
+//static float timeElapsed = 0.0f;
 static int fps = 60;
 
 /// Metaballs
@@ -173,8 +171,8 @@ Initializations(void)
    int tileStartx, tileStarty;
    C_Vertex cameraPosition = map.cameraStartPosition(&tileStartx, &tileStarty);
    printf("****\nx: %d, y: %d\n", tileStartx, tileStarty);
-//   printf("cameraPosition: %f %f %f\n", cameraPosition.x, cameraPosition.y, cameraPosition.z);
-//   camera.SetPosition(cameraPosition);
+   printf("cameraPosition: %f %f %f\n", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+   camera.SetPosition(cameraPosition);
    camera.Rotate(0.0f, 180.0f);
 
    cube.loadFromFile("objmodels/cube.obj");

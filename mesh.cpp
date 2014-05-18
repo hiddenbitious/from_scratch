@@ -340,7 +340,7 @@ void
 C_Mesh::drawNormals(void)
 {
    glBegin(GL_LINES);
-   for(unsigned int i = 0; i < nTriangles; i++) {
+   for(int i = 0; i < nTriangles; i++) {
       /// Draw normals
       glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
 

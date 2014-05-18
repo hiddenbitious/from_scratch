@@ -925,7 +925,7 @@ C_BspTree::closeLeafHoles(void)
                if(cNode->bestNodeToConnect[i].size()) {
                   leaf1->bbox.GetMax(&max);
                   leaf1->bbox.GetMin(&min);
-                  for(int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj) {
+                  for(unsigned int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj) {
 //                     leaf1->addNodeToPVS(cNode->bestNodeToConnect[i][jj]);
 
                      /// Enlrage bounding boxes

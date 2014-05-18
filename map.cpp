@@ -293,7 +293,7 @@ C_Map::load3DObjects(void)
 
    /// Scale wall mesh
    C_Vertex min, max;
-   float xLen, yLen, zLen, scale;
+   float xLen, /*yLen,*/ zLen, scale;
 
    wallMesh.bbox.GetMax(&max);
    wallMesh.bbox.GetMin(&min);
@@ -429,13 +429,13 @@ C_Map::load3DObjects(void)
 void
 C_Map::draw(C_Camera *camera)
 {
-   int mapPolys;
+//   int mapPolys;
 
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 //   floorMesh4.draw(camera);
 //   corner_outer.draw(camera);
-   mapPolys = bspTree->Draw_PVS(camera);
+   bspTree->Draw_PVS(camera);
 
 //	int line = 2;
 //	int lineHeight = 18;

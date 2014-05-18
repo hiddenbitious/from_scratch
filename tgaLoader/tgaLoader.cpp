@@ -114,7 +114,7 @@ C_Texture::LoadUncompressedTGA(const char *filename, FILE *fTGA)   // Load an un
    }
 
    // Byte Swapping Optimized By Steve Thomas
-   for(GLuint cswap = 0; cswap < (int)tga.imageSize; cswap += tga.bytesPerPixel) {
+   for(GLuint cswap = 0; cswap < (GLuint)tga.imageSize; cswap += tga.bytesPerPixel) {
       imageData[cswap] ^= imageData[cswap + 2] ^= imageData[cswap] ^= imageData[cswap + 2];
    }
 
