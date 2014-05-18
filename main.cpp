@@ -29,6 +29,9 @@
 #include "metaballs/cubeGrid.h"
 #include "metaballs/metaball.h"
 
+#include "battleMap/battleMap.h"
+#include "battleMap/battleTile.h"
+
 using namespace std;
 
 int mapPolys;
@@ -56,6 +59,7 @@ static C_Frustum frustum;
 static C_Party party;
 C_Mob mob;
 C_InputHandler inputHandler;
+C_BattleMap battleMap(&camera);
 
 /// window stuff
 static int winID;
@@ -184,6 +188,13 @@ Initializations(void)
    mob.setMap(&map);
    mob.loadModel();
    mob.setCoordinates(tileStartx + 5, tileStarty);
+
+
+   for (int x = 0; x < WORLD_WIDTH / 128; x ++) {
+      for (int y = 0; y < WORLD_HEIGHT / 128; y ++) {
+         battleMap.AddStaticObject(new C_BattleTile(&battleMap, x * 128.f, 0.f, y * 128.f, 0.f));
+      }
+   }
 
 	/// timer initialization
 	timer.Initialize ();

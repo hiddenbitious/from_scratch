@@ -1,5 +1,5 @@
 CXX=g++
-CFLAGS=-c -Wall -O3  -Wno-unused-result
+CFLAGS=-c -Wall -O0 -g -Wno-unused-result
 
 GL_PATH=/usr/lib/x86_64-linux-gnu/mesa/
 GLEW_PATH=/usr/lib/x86_64-linux-gnu/
@@ -14,7 +14,11 @@ SOURCES=main.cpp bbox.cpp metaballs/cubeGrid.cpp quaternion.cpp \
 		  math.cpp frustum.cpp vectors.cpp plane.cpp camera.cpp timer.cpp glsl/glsl.cpp \
 		  bspTree.cpp bspNode.cpp bspHelperFunctions.cpp mesh.cpp \
 		  objreader/objfile.cpp tgaLoader/tgaLoader.cpp \
-		  map.cpp tile.cpp actor.cpp input.cpp
+		  map.cpp tile.cpp actor.cpp input.cpp \
+		  battleMap/battleMap.cpp battleMap/battleObject.cpp \
+		  battleMap/battleStaticObject.cpp battleMap/battleDynamicObject.cpp \
+		  battleMap/battleEnemy.cpp battleMap/battlePlayer.cpp battleMap/battleTile.cpp
+
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=from_scratch
 
@@ -27,4 +31,4 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(CFLAGS) $< -o $@
 
 clean:
-	rm *.o metaballs/*.o glsl/glsl.o objreader/objfile.o tgaLoader/tgaLoader.o $(EXECUTABLE)
+	rm *.o metaballs/*.o glsl/glsl.o objreader/objfile.o tgaLoader/tgaLoader.o battleMap/*.o $(EXECUTABLE)
