@@ -37,31 +37,29 @@ using namespace std;
 
 #endif
 
-typedef unsigned long ULONG;
-typedef unsigned int UINT;
-typedef unsigned short USHORT;
+/// -------------------------
+/// Basic structs and types
 
-//Very simple struct to hold vertex information
+typedef unsigned long   ULONG;
+typedef unsigned int    UINT;
+typedef unsigned short  USHORT;
+
 typedef struct {
 	float x , y , z;
 } C_Vertex;
 
-//Very simple struct to hold normal information
 typedef struct {
 	float nx , ny , nz;
 } C_Normal;
 
-//Very simple struct to hold texture coordinate information
 typedef struct {
 	float u , v;
 } C_TexCoord;
 
-//Very simple struct to hold color information
 typedef struct {
 	float r , g , b , a;
 } C_Color;
 
-//Very simple struct to hold index information
 typedef struct {
 	UINT p0 , p1 , p2;
 } C_TriIndices;
@@ -131,6 +129,9 @@ typedef	struct {
 	std::string	textureName;
 } glTexture;
 
+/// -------------------------
+/// Forward declarations
+
 class C_3DSReader;
 class C_Camera;
 class C_Quaternion;
@@ -144,17 +145,21 @@ class C_Mob;
 class C_Mesh;
 class C_MeshGroup;
 
-extern ESMatrix globalViewMatrix, globalProjectionMatrix, globalMVPMatrix;
-extern C_GLShaderManager *shaderManager;
-extern C_TextureManager *textureManager;
-extern C_GLShader *bspShader;
-extern C_GLShader *basicShader;
-extern C_GLShader *pointShader;
-extern C_GLShader *wallShader;
-extern C_GLShader *simple_texture_shader;
-extern C_Vertex lightPosition;
-extern char MAX_THREADS;
-extern C_Camera camera;
-extern C_InputHandler inputHandler;
+/// -------------------------
+/// Global variables
+
+extern ESMatrix            globalViewMatrix, globalProjectionMatrix, globalMVPMatrix;
+extern C_GLShaderManager   *shaderManager;
+extern C_TextureManager    *textureManager;
+extern C_GLShader          *bspShader;
+extern C_GLShader          *basicShader;
+extern C_GLShader          *pointShader;
+extern C_GLShader          *wallShader;
+extern C_GLShader          *simple_texture_shader;
+extern C_Vertex            lightPosition;
+extern char                MAX_THREADS;
+extern C_Camera            camera;
+extern C_InputHandler      inputHandler;
 extern C_Mob mob;
-#endif
+
+#endif // _GLOBALS_H_

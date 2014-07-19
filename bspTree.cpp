@@ -716,7 +716,7 @@ C_BspTree::dumpSamplePoints(const char *filename)
 }
 
 /**
- * Scan all the leaves and find gaps between them. Gaps possibly mean gliches in the tree's PVS.
+ * Scan all the leaves and find gaps between them. Gaps possibly mean glitches in the tree's PVS.
  * Steps are:
  * 1. For every leaf in the tree loop through all the other leaves and see if all its
  *    4 (6) faces, -X, +X, -Z, +Z (-Y, +Y) are coincident with an other leaf.
