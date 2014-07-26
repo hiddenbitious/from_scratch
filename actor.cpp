@@ -3,9 +3,10 @@
 
 C_Actor::C_Actor(void)
 {
+   map = NULL;
+
    mapCoordinateX = 0;
    mapCoordinateY = 0;
-   map = NULL;
    facingDirection = TILE_X_PLUS;
    movingDirection = TILE_X_PLUS;
 

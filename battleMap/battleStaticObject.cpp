@@ -5,3 +5,9 @@ C_BattleObject(battleMap, height)
 {
    m_walkable = walkable;
 }
+
+void
+C_BattleStaticObject::Draw(void)
+{
+
+}

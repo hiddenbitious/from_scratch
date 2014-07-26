@@ -23,8 +23,6 @@ OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = from_scratch
 DEPS = $(SOURCES:.cpp=.d)
 
-#$(info deps = $(DEPS))
-
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)

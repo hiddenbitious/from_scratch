@@ -2,6 +2,7 @@
 #define _BATTLEOBJECT_H_
 
 #include "../globals.h"
+#include "../mesh.h"
 
 class C_BattleMap;
 
@@ -9,8 +10,8 @@ class C_BattleObject {
 public:
    C_BattleObject(C_BattleMap *battleMap, float height);
 
-//   virtual void Init();
-//   virtual void Draw();
+   void Init();
+   virtual void Draw(void) { model.draw(&camera); }
 
    void SetPosition(float x, float y, float z);
 
@@ -24,6 +25,7 @@ public:
 protected:
    C_BattleMap *m_battleMap;
    C_Vertex    m_position;
+   C_MeshGroup model;
 
 private:
    float       m_height;

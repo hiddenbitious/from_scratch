@@ -6,12 +6,16 @@
 class C_BattleStaticObject : public C_BattleObject {
 public:
    C_BattleStaticObject(C_BattleMap *battleMap, float height, bool walkable);
+   virtual ~C_BattleStaticObject(void) {}
 
-   int GetGridX();
-   int GetGridY();
-   int GetGridZ();
+   virtual void Draw(void);
+//   virtual void Updateid(float time) { }
 
-   bool IsWalkable();
+//   int GetGridX();
+//   int GetGridY();
+//   int GetGridZ();
+
+   inline bool IsWalkable(void) { return m_walkable; }
 
 protected:
    C_BattleStaticObject(C_BattleMap *battleMap, float h);

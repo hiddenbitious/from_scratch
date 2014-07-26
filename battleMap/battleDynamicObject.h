@@ -8,20 +8,22 @@
 
 class C_BattleDynamicObject : public C_BattleObject {
 public:
-   C_BattleDynamicObject(C_BattleMap *battleMap, float h, bool s);
+   C_BattleDynamicObject(C_BattleMap *battleMap, float h);
+   virtual ~C_BattleDynamicObject(void) {}
 
-   virtual void Update(float time);
-   virtual void Remove();
+   virtual void Draw(void);
+//   virtual void Update(float time) { }
+//   virtual void Remove();
 //   virtual void OnNotify(unsigned const int type);
 
 //   void Init(Pathfinder *p);
-   void Move(float time);
-   void SetDestination(C_Vertex *d);
-   void SetPath(float x, float z);
-   void ResetDestination();
+//   void Move(float time);
+//   void SetDestination(C_Vertex *d);
+//   void SetPath(float x, float z);
+//   void ResetDestination();
 
 protected:
-   bool IsCanMove();
+   inline bool IsCanMove(void) { return m_canMove; };
    float m_speed;
 
 private:
