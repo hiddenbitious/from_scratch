@@ -785,7 +785,7 @@ C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const char *fragme
       vertexExists = true;
 	   delete tVertexShader;
 	   tVertexShader = (C_GLVertexShader *)tmpShader;
-	   printf("Shader already loaded.\n");
+	   printf("Vertex shader already loaded.\n");
 	} else {
    	printf("done!\n");
 	}
@@ -804,7 +804,7 @@ C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const char *fragme
       fragmentExists = true;
 	   delete tFragmentShader;
 	   tFragmentShader = (C_GLFragmentShader *)tmpShader;
-	   printf("Shader already loaded.\n");
+	   printf("Fragment shader already loaded.\n");
 	} else {
    	printf("done!\n");
 	}

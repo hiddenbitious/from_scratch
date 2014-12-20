@@ -220,7 +220,7 @@ C_BspTree::CalcNorms(void)
 
 /**
  * Insert a mesh into the tree as a static object.
- * To determin to which node(s) the mesh belongs, all 8 bbox's vertices are
+ * To determine to which node(s) the mesh belongs, all 8 bbox's vertices are
  * "thrown" down the tree
  */
 void
@@ -726,10 +726,16 @@ C_BspTree::dumpSamplePoints(const char *filename)
 void
 C_BspTree::closeLeafHoles(void)
 {
+   int i;
+   float dist;
+   C_BspNode *leaf1, *leaf2;
+   C_Vertex treeMin, treeMax, leaf1Min, leaf1Max, leaf2Min, leaf2Max;
+
    typedef struct {
       vector<C_BspNode *> adjacentNodes[TOTAL_FACES];
       vector<C_BspNode *> bestNodeToConnect[TOTAL_FACES];
       float bestNodeDistances[TOTAL_FACES];
+      bool boundaryLeaf;
    } nodeAdjacentData_t;
    nodeAdjacentData_t *aData = new nodeAdjacentData_t[leaves.size()];
 
@@ -743,13 +749,6 @@ C_BspTree::closeLeafHoles(void)
 		memset(leaves[i]->checkedVisibilityWith, false, nNodes * sizeof(bool));
 	}
 
-	return;
-
-   int i;
-   float dist;
-   C_BspNode *leaf1, *leaf2;
-   C_Vertex treeMin, treeMax, leaf1Min, leaf1Max, leaf2Min, leaf2Max;
-
    bbox.GetMin(&treeMin);
    bbox.GetMax(&treeMax);
 
@@ -758,19 +757,20 @@ C_BspTree::closeLeafHoles(void)
       leaf1 = leaves[b1];
       leaf1->bbox.GetMin(&leaf1Min);
       leaf1->bbox.GetMax(&leaf1Max);
+
       /// Init node's data
-//      memset(cNode->bestNodeToConnect, 0, sizeof(C_BspNode *) * TOTAL_FACES);
+      cNode->boundaryLeaf = false;
       for(i = 0; i < TOTAL_FACES; i++) {
          cNode->bestNodeDistances[i] = GREATEST_FLOAT;
       }
 
       /// Take into consideration that a leaf might be at the boundary of the tree
-      if(leaf1Min.x == treeMin.x) {cNode->adjacentNodes[X_MINUS].push_back(NULL);}
-      if(leaf1Max.x == treeMax.x) {cNode->adjacentNodes[X_PLUS].push_back(NULL);}
-      if(leaf1Min.z == treeMin.z) {cNode->adjacentNodes[Z_MINUS].push_back(NULL);}
-      if(leaf1Max.z == treeMax.z) {cNode->adjacentNodes[Z_PLUS].push_back(NULL);}
-      if(leaf1Min.y == treeMin.y) {cNode->adjacentNodes[Y_MINUS].push_back(NULL);} else assert(0);
-      if(leaf1Max.y == treeMax.y) {cNode->adjacentNodes[Y_PLUS].push_back(NULL);} else assert(0);
+      if(leaf1Min.x == treeMin.x) { cNode->adjacentNodes[X_MINUS].push_back(NULL); cNode->boundaryLeaf = true; }
+      if(leaf1Max.x == treeMax.x) { cNode->adjacentNodes[X_PLUS].push_back(NULL);  cNode->boundaryLeaf = true; }
+      if(leaf1Min.z == treeMin.z) { cNode->adjacentNodes[Z_MINUS].push_back(NULL); cNode->boundaryLeaf = true; }
+      if(leaf1Max.z == treeMax.z) { cNode->adjacentNodes[Z_PLUS].push_back(NULL);  cNode->boundaryLeaf = true; }
+      if(leaf1Min.y == treeMin.y) { cNode->adjacentNodes[Y_MINUS].push_back(NULL); cNode->boundaryLeaf = true; } else assert(0);
+      if(leaf1Max.y == treeMax.y) { cNode->adjacentNodes[Y_PLUS].push_back(NULL);  cNode->boundaryLeaf = true; } else assert(0);
 
       for(unsigned int b2 = 0; b2 < leaves.size(); b2++) {
          if(b1 == b2)
@@ -900,23 +900,27 @@ C_BspTree::closeLeafHoles(void)
          !cNode->adjacentNodes[Z_MINUS].size() || !cNode->adjacentNodes[Z_PLUS].size() ||
          !cNode->adjacentNodes[Y_MINUS].size() || !cNode->adjacentNodes[Y_PLUS].size()) {
 
-//         printf("leaf %lu is not tightly packed.", leaf1->nodeID);
-//         printf("Uncovered faces are: ");
-//         for(int i = 0; i < TOTAL_FACES; i++) {
-//            if(!cNode->adjacentNodes[i].size()) {
-//               printf("%s ", C_BBox::ADJACENT_FACE_NAMES[i]);
-//               printf("Best candidates: ");
-//
-//               if(cNode->bestNodeToConnect[i].size()) {
-////                  printf("+_+_+_ %d\n", cNode->bestNodeToConnect[i].size());
-//                  for(int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj)
-//                    printf("%lu ", cNode->bestNodeToConnect[i][jj]->nodeID);
-//                  printf("\n");
-//               } else {
-//                  printf("none!\n");
-//               }
-//            }
-//         }
+         printf("\nleaf %lu is not tightly packed. ", leaf1->nodeID);
+         printf("Uncovered faces are: ");
+         for(int i = 0; i < TOTAL_FACES; i++) {
+            if(!cNode->adjacentNodes[i].size()) {
+               printf("\n\t\t\t%s. ", C_BBox::ADJACENT_FACE_NAMES[i]);
+               printf("Best candidates: ");
+
+               if(cNode->bestNodeToConnect[i].size()) {
+//                  printf("+_+_+_ %d\n", cNode->bestNodeToConnect[i].size());
+                  for(unsigned int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj)
+                    printf("%lu ", cNode->bestNodeToConnect[i][jj]->nodeID);
+               } else {
+                  if(cNode->boundaryLeaf) {
+                     printf("none! Boundary leaf.");
+                  } else {
+                     printf("none and not a boundary leaf.");
+                     assert(0);
+                  }
+               }
+            }
+         }
 
          /// Connect leaf1 with all candidate nodes
          C_Vertex min, max;
@@ -951,10 +955,8 @@ C_BspTree::closeLeafHoles(void)
                } // if
             } // if
          } // for
-
      }
    }
-
 
    delete[] aData;
 }

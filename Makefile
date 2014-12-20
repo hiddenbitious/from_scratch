@@ -8,7 +8,7 @@ GLEW_PATH = /usr/lib/x86_64-linux-gnu/
 LDFLAGS =
 #LIBS=-L$(GLEW_PATH) -L$(GL_PATH) -lm -lGL -lglut -lGLU -lGLEW -L../oglRenderer -lOglRenderer
 LIBS   = -L$(GLEW_PATH) -L$(GL_PATH) -lm -lGL -lglut -lGLU -lGLEW -lpthread
-CFLAGS = -c -Wall -O0 -g -Wno-unused-result -MMD
+CXXFLAGS = -c -Wall -O0 -g -MMD -Wall -Wno-unused-result
 
 SOURCES = main.cpp bbox.cpp metaballs/cubeGrid.cpp quaternion.cpp \
 		    math.cpp frustum.cpp vectors.cpp plane.cpp camera.cpp timer.cpp glsl/glsl.cpp \
@@ -31,8 +31,8 @@ $(EXECUTABLE): $(OBJECTS)
 -include $(DEPS)
 
 .cpp.o:
-	$(CXX) $(CFLAGS) $< -o $@
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
 	rm *.o metaballs/*.o glsl/glsl.o objreader/objfile.o tgaLoader/tgaLoader.o battleMap/*.o $(EXECUTABLE)
-	rm *.d metaballs/*.d glsl/glsl.d objreader/objfile.d tgaLoader/tgaLoader.d battleMap/*.d $(EXECUTABLE)
+	rm *.d metaballs/*.d glsl/glsl.d objreader/objfile.d tgaLoader/tgaLoader.d battleMap/*.d

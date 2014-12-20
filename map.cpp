@@ -261,7 +261,7 @@ C_Map::load3DObjects(void)
    /// This is supposed to check every tile in the map
    /// and load the needed 3d mesh from disk
 
-   /// Obiously an mesh manager will be needed to avoid loading
+   /// Obviously a mesh manager will be needed to avoid loading
    /// the same mesh more than once
 
    wallMesh.loadFromFile("wallMeshes/wall_01.obj");
