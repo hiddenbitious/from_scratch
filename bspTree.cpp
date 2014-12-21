@@ -56,7 +56,6 @@ C_BspTree::~C_BspTree(void)
    delete[] pBrushes;
    delete[] pRawPolys;
 
-
 	for(unsigned int i = 0; i < staticObjects.size(); ++i) {
 	   delete staticObjects[i];
 	}
@@ -925,34 +924,32 @@ C_BspTree::closeLeafHoles(void)
          /// Connect leaf1 with all candidate nodes
          C_Vertex min, max;
          for(int i = 0; i < TOTAL_FACES; i++) {
-            if(!cNode->adjacentNodes[i].size()) {
-               if(cNode->bestNodeToConnect[i].size()) {
-                  leaf1->bbox.GetMax(&max);
-                  leaf1->bbox.GetMin(&min);
-                  for(unsigned int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj) {
+            if(!cNode->adjacentNodes[i].size() && cNode->bestNodeToConnect[i].size()) {
+               leaf1->bbox.GetMax(&max);
+               leaf1->bbox.GetMin(&min);
+               for(unsigned int jj = 0; jj < cNode->bestNodeToConnect[i].size(); ++jj) {
 //                     leaf1->addNodeToPVS(cNode->bestNodeToConnect[i][jj]);
 
-                     /// Enlrage bounding boxes
-                     switch(i) {
-                     case X_MINUS:
-                        leaf1->bbox.SetMin(min.x - cNode->bestNodeDistances[X_MINUS], min.y, min.z);
-                        leaf1->bbox.SetVertices();
-                        break;
-                     case X_PLUS:
-                        leaf1->bbox.SetMax(max.x + cNode->bestNodeDistances[X_PLUS], max.y, max.z);
-                        leaf1->bbox.SetVertices();
-                        break;
-                     case Z_PLUS:
-                        leaf1->bbox.SetMax(max.x, max.y, max.z + cNode->bestNodeDistances[Z_PLUS]);
-                        leaf1->bbox.SetVertices();
-                        break;
-                     case Z_MINUS:
-                        leaf1->bbox.SetMin(min.x, min.y, min.z - cNode->bestNodeDistances[Z_MINUS]);
-                        leaf1->bbox.SetVertices();
-                        break;
-                     } // switch
-                  } // for(int jj
-               } // if
+                  /// Enlarge bounding boxes
+                  switch(i) {
+                  case X_MINUS:
+                     leaf1->bbox.SetMin(min.x - cNode->bestNodeDistances[X_MINUS], min.y, min.z);
+                     leaf1->bbox.SetVertices();
+                     break;
+                  case X_PLUS:
+                     leaf1->bbox.SetMax(max.x + cNode->bestNodeDistances[X_PLUS], max.y, max.z);
+                     leaf1->bbox.SetVertices();
+                     break;
+                  case Z_PLUS:
+                     leaf1->bbox.SetMax(max.x, max.y, max.z + cNode->bestNodeDistances[Z_PLUS]);
+                     leaf1->bbox.SetVertices();
+                     break;
+                  case Z_MINUS:
+                     leaf1->bbox.SetMin(min.x, min.y, min.z - cNode->bestNodeDistances[Z_MINUS]);
+                     leaf1->bbox.SetVertices();
+                     break;
+                  } // switch
+               } // for(int jj
             } // if
          } // for
      }

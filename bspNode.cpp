@@ -423,12 +423,12 @@ C_BspNode::Draw(C_Camera *camera)
    //         continue;
    //      }
 
-         if(staticObjects[i]->mesh.draw(camera))
+         if(staticObjects[i]->mesh.draw(camera)) {
             tree->statistics.staticObjectsDrawn++;
+            tree->statistics.trianglesDrawn += staticObjects[i]->mesh.nTriangles;
+         }
 
          staticObjects[i]->drawn = true;
-
-         tree->statistics.trianglesDrawn += staticObjects[i]->mesh.nTriangles;
       }
    }
 }

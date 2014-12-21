@@ -254,6 +254,7 @@ void C_GLShader::AddShader(C_GLShaderObject* shader)
 		}
 	}
 
+   assert(nShaders < MAX_SHADERS);
 	shaderList[nShaders++] = shader;
 }
 
@@ -656,16 +657,16 @@ void C_GLShader::UpdateAttribLocations(void)
 {
    assert(isLinked);
 
-   verticesAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_VERTICES);
-   normalsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_NORMALS);
-   texCoordsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_TEXCOORDS);
-   colorsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_COLORS);
-   tangetsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_TANGENTS);
-   binormalsAttribLocation = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_BINORMALS);
+   verticesAttribLocation     = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_VERTICES);
+   normalsAttribLocation      = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_NORMALS);
+   texCoordsAttribLocation    = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_TEXCOORDS);
+   colorsAttribLocation       = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_COLORS);
+   tangetsAttribLocation      = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_TANGENTS);
+   binormalsAttribLocation    = getAttribLocation(VERTEX_ATTRIBUTE_VARIABLE_NAME_BINORMALS);
 
-   textureUniformLocation_0 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_0);
-   textureUniformLocation_1 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_1);
-   textureUniformLocation_2 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_2);
+   textureUniformLocation_0   = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_0);
+   textureUniformLocation_1   = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_1);
+   textureUniformLocation_2   = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_2);
 
    textureDiffuseLocation_0   = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_DIFFUSE);
    textureNormalMapLocation_1 = GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_NORMAL_MAP);
@@ -722,9 +723,11 @@ C_GLShaderObject *C_GLShaderManager::shaderObjectExists(const C_GLShaderObject *
 C_GLShader *C_GLShaderManager::shaderExists(const C_GLShaderObject *shaderObject1, const C_GLShaderObject *shaderObject2)
 {
    for(unsigned int i = 0; i < shaderList.size(); i++) {
+      /// In case the shader object consists of only 1 shader
       if(shaderList[i]->nShaders == 1) {
-         if(shaderList[i]->shaderList[0] == shaderObject1)
+         if(shaderList[i]->shaderList[0] == shaderObject1) {
             return shaderList[i];
+         }
       } else if (shaderList[i]->nShaders == 2) {
          if((shaderList[i]->shaderList[0] == shaderObject1 && shaderList[i]->shaderList[1] == shaderObject2) ||
             (shaderList[i]->shaderList[0] == shaderObject2 && shaderList[i]->shaderList[1] == shaderObject1))
@@ -737,6 +740,8 @@ C_GLShader *C_GLShaderManager::shaderExists(const C_GLShaderObject *shaderObject
 
 void C_GLShaderManager::pushShader(C_GLShader *shader)
 {
+   /// XXX: Optimization: Check if shader being pushed is already at the
+   ///      top of the stack.
    /// Deactivate current shader
    if(activeShader.size())
       activeShader[activeShader.size() - 1]->End();
@@ -750,6 +755,8 @@ void C_GLShaderManager::popShader(void)
    if(!activeShader.size())
       return;
 
+   /// XXX: Optimization: If shader stack is not empty skip calling End() on shader
+   ///      that is on top of stack, and activate immediately next shader
    activeShader[activeShader.size() - 1]->End();
    activeShader.pop_back();
    if(activeShader.size())
@@ -758,7 +765,7 @@ void C_GLShaderManager::popShader(void)
 
 #ifndef JNI_COMPATIBLE
 C_GLShader *
-C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const char *fragmentFile)
+C_GLShaderManager::LoadShaderProgram(const char *vertexFile, const char *fragmentFile)
 {
    bool fragmentExists = false;
    bool vertexExists = false;
@@ -870,7 +877,7 @@ C_GLShaderManager::LoadShaderProgram(const char *vertexFile , const char *fragme
    printf("done!\n");
 	printf("----------------------------------------------------------\n");
 
-   /// Detect all default vertex atributes and shader uniforms
+   /// Detect all default vertex attributes and shader uniforms
 	shaderObject->UpdateAttribLocations();
 
    /// Put the new shader in the shader manager's list

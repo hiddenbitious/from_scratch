@@ -61,12 +61,11 @@ public:
    char *compilerLog;
 
 protected:
-   /// shader object. This is the shader ID returned from GL
-   GLuint shaderObject;
-   shader_type_t type;
-   GLubyte *shaderSource;
-   size_t sourceBytes;
-   bool isCompiled;
+   GLuint         shaderObject;  /// This is the shader ID returned from GL
+   shader_type_t  type;
+   GLubyte        *shaderSource;
+   size_t         sourceBytes;
+   bool           isCompiled;
 };
 
 class C_GLVertexShader : public C_GLShaderObject
@@ -135,52 +134,48 @@ public:
    GLint textureDiffuseLocation_0, textureNormalMapLocation_1, textureSpecularLocation_2;
 
 protected:
-   char *linkerLog;
+   void              AddShader(C_GLShaderObject* shader);      /// Add a vertex or fragment shader
+   bool              Link(void);                               /// Link shaders
+   void              UpdateAttribLocations(void);
+   inline bool       GetisLinked(void) { return isLinked; }
 
-   // Add a vertex or fragment shader
-   void AddShader(C_GLShaderObject* shader);
-   // Link shaders
-   bool Link(void);
-   inline bool GetisLinked(void) { return isLinked; }
-   void UpdateAttribLocations(void);
+   char              *linkerLog;
 
 private:
-   // Holds all the shaders
-   C_GLShaderObject* shaderList[MAX_SHADERS];
-   int nShaders;
-   GLuint programObject;
-   bool isLinked;
-   bool inUse;
+   C_GLShaderObject  *shaderList[MAX_SHADERS];                 /// Holds all the shaders
+   int               nShaders;
+   GLuint            programObject;                            /// Shader ID returned from glCreatePrograms
+   bool              isLinked;
+   bool              inUse;
 };
 
 class C_GLShaderManager
 {
 public :
    ~C_GLShaderManager();
-   static C_GLShaderManager *getSingleton(void);
+   static C_GLShaderManager   *getSingleton(void);
 
    /// Load a vertex and a fragment shader and returns a pointer to a C_GLShader object that holds both
-   C_GLShader* LoadShaderProgram(const char *, const char *);
-   void pushShader(C_GLShader *shader);
-   void popShader(void);
+   C_GLShader                 *LoadShaderProgram(const char *, const char *);
+   void                       pushShader(C_GLShader *shader);
+   void                       popShader(void);
 
 private:
    C_GLShaderManager();
 
-   static bool instanceFlag;
-   static C_GLShaderManager *classInstance;
+   static bool                instanceFlag;
+   static C_GLShaderManager   *classInstance;
 
-   /// All loaded shaders
-   vector<C_GLShader *> shaderList;
-   /// Stack of active shaders
-   vector<C_GLShader *> activeShader;
+   vector<C_GLShader *>       shaderList;       /// All loaded shaders
+   vector<C_GLShader *>       activeShader;     /// Stack of active shaders
+   bool                       markForDeactivation;
 
    /// Finds if a shader has already been loaded by comparing it's source
-   C_GLShaderObject *shaderObjectExists(const C_GLShaderObject *shaderObject, shader_type_t type);
-   C_GLShader *shaderExists(const C_GLShaderObject *shaderObject1, const C_GLShaderObject *shaderObject2);
+   C_GLShaderObject           *shaderObjectExists(const C_GLShaderObject *shaderObject, shader_type_t type);
+   C_GLShader                 *shaderExists(const C_GLShaderObject *shaderObject1, const C_GLShaderObject *shaderObject2);
 };
 
-//Initializes extensions using glew
+/// Initializes extensions using glew
 //#ifndef JNI_COMPATIBLE
 bool InitGLExtensions(void);
 //#endif

@@ -55,7 +55,7 @@ C_MeshGroup::softCopy(const C_MeshGroup *group)
    PRINT_FUNC_ENTRY;
 
    if(this != group) {
-      /// Increase the ref counter of all the meshes
+      /// Increase the reference counter of all meshes
       meshes = group->meshes->refMesh();
       C_Mesh *meshList = meshes->next;
       while(meshList) {
@@ -119,13 +119,16 @@ C_Mesh &C_Mesh::operator= (const C_Mesh &mesh)
       if(mesh.texture_diffuse) {
          texture_diffuse = mesh.texture_diffuse->refTexture();
       }
+
       if(mesh.texture_normal) {
          texture_normal = mesh.texture_normal->refTexture();
       }
+
       if(mesh.texture_specular) {
          texture_specular = mesh.texture_specular->refTexture();
       }
    }
+
    return *this;
 }
 
@@ -166,6 +169,7 @@ C_MeshGroup::~C_MeshGroup(void)
 
    C_Mesh *oldMesh;
    C_Mesh *mesh = meshes;
+
    while(mesh) {
       oldMesh = mesh;
       mesh = mesh->next;
@@ -473,8 +477,6 @@ C_MeshGroup::draw(C_Camera *camera)
 
 	shaderManager->pushShader(shader);
 	ESMatrix mat;
-	ESMatrix rotMat;
-	rotationQuat.QuaternionToMatrix16(&rotMat);
 
    /// Apply camera transformation
 	esMatrixMultiply(&mat, &matrix, &globalViewMatrix);
@@ -482,6 +484,8 @@ C_MeshGroup::draw(C_Camera *camera)
 	esTranslate(&mat, position.x, position.y, position.z);
 	/// Apply model rotation
 	if(rotated) {
+	   ESMatrix rotMat;
+	   rotationQuat.QuaternionToMatrix16(&rotMat);
    	esMatrixMultiply(&mat, &rotMat, &mat);
       rotated = false;
    }
@@ -507,19 +511,19 @@ C_MeshGroup::draw(C_Camera *camera)
    C_Mesh *mesh = meshes;
    while(mesh) {
       /// If mesh has texture enable it
-      if(mesh->texture_diffuse && shader->GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_DIFFUSE) >= 0) {
+      if(mesh->texture_diffuse && shader->textureDiffuseLocation_0 >= 0) {
          glActiveTexture(GL_TEXTURE0);
          glBindTexture(GL_TEXTURE_2D, mesh->texture_diffuse->getGLtextureID());
          shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_DIFFUSE, 0);
       }
 
-      if(mesh->texture_normal && shader->GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_NORMAL_MAP) >= 0) {
+      if(mesh->texture_normal && shader->textureNormalMapLocation_1 >= 0) {
          glActiveTexture(GL_TEXTURE1);
          glBindTexture(GL_TEXTURE_2D, mesh->texture_normal->getGLtextureID());
          shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_NORMAL_MAP, 1);
       }
 
-      if(mesh->texture_specular && shader->GetUniLoc(UNIFORM_VARIABLE_NAME_TEXTURE_SPECULAR) >= 0) {
+      if(mesh->texture_specular && shader->textureSpecularLocation_2 >= 0) {
          glActiveTexture(GL_TEXTURE2);
          glBindTexture(GL_TEXTURE_2D, mesh->texture_specular->getGLtextureID());
          shader->setUniform1i(UNIFORM_VARIABLE_NAME_TEXTURE_SPECULAR, 2);
@@ -550,12 +554,12 @@ C_MeshGroup::draw(C_Camera *camera)
 void
 C_Mesh::draw(C_GLShader *shader)
 {
-   if(shader->verticesAttribLocation >= 0)   glVertexAttribPointer(shader->verticesAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, vertices);
-   if(shader->colorsAttribLocation >= 0)     glVertexAttribPointer(shader->colorsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
+   if(shader->verticesAttribLocation >= 0)   glVertexAttribPointer(shader->verticesAttribLocation,  sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, vertices);
+   if(shader->colorsAttribLocation >= 0)     glVertexAttribPointer(shader->colorsAttribLocation,    sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
    if(shader->texCoordsAttribLocation >= 0)  glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, textCoords);
-   if(shader->normalsAttribLocation >= 0)    glVertexAttribPointer(shader->normalsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, normals);
-   if(shader->binormalsAttribLocation >= 0)  glVertexAttribPointer(shader->binormalsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, binormals);
-   if(shader->tangetsAttribLocation >= 0)    glVertexAttribPointer(shader->tangetsAttribLocation, sizeof(C_Vertex) / sizeof(float), GL_FLOAT, GL_FALSE, 0, tangents);
+   if(shader->normalsAttribLocation >= 0)    glVertexAttribPointer(shader->normalsAttribLocation,   sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, normals);
+   if(shader->binormalsAttribLocation >= 0)  glVertexAttribPointer(shader->binormalsAttribLocation, sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, binormals);
+   if(shader->tangetsAttribLocation >= 0)    glVertexAttribPointer(shader->tangetsAttribLocation,   sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, tangents);
 
    if(!indices) {
       glDrawArrays(GL_TRIANGLES, 0, nVertices);
