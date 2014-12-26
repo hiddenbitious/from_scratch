@@ -170,7 +170,7 @@ Initializations(void)
    /// Texture manager
    textureManager = C_TextureManager::getSingleton();
 
-   map.createMap("map.txt");
+   map.createMap("map");
 
    int tileStartx, tileStarty;
    C_Vertex cameraPosition = map.cameraStartPosition(&tileStartx, &tileStarty);

@@ -22,7 +22,7 @@ public:
    C_Map(void);
    ~C_Map(void);
 
-   bool createMap(const char *filename);
+   bool createMap(const string &filename);
 
    C_Vertex cameraStartPosition(int *x, int *y);
    tile *getTile(int x, int y);

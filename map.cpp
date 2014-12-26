@@ -69,14 +69,16 @@ C_Map::~C_Map()
 }
 
 bool
-C_Map::createMap(const char *filename)
+C_Map::createMap(const string &filename)
 {
    bool ret;
 
    printf("Creating map...\n");
 
    /// Read the tile data
-   ret = readMap(filename);
+   string mapFile = filename;
+   mapFile.append(".txt\0");
+   ret = readMap(mapFile.c_str());
    if(!ret) {
       assert(0);
       return false;
@@ -85,7 +87,10 @@ C_Map::createMap(const char *filename)
    bspTree = new C_BspTree(6);
 
    /// Read bsp geometry and build the bsp tree
-   bspTree->ReadGeometryFile("mapGeometry.bsp");
+   mapFile = filename;
+   mapFile.append(".bsp\0");
+
+   bspTree->ReadGeometryFile(mapFile.c_str());
    bspTree->BuildBspTree();
    bspTree->BuildPVS();
 
@@ -135,8 +140,6 @@ C_Map::placeObjects(void)
                   esScale(&mat, scale, scale, scale);
                   esRotate(&mat, 180.0f, 0.0f, 1.0f, 0.0f);
                   bspTree->insertStaticObject(&wallMesh, &mat);
-
-                  esMatrixLoadIdentity(&mat);
                }
             }
 
@@ -437,20 +440,20 @@ C_Map::draw(C_Camera *camera)
 //   corner_outer.draw(camera);
    bspTree->Draw_PVS(camera);
 
-//	int line = 2;
-//	int lineHeight = 18;
-//
-//	camera->PrintText(0, lineHeight * line++,
-//					 1.0f, 1.0f, 0.0f, 0.6f,
-//					 "total leaves: %d. Drawn: %d" , bspTree->statistics.totalLeaves, bspTree->statistics.leavesDrawn);
-//
-//	camera->PrintText(0, lineHeight * line++,
-//					 1.0f, 1.0f, 0.0f, 0.6f,
-//					 "total objects: %d. Drawn: %d" , bspTree->statistics.totalStaticObjects, bspTree->statistics.staticObjectsDrawn);
-//
-//	camera->PrintText(0, lineHeight * line++,
-//					 1.0f, 1.0f, 0.0f, 0.6f,
-//					 "total triangles: %d. Drawn: %d" , bspTree->statistics.totalTriangles, bspTree->statistics.trianglesDrawn);
+	int line = 2;
+	int lineHeight = 18;
+
+	camera->PrintText(0, lineHeight * line++,
+					 1.0f, 1.0f, 0.0f, 0.6f,
+					 "total leaves: %d. Drawn: %d" , bspTree->statistics.totalLeaves, bspTree->statistics.leavesDrawn);
+
+	camera->PrintText(0, lineHeight * line++,
+					 1.0f, 1.0f, 0.0f, 0.6f,
+					 "total objects: %d. Drawn: %d" , bspTree->statistics.totalStaticObjects, bspTree->statistics.staticObjectsDrawn);
+
+	camera->PrintText(0, lineHeight * line++,
+					 1.0f, 1.0f, 0.0f, 0.6f,
+					 "total triangles: %d. Drawn: %d" , bspTree->statistics.totalTriangles, bspTree->statistics.trianglesDrawn);
 
 //   /// Print statistics
 //   printf("Draw statistics:\n");
