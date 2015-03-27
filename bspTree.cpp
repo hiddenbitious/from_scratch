@@ -254,13 +254,13 @@ C_BspTree::DistributeSamplePoints(void)
 }
 
 void
-C_BspTree::BuildPVS(void)
+C_BspTree::BuildPVS(const char *filename)
 {
 	printf("%s\n", __FUNCTION__);
 
 	/// An iparhei arheio me tin pliroforia diabase apo ekei
 	bool pvsFileFound = false;
-	pvsFileFound = this->ReadPVSFile("newmap_pvs.txt");
+	pvsFileFound = this->ReadPVSFile(filename);
 
 	cout << "Building PVS..." << endl;
 	cout << "\tDistributing sample points... " << flush;
@@ -278,7 +278,7 @@ C_BspTree::BuildPVS(void)
 
 	/// Write PVS into a file
 	if(!pvsFileFound) {
-		WritePVSFile("newmap_pvs.txt");
+		WritePVSFile(filename);
 	}
 }
 

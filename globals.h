@@ -8,7 +8,9 @@
 #define USE_PVS                        true
 
 #define ENABLE_COLLISION_DETECTION     true
-#define USE_HIGH_QUALITY_SHADERS       false
+#define USE_HIGH_QUALITY_SHADERS       true
+
+#define PRINT_TREE_STATISTICS          false
 
 #define ROTATE_MESH_BBOXES             true
 
@@ -30,8 +32,13 @@
 #	include <stdint.h>
 #	include <string>
 #	include <limits>
-#	include <assert.h>
 #	include <GL/glew.h>
+
+#  ifdef DISABLE_ASSERTS
+#     define assert(cond)
+#  else
+#	   include <assert.h>
+#  endif // DISABLE_ASSERTS
 
 using namespace std;
 
@@ -161,5 +168,17 @@ extern char                MAX_THREADS;
 extern C_Camera            camera;
 extern C_InputHandler      inputHandler;
 extern C_Mob mob;
+
+
+extern    C_MeshGroup wallMesh;
+extern    C_MeshGroup wallMesh2;
+extern    C_MeshGroup floorMesh;
+extern    C_MeshGroup floorMesh2;
+extern    C_MeshGroup floorMesh3;
+extern    C_MeshGroup floorMesh4;
+extern    C_MeshGroup grating;
+extern    C_MeshGroup corner_inner;
+extern    C_MeshGroup corner_outer;
+
 
 #endif // _GLOBALS_H_

@@ -1,4 +1,3 @@
-#include <assert.h>
 #include "cubeGrid.h"
 #include "tables.h"
 #include "../math.h"

@@ -2,7 +2,6 @@
 
 //#ifndef JNI_COMPATIBLE
 #	include <fstream>
-#	include <assert.h>
 //#endif
 
 bool extensions_init = false;

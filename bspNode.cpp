@@ -4,7 +4,6 @@
 #include <GL/glut.h>
 
 #include <stdio.h>
-#include <assert.h>
 
 #define MINIMUMRELATION			0.5f
 #define MINIMUMRELATIONSCALE	2.0f

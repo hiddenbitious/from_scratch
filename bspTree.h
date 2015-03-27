@@ -65,7 +65,7 @@ public:
    bool ReadPVSFile(const char *fileName);
 
    void BuildBspTree(void);
-   void BuildPVS(void);
+   void BuildPVS(const char *filename);
 
    void TraceVisibility(void);
    C_BspNode *CheckVisibility(C_BspNode *node1 , C_BspNode *node2);
