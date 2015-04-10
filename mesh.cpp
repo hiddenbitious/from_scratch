@@ -29,6 +29,8 @@ C_Mesh::C_Mesh(void)
    texture_diffuse = NULL;
    texture_specular = NULL;
    texture_normal = NULL;
+
+   memset(vbos, 0, MAX_VBOS_PER_OBJECT * sizeof(unsigned));
 }
 
 C_Mesh *
@@ -467,11 +469,9 @@ C_MeshGroup::rotate(float x, float y, float z)
 bool
 C_MeshGroup::draw(C_Camera *camera)
 {
-   if(ENABLE_MESH_FRUSTUM_CULLING) {
-      if(applyFrustumCulling) {
-         if(camera && !camera->frustum->cubeInFrustum(&bbox)) {
-            return false;
-         }
+   if(ENABLE_MESH_FRUSTUM_CULLING && applyFrustumCulling) {
+      if(!camera->frustum->cubeInFrustum(&bbox)) {
+         return false;
       }
    }
 
@@ -554,12 +554,35 @@ C_MeshGroup::draw(C_Camera *camera)
 void
 C_Mesh::draw(C_GLShader *shader)
 {
-   if(shader->verticesAttribLocation >= 0)   glVertexAttribPointer(shader->verticesAttribLocation,  sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, vertices);
-   if(shader->colorsAttribLocation >= 0)     glVertexAttribPointer(shader->colorsAttribLocation,    sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, colors);
-   if(shader->texCoordsAttribLocation >= 0)  glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, textCoords);
-   if(shader->normalsAttribLocation >= 0)    glVertexAttribPointer(shader->normalsAttribLocation,   sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, normals);
-   if(shader->binormalsAttribLocation >= 0)  glVertexAttribPointer(shader->binormalsAttribLocation, sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, binormals);
-   if(shader->tangetsAttribLocation >= 0)    glVertexAttribPointer(shader->tangetsAttribLocation,   sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, tangents);
+   if(shader->verticesAttribLocation >= 0) {
+      glBindBuffer(GL_ARRAY_BUFFER, vbos[VERTICES_VBO]);
+      glVertexAttribPointer(shader->verticesAttribLocation,  sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+   }
+
+   if(shader->colorsAttribLocation >= 0) {
+      glBindBuffer(GL_ARRAY_BUFFER, vbos[COLORS_VBO]);
+      glVertexAttribPointer(shader->colorsAttribLocation,    sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+   }
+
+   if(shader->texCoordsAttribLocation >= 0) {
+      glBindBuffer(GL_ARRAY_BUFFER, vbos[TEXCOORDS_VBO]);
+      glVertexAttribPointer(shader->texCoordsAttribLocation, sizeof(C_TexCoord) / sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+   }
+
+   if(shader->normalsAttribLocation >= 0) {
+      glBindBuffer(GL_ARRAY_BUFFER, vbos[NORMALS_VBO]);
+      glVertexAttribPointer(shader->normalsAttribLocation,   sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+   }
+
+   if(shader->binormalsAttribLocation >= 0) {
+      glBindBuffer(GL_ARRAY_BUFFER, vbos[BINORMALS_VBO]);
+      glVertexAttribPointer(shader->binormalsAttribLocation, sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+   }
+
+   if(shader->tangetsAttribLocation >= 0) {
+      glBindBuffer(GL_ARRAY_BUFFER, vbos[TANGENTS_VBO]);
+      glVertexAttribPointer(shader->tangetsAttribLocation,   sizeof(C_Vertex)   / sizeof(float), GL_FLOAT, GL_FALSE, 0, 0);
+   }
 
    if(!indices) {
       glDrawArrays(GL_TRIANGLES, 0, nVertices);
@@ -567,4 +590,66 @@ C_Mesh::draw(C_GLShader *shader)
       assert(0);
       glDrawElements(GL_TRIANGLES, 3 * nTriangles, GL_UNSIGNED_INT, indices);
    }
+}
+
+bool
+C_MeshGroup::initVBOS(void)
+{
+   C_Mesh *mesh = meshes;
+
+   while(mesh) {
+      if(mesh->nVertices) {
+         glGenBuffers(1, &mesh->vbos[VERTICES_VBO]);
+         if(!mesh->vbos[VERTICES_VBO]) {
+            assert(0);
+            return false;
+         }
+         glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[VERTICES_VBO]);
+         glBufferData(GL_ARRAY_BUFFER, mesh->nVertices * sizeof(C_Vertex), mesh->vertices, GL_STATIC_DRAW);
+      }
+
+      if(mesh->normals) {
+         glGenBuffers(1, &mesh->vbos[NORMALS_VBO]);
+         if(!mesh->vbos[NORMALS_VBO]) {
+            assert(0);
+            return false;
+         }
+         glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[NORMALS_VBO]);
+         glBufferData(GL_ARRAY_BUFFER, mesh->nVertices * sizeof(C_Vertex), mesh->normals, GL_STATIC_DRAW);
+      }
+
+      if(mesh->tangents) {
+         glGenBuffers(1, &mesh->vbos[TANGENTS_VBO]);
+         if(!mesh->vbos[TANGENTS_VBO]) {
+            assert(0);
+            return false;
+         }
+         glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[TANGENTS_VBO]);
+         glBufferData(GL_ARRAY_BUFFER, mesh->nVertices * sizeof(C_Vertex), mesh->tangents, GL_STATIC_DRAW);
+      }
+
+      if(mesh->binormals) {
+         glGenBuffers(1, &mesh->vbos[BINORMALS_VBO]);
+         if(!mesh->vbos[BINORMALS_VBO]) {
+            assert(0);
+            return false;
+         }
+         glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[BINORMALS_VBO]);
+         glBufferData(GL_ARRAY_BUFFER, mesh->nVertices * sizeof(C_Vertex), mesh->binormals, GL_STATIC_DRAW);
+      }
+
+      if(mesh->textCoords) {
+         glGenBuffers(1, &mesh->vbos[TEXCOORDS_VBO]);
+         if(!mesh->vbos[TEXCOORDS_VBO]) {
+            assert(0);
+            return false;
+         }
+         glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[TEXCOORDS_VBO]);
+         glBufferData(GL_ARRAY_BUFFER, mesh->nVertices * sizeof(C_TexCoord), mesh->textCoords, GL_STATIC_DRAW);
+      }
+
+      mesh = mesh->next;
+   }
+
+   return true;
 }

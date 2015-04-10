@@ -69,21 +69,11 @@ void
 C_Actor::updateTileCoordinates(void)
 {
    switch(movingDirection) {
-   case TILE_X_PLUS:
-      ++mapCoordinateX;
-      break;
-   case TILE_X_MINUS:
-      --mapCoordinateX;
-      break;
-   case TILE_Y_PLUS:
-      ++mapCoordinateY;
-      break;
-   case TILE_Y_MINUS:
-      --mapCoordinateY;
-      break;
-   default:
-      assert(0);
-      break;
+      case TILE_X_PLUS:    ++mapCoordinateX; break;
+      case TILE_X_MINUS:   --mapCoordinateX; break;
+      case TILE_Y_PLUS:    ++mapCoordinateY; break;
+      case TILE_Y_MINUS:   --mapCoordinateY; break;
+      default:             assert(0);        break;
    }
 
 //   printf("coordx: %d coordy: %d\n\n", mapCoordinateX, mapCoordinateY);
@@ -323,6 +313,7 @@ C_Mob::loadModel(void)
    esTranslate(&matrix, 0.0f, TILE_SIZE / 4.0f, 0.0f);
    esScale(&matrix, scale, scale, scale);
    model.applyTransformationOnVertices(&matrix);
+   model.initVBOS();
 }
 
 void

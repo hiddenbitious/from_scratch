@@ -19,7 +19,7 @@ public:
    ~C_Actor(void) {}
 
    bool move(movements_t movement);
-   void setMap(C_Map *map_) { assert(map_); map = map_; }
+   void setMap(C_Map *map) { assert(map); this->map = map; }
    virtual void setCoordinates(int x, int y);
    virtual void update(int fps);
 

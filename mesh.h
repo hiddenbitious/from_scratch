@@ -7,6 +7,8 @@
 #include "camera.h"
 #include "math.h"
 
+typedef enum { VERTICES_VBO, NORMALS_VBO, BINORMALS_VBO, TANGENTS_VBO, COLORS_VBO, TEXCOORDS_VBO, MAX_VBOS_PER_OBJECT } mesh_vbos;
+
 class C_BaseMesh {
 public:
    int            nVertices;
@@ -45,6 +47,8 @@ public:
    C_Texture      *texture_specular;   /// Pointer to texture struct
    C_Texture      *texture_normal;     /// Pointer to texture struct
 
+   unsigned       vbos[MAX_VBOS_PER_OBJECT];
+
    C_Mesh(void);
    ~C_Mesh(void);
 
@@ -61,6 +65,7 @@ public:
    void drawNormals(void);
    void calculateBbox(void);
    void applyTransformationOnVertices(const ESMatrix *mat);
+
 };
 
 class C_MeshGroup : public C_BaseMesh  {
@@ -85,6 +90,8 @@ public:
    void calculateBbox(void);
    void applyTransformationOnVertices(const ESMatrix *mat);
    bool loadFromFile(const char *filename);
+
+   bool initVBOS();
 
    virtual void translate(float x, float y, float z);
    virtual void translate(C_Vertex *translation);

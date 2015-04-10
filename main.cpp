@@ -180,6 +180,7 @@ Initializations(void)
    camera.Rotate(0.0f, 180.0f);
 
    cube.loadFromFile("objmodels/cube.obj");
+   cube.initVBOS();
    cube.shader = simple_texture_shader;
 
    party.setMap(&map);
@@ -341,18 +342,22 @@ handle_arrows(int key , int x , int y)
 {
 	switch(key) {
    case GLUT_KEY_UP:
+//         camera.Move(speed);
       party.move(MOVE_FORWARD);
       break;
 
    case GLUT_KEY_DOWN:
+//         camera.Move(-speed);
       party.move(MOVE_BACKWARDS);
       break;
 
    case GLUT_KEY_RIGHT:
+//         camera.StrafeRight(speed);
 			party.move(MOVE_TURN_RIGHT);
       break;
 
    case GLUT_KEY_LEFT:
+//         camera.StrafeLeft(speed);
 			party.move(MOVE_TURN_LEFT);
       break;
 	}
@@ -368,8 +373,8 @@ CountFPS (void)
 	float delta = timer.GetTime () - start;
 	count++;
 
-	if(delta >= 200.0f) {
-		fps = count * 5;
+	if(delta >= 1000.0f) {
+		fps = count;
 		start = timer.GetTime ();
 
 		printf("fps: %d\n", fps);

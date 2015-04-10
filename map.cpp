@@ -328,6 +328,7 @@ C_Map::load3DObjects(void)
    }
 
    wallMesh.applyTransformationOnVertices(&matrix);
+   wallMesh.initVBOS();
 
    /// Scale wall2 mesh
    wallMesh2.bbox.GetMax(&max);
@@ -348,6 +349,7 @@ C_Map::load3DObjects(void)
    }
 
    wallMesh2.applyTransformationOnVertices(&matrix);
+   wallMesh2.initVBOS();
 
    /// Scale floor mesh
    floorMesh.bbox.GetMax(&max);
@@ -361,6 +363,7 @@ C_Map::load3DObjects(void)
    /// Scale it to fit TILE_SIZE
    esScale(&matrix, scale, scale, scale);
    floorMesh.applyTransformationOnVertices(&matrix);
+   floorMesh.initVBOS();
 
    /// Scale floor2 mesh
    floorMesh2.bbox.GetMax(&max);
@@ -374,6 +377,7 @@ C_Map::load3DObjects(void)
    /// Scale it to fit TILE_SIZE
    esScale(&matrix, scale, scale, scale);
    floorMesh2.applyTransformationOnVertices(&matrix);
+   floorMesh2.initVBOS();
 
    /// Scale floor3 mesh
    floorMesh3.bbox.GetMax(&max);
@@ -387,6 +391,7 @@ C_Map::load3DObjects(void)
    /// Scale it to fit TILE_SIZE
    esScale(&matrix, scale, scale, scale);
    floorMesh3.applyTransformationOnVertices(&matrix);
+   floorMesh3.initVBOS();
 
    /// Scale floor4 mesh
    floorMesh4.bbox.GetMax(&max);
@@ -400,6 +405,7 @@ C_Map::load3DObjects(void)
    /// Scale it to fit TILE_SIZE
    esScale(&matrix, scale, scale, scale);
    floorMesh4.applyTransformationOnVertices(&matrix);
+   floorMesh4.initVBOS();
 
    /// Scale grating mesh
    grating.bbox.GetMax(&max);
@@ -413,6 +419,7 @@ C_Map::load3DObjects(void)
    /// Scale it to fit TILE_SIZE
    esScale(&matrix, scale, scale, scale);
    grating.applyTransformationOnVertices(&matrix);
+   grating.initVBOS();
 
 //   /// Scale corner_inner mesh
 //   corner_inner.bbox.GetMax(&max);
