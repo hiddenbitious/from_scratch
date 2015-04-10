@@ -600,52 +600,77 @@ C_MeshGroup::initVBOS(void)
    while(mesh) {
       if(mesh->nVertices) {
          glGenBuffers(1, &mesh->vbos[VERTICES_VBO]);
+
          if(!mesh->vbos[VERTICES_VBO]) {
             assert(0);
             return false;
          }
+
          glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[VERTICES_VBO]);
          glBufferData(GL_ARRAY_BUFFER, mesh->nVertices * sizeof(C_Vertex), mesh->vertices, GL_STATIC_DRAW);
+
+         delete[] mesh->vertices;
+         mesh->vertices = NULL;
       }
 
       if(mesh->normals) {
          glGenBuffers(1, &mesh->vbos[NORMALS_VBO]);
+
          if(!mesh->vbos[NORMALS_VBO]) {
             assert(0);
             return false;
          }
+
          glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[NORMALS_VBO]);
          glBufferData(GL_ARRAY_BUFFER, mesh->nVertices * sizeof(C_Vertex), mesh->normals, GL_STATIC_DRAW);
+
+         delete[] mesh->normals;
+         mesh->normals = NULL;
       }
 
       if(mesh->tangents) {
          glGenBuffers(1, &mesh->vbos[TANGENTS_VBO]);
+
          if(!mesh->vbos[TANGENTS_VBO]) {
             assert(0);
             return false;
          }
+
          glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[TANGENTS_VBO]);
          glBufferData(GL_ARRAY_BUFFER, mesh->nVertices * sizeof(C_Vertex), mesh->tangents, GL_STATIC_DRAW);
+
+         delete[] mesh->tangents;
+         mesh->tangents = NULL;
       }
 
       if(mesh->binormals) {
          glGenBuffers(1, &mesh->vbos[BINORMALS_VBO]);
+
          if(!mesh->vbos[BINORMALS_VBO]) {
             assert(0);
             return false;
          }
+
          glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[BINORMALS_VBO]);
          glBufferData(GL_ARRAY_BUFFER, mesh->nVertices * sizeof(C_Vertex), mesh->binormals, GL_STATIC_DRAW);
+
+         delete[] mesh->binormals;
+         mesh->binormals = NULL;
       }
 
       if(mesh->textCoords) {
          glGenBuffers(1, &mesh->vbos[TEXCOORDS_VBO]);
+
          if(!mesh->vbos[TEXCOORDS_VBO]) {
             assert(0);
             return false;
          }
+
          glBindBuffer(GL_ARRAY_BUFFER, mesh->vbos[TEXCOORDS_VBO]);
          glBufferData(GL_ARRAY_BUFFER, mesh->nVertices * sizeof(C_TexCoord), mesh->textCoords, GL_STATIC_DRAW);
+
+         delete[] mesh->textCoords;
+         mesh->textCoords = NULL;
       }
 
       mesh = mesh->next;
