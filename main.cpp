@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <sys/sysinfo.h>
 
+
+
 #ifndef JNI_COMPATIBLE
 #	include <GL/glew.h>
 #	include <GL/glut.h>
