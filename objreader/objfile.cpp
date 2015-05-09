@@ -541,13 +541,13 @@ void glmReadOBJ(const char* filename, C_MeshGroup *meshgroup)
  */
 void glmFirstPass(GLMmodel* model, FILE* file)
 {
-	unsigned int    numvertices;		/* number of vertices in model */
-	unsigned int    numnormals;			/* number of normals in model */
-	unsigned int    numtexcoords;		/* number of texcoords in model */
-	unsigned int    numtriangles;		/* number of triangles in model */
-	GLMgroup* group;			/* current group */
-	unsigned  v, n, t;
-	char      buf[128];
+	unsigned int   numvertices;	/* number of vertices in model */
+	unsigned int   numnormals;		/* number of normals in model */
+	unsigned int   numtexcoords;	/* number of texcoords in model */
+	unsigned int   numtriangles;	/* number of triangles in model */
+	GLMgroup       *group;			/* current group */
+	int            v, n, t;
+	char           buf[128];
 
 	/* make a default group */
 	group = glmAddGroup(model, "default");
@@ -688,23 +688,23 @@ void glmFirstPass(GLMmodel* model, FILE* file)
  */
 void glmSecondPass(GLMmodel* model, FILE* file)
 {
-	unsigned int    numvertices;		/* number of vertices in model */
-	unsigned int    numnormals;			/* number of normals in model */
-	unsigned int    numtexcoords;		/* number of texcoords in model */
-	unsigned int    numtriangles;		/* number of triangles in model */
-	float*  vertices;			/* array of vertices  */
-	float*  normals;			/* array of normals */
-	float*  texcoords;			/* array of texture coordinates */
-	GLMgroup* group;			/* current group pointer */
-	unsigned int    material;			/* current material */
-	unsigned int    v, n, t;
-	char      buf[128];
+	unsigned int   numvertices;	/* number of vertices in model */
+	unsigned int   numnormals;		/* number of normals in model */
+	unsigned int   numtexcoords;	/* number of texcoords in model */
+	unsigned int   numtriangles;	/* number of triangles in model */
+	float          *vertices;		/* array of vertices  */
+	float          *normals;		/* array of normals */
+	float          *texcoords;		/* array of texture coordinates */
+	GLMgroup       *group;			/* current group pointer */
+	unsigned int   material;		/* current material */
+	int            v, n, t;
+	char           buf[128];
 
 	/* set the pointer shortcuts */
-	vertices     = model->vertices;
-	normals      = model->normals;
-	texcoords    = model->texcoords;
-	group        = model->groups;
+	vertices  = model->vertices;
+	normals   = model->normals;
+	texcoords = model->texcoords;
+	group     = model->groups;
 
 	/* on the second pass through the file, read all the data into the
 	   allocated arrays */

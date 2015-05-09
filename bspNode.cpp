@@ -298,7 +298,7 @@ C_BspNode::SelectPartitionfromList(C_Plane* finalPlane)
 //			printf("bestRelation: %f\n", bestRelation);
 
          if((relation > minRelation && nSplits < bestSplits) || (nSplits == bestSplits && relation > bestRelation) ||
-             (!minRelation && nSplits)) {
+             (FLOAT_EQ(minRelation, 0.0f) && nSplits)) {
             finalPlane->setPlane(&tempPlane);
             bestSplits = nSplits;
             bestRelation = relation;

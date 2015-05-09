@@ -315,24 +315,24 @@ C_Vector3 C_Vector3::CrossProduct2(const C_Vertex* v1 , const C_Vertex* v2 , con
 
 void C_Vector3::Normalize(void)
 {
-	float lenght = C_Vector3::Magnitude(x , y , z);
+	float length = C_Vector3::Magnitude(x , y , z);
 
-	if(lenght) {
-		x /= lenght;
-		y /= lenght;
-		z /= lenght;
+	if(!FLOAT_EQ(length, 0.0f)) {
+		x /= length;
+		y /= length;
+		z /= length;
 	}
 }
 
 
 void C_Vector3::Normalize(float* x , float* y , float* z)
 {
-	float lenght = C_Vector3::Magnitude(*x , *y , *z);
+	float length = C_Vector3::Magnitude(*x , *y , *z);
 
-	if(lenght) {
-		*x /= lenght;
-		*y /= lenght;
-		*z /= lenght;
+	if(!FLOAT_EQ(length, 0.0f)) {
+		*x /= length;
+		*y /= length;
+		*z /= length;
 	}
 }
 

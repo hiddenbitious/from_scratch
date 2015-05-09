@@ -105,13 +105,13 @@ typedef enum {
 	txGif		= 5,
 	txIco		= 6,
 	txEmf		= 7,
-	txWmf		= 8,
+	txWmf		= 8
 } eglTexType;
 
 typedef enum {
 	txNoFilter	= 0,
 	txBilinear	= 1,
-	txTrilinear	= 2,
+	txTrilinear	= 2
 } eglTexFilterType;
 
 typedef enum {

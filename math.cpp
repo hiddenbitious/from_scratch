@@ -20,7 +20,7 @@ math::Normalize(C_Vertex *vec)
 {
 	float lenght = math::Magnitude(vec->x, vec->y, vec->z);
 
-	if(lenght) {
+	if(!FLOAT_EQ(lenght, 0.0f)) {
 		vec->x /= lenght;
 		vec->y /= lenght;
 		vec->z /= lenght;
@@ -56,7 +56,7 @@ math::Normalize(float* x , float* y , float *z)
 {
    float length = math::Magnitude(*x , *y , *z);
 
-   if(length) {
+   if(!FLOAT_EQ(length, 0.0f)) {
       *x /= length;
       *y /= length;
       *z /= length;
@@ -252,8 +252,9 @@ esOrtho(ESMatrix *result, float left, float right, float bottom, float top, floa
    float       deltaZ = farZ - nearZ;
    ESMatrix    ortho;
 
-   if ( (deltaX == 0.0f) || (deltaY == 0.0f) || (deltaZ == 0.0f) )
+   if(FLOAT_EQ(deltaX, 0.0f) || FLOAT_EQ(deltaY, 0.0f) || FLOAT_EQ(deltaZ, 0.0f)) {
       return;
+   }
 
    esMatrixLoadIdentity(&ortho);
    ortho.m[0][0] = 2.0f / deltaX;

@@ -764,12 +764,12 @@ C_BspTree::closeLeafHoles(void)
       }
 
       /// Take into consideration that a leaf might be at the boundary of the tree
-      if(leaf1Min.x == treeMin.x) { cNode->adjacentNodes[X_MINUS].push_back(NULL); cNode->boundaryLeaf = true; }
-      if(leaf1Max.x == treeMax.x) { cNode->adjacentNodes[X_PLUS].push_back(NULL);  cNode->boundaryLeaf = true; }
-      if(leaf1Min.z == treeMin.z) { cNode->adjacentNodes[Z_MINUS].push_back(NULL); cNode->boundaryLeaf = true; }
-      if(leaf1Max.z == treeMax.z) { cNode->adjacentNodes[Z_PLUS].push_back(NULL);  cNode->boundaryLeaf = true; }
-      if(leaf1Min.y == treeMin.y) { cNode->adjacentNodes[Y_MINUS].push_back(NULL); cNode->boundaryLeaf = true; } else assert(0);
-      if(leaf1Max.y == treeMax.y) { cNode->adjacentNodes[Y_PLUS].push_back(NULL);  cNode->boundaryLeaf = true; } else assert(0);
+      if(FLOAT_EQ(leaf1Min.x, treeMin.x)) { cNode->adjacentNodes[X_MINUS].push_back(NULL); cNode->boundaryLeaf = true; }
+      if(FLOAT_EQ(leaf1Max.x, treeMax.x)) { cNode->adjacentNodes[X_PLUS].push_back(NULL);  cNode->boundaryLeaf = true; }
+      if(FLOAT_EQ(leaf1Min.z, treeMin.z)) { cNode->adjacentNodes[Z_MINUS].push_back(NULL); cNode->boundaryLeaf = true; }
+      if(FLOAT_EQ(leaf1Max.z, treeMax.z)) { cNode->adjacentNodes[Z_PLUS].push_back(NULL);  cNode->boundaryLeaf = true; }
+      if(FLOAT_EQ(leaf1Min.y, treeMin.y)) { cNode->adjacentNodes[Y_MINUS].push_back(NULL); cNode->boundaryLeaf = true; } else assert(0);
+      if(FLOAT_EQ(leaf1Max.y, treeMax.y)) { cNode->adjacentNodes[Y_PLUS].push_back(NULL);  cNode->boundaryLeaf = true; } else assert(0);
 
       for(unsigned int b2 = 0; b2 < leaves.size(); b2++) {
          if(b1 == b2)

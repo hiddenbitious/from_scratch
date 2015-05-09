@@ -32,6 +32,8 @@
 #include "battleMap/battleMap.h"
 #include "battleMap/battleTile.h"
 
+//AUDIO!!!
+#include <SFML/Audio.hpp>
 using namespace std;
 
 int mapPolys;
@@ -82,12 +84,34 @@ static int fps = 60;
 /// Metaballs
 static C_CubeGrid *grid;
 static C_Metaball metaball[3];
+//AUDIO!!!
+sf::SoundBuffer bufIntro;
+sf::SoundBuffer bufStep;
+sf::SoundBuffer bufRush;
+sf::SoundBuffer bufTurn;
+sf::Sound sndIntro;
+sf::Sound sndStep;
+sf::Sound sndRush;
+sf::Sound sndTurn;
 
 static void CountFPS (void);
 
 static void
 Initializations(void)
 {
+	//AUDIO!!!
+	bufIntro.loadFromFile("audio/intro.ogg");
+	bufStep.loadFromFile("audio/step.ogg");
+    bufRush.loadFromFile("audio/rush.ogg");
+    bufTurn.loadFromFile("audio/turn.ogg");
+    sndIntro.setBuffer(bufIntro);
+    sndStep.setBuffer(bufStep);
+    sndRush.setBuffer(bufRush);
+    sndTurn.setBuffer(bufTurn);
+
+    sndRush.setLoop(true);
+	sndRush.setVolume(40);
+	sndTurn.setVolume(25);
 	/// Find number of cores available
    MAX_THREADS = get_nprocs();
    printf("Detected %d cpu cores.\n", MAX_THREADS);
@@ -212,6 +236,8 @@ shutdown(void)
 static void
 Draw(void)
 {
+	//AUDIO!!!
+	if (sndRush.getStatus()==0) sndRush.play();
    static float angle = 0.0f;
    static float radius = 4.0f;
    C_Vertex offset;
@@ -282,15 +308,15 @@ mouse_look(int x , int y)
 {
 	static int oldX = 0;
 	static int oldY = 0;
-	float xx = 360 * (windowWidth - x) / windowWidth;
-	float yy = 360 * (windowHeight - y) / windowHeight;
+	float xx = 360.0f * (windowWidth - x) / windowWidth;
+	float yy = 360.0f * (windowHeight - y) / windowHeight;
 
-	if(oldY != yy) {
+	if(oldY != (int)yy) {
 		camera.Rotate(2 * (yy - oldY) , 0.0);
 		oldY = yy;
 	}
 
-	if(oldX != xx) {
+	if(oldX != (int)xx) {
 		camera.Rotate(0.0 , 2 * (xx - oldX));
 		oldX = xx;
 	}
@@ -344,21 +370,29 @@ handle_arrows(int key , int x , int y)
    case GLUT_KEY_UP:
 //         camera.Move(speed);
       party.move(MOVE_FORWARD);
+      //AUDIO!!!
+      if (sndStep.getStatus()==0) sndStep.play();
       break;
 
    case GLUT_KEY_DOWN:
 //         camera.Move(-speed);
       party.move(MOVE_BACKWARDS);
+      //AUDIO!!!
+      if (sndStep.getStatus()==0) sndStep.play();
       break;
 
    case GLUT_KEY_RIGHT:
 //         camera.StrafeRight(speed);
 			party.move(MOVE_TURN_RIGHT);
+			//AUDIO!!!
+      if (sndTurn.getStatus()==0) sndTurn.play();
       break;
 
    case GLUT_KEY_LEFT:
 //         camera.StrafeLeft(speed);
 			party.move(MOVE_TURN_LEFT);
+			//AUDIO!!!
+      if (sndTurn.getStatus()==0) sndTurn.play();
       break;
 	}
 

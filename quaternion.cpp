@@ -66,7 +66,7 @@ void C_Quaternion::Normalize(void)
 {
 	float magn = sqrt(this->x * this->x + this->y * this->y + this->z * this->z + this->a * this->a);
 
-	if(magn) {
+	if(!FLOAT_EQ(magn, 0.0f)) {
 		this->x /= magn;
 		this->y /= magn;
 		this->z /= magn;
@@ -141,7 +141,7 @@ void C_Quaternion::QuaternionToAxisAngle(float& _x , float& _y , float& _z , flo
 //	float tmp = sqrt ( 1.0f - (float) sin ( this->a / 2.0f ) );
 	float tmp = sqrt(x * x + y * y + z * z);
 
-	if(tmp) {
+	if(!FLOAT_EQ(tmp, 0.0f)) {
 		_x = this->x / tmp;
 		_y = this->y / tmp;
 		_z = this->z / tmp;
@@ -400,7 +400,7 @@ void C_Quaternion::CopyQuaternion(C_Quaternion* quat) const
 
 bool C_Quaternion::HoldsRotation(void)
 {
-	if(!this->x && !this->y && !this->z) {
+	if(FLOAT_EQ(x, 0.0f) && FLOAT_EQ(y, 0.0f) && FLOAT_EQ(z, 0.0f)) {
 		return false;
 	}
 
