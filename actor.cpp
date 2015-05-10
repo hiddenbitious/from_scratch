@@ -1,5 +1,6 @@
 #include "actor.h"
 #include "input.h"
+#include "sound.h"
 
 C_Actor::C_Actor(void)
 {
@@ -252,6 +253,8 @@ C_Party::update(int fps)
       switch(movement) {
       case MOVE_TURN_LEFT:
       case MOVE_TURN_RIGHT:
+         soundManager->PlaySound(SOUND_TURN);
+
          yAngle_old = yAngle;
          C_Actor::update(fps);
          camera.Rotate(0.0f, yAngle - yAngle_old);
@@ -261,6 +264,8 @@ C_Party::update(int fps)
       case MOVE_BACKWARDS:
       case MOVE_STRAFE_LEFT:
       case MOVE_STRAFE_RIGHT:
+         soundManager->PlaySound(SOUND_STEP);
+
          cartesianCoordinates_old = cartesianCoordinates;
          C_Actor::update(fps);
          if(movingDirection == TILE_X_PLUS || movingDirection == TILE_X_MINUS)

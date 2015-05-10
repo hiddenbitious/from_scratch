@@ -28,12 +28,11 @@
 #include "glsl/glsl.h"
 #include "metaballs/cubeGrid.h"
 #include "metaballs/metaball.h"
+#include "sound.h"
 
 #include "battleMap/battleMap.h"
 #include "battleMap/battleTile.h"
 
-//AUDIO!!!
-#include <SFML/Audio.hpp>
 using namespace std;
 
 int mapPolys;
@@ -45,7 +44,8 @@ C_MeshGroup cube;
 ESMatrix globalViewMatrix, globalProjectionMatrix, globalMVPMatrix;
 
 C_GLShaderManager *shaderManager = NULL;
-C_TextureManager *textureManager = NULL;
+C_TextureManager  *textureManager = NULL;
+C_SoundManager    *soundManager = NULL;
 
 char MAX_THREADS = 0;
 
@@ -99,20 +99,7 @@ static void CountFPS (void);
 static void
 Initializations(void)
 {
-	//AUDIO!!!
-	bufIntro.loadFromFile("audio/intro.ogg");
-	bufStep.loadFromFile("audio/step.ogg");
-    bufRush.loadFromFile("audio/rush.ogg");
-    bufTurn.loadFromFile("audio/turn.ogg");
-    sndIntro.setBuffer(bufIntro);
-    sndStep.setBuffer(bufStep);
-    sndRush.setBuffer(bufRush);
-    sndTurn.setBuffer(bufTurn);
-
-    sndRush.setLoop(true);
-	sndRush.setVolume(40);
-	sndTurn.setVolume(25);
-	/// Find number of cores available
+	/// Find number of available cores
    MAX_THREADS = get_nprocs();
    printf("Detected %d cpu cores.\n", MAX_THREADS);
 
@@ -194,6 +181,9 @@ Initializations(void)
    /// Texture manager
    textureManager = C_TextureManager::getSingleton();
 
+   /// Sound manager
+   soundManager = C_SoundManager::GetSingleton();
+
    map.createMap("map");
 
    int tileStartx, tileStarty;
@@ -236,8 +226,8 @@ shutdown(void)
 static void
 Draw(void)
 {
-	//AUDIO!!!
-	if (sndRush.getStatus()==0) sndRush.play();
+   soundManager->PlaySound(SOUND_RUSH);
+
    static float angle = 0.0f;
    static float radius = 4.0f;
    C_Vertex offset;
@@ -370,29 +360,21 @@ handle_arrows(int key , int x , int y)
    case GLUT_KEY_UP:
 //         camera.Move(speed);
       party.move(MOVE_FORWARD);
-      //AUDIO!!!
-      if (sndStep.getStatus()==0) sndStep.play();
       break;
 
    case GLUT_KEY_DOWN:
 //         camera.Move(-speed);
       party.move(MOVE_BACKWARDS);
-      //AUDIO!!!
-      if (sndStep.getStatus()==0) sndStep.play();
       break;
 
    case GLUT_KEY_RIGHT:
 //         camera.StrafeRight(speed);
-			party.move(MOVE_TURN_RIGHT);
-			//AUDIO!!!
-      if (sndTurn.getStatus()==0) sndTurn.play();
+		party.move(MOVE_TURN_RIGHT);
       break;
 
    case GLUT_KEY_LEFT:
 //         camera.StrafeLeft(speed);
-			party.move(MOVE_TURN_LEFT);
-			//AUDIO!!!
-      if (sndTurn.getStatus()==0) sndTurn.play();
+		party.move(MOVE_TURN_LEFT);
       break;
 	}
 
