@@ -3,7 +3,7 @@
 
 #include <SFML/Audio.hpp>
 
-#define SOUNDS  4
+#define SOUNDS          4
 
 #define SOUND_INTRO     0
 #define SOUND_STEP      1
@@ -18,7 +18,7 @@ private:
 
    C_SoundManager();
 
-   static C_SoundManager *sinlgeton;
+   static C_SoundManager *singleton;
 
 public:
    static C_SoundManager *GetSingleton(void);

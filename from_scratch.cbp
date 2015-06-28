@@ -130,6 +130,8 @@
 		<Unit filename="shaders/simple_texture.vert" />
 		<Unit filename="shaders/wire_shader.frag" />
 		<Unit filename="shaders/wire_shader.vert" />
+		<Unit filename="sound.cpp" />
+		<Unit filename="sound.h" />
 		<Unit filename="tgaLoader/texture.h" />
 		<Unit filename="tgaLoader/tga.h" />
 		<Unit filename="tgaLoader/tgaLoader.cpp" />

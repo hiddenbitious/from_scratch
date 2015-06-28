@@ -1,10 +1,12 @@
 from_scratch
 ============
 
-Creates a bsp tree for a given Geometry. Uses OpenGL for rendering.
+This is a wannabe tile based dungeon crawler rpg game. For now it is a bare minimum 3d engine which creates a bsp tree for a given Geometry.
+It uses the binary space partitioning information to create a Possible Visibility Set (PVS) from each tree leaf, in order to eliminate
+rendering of non visible geometry at run time. Uses OpenGL for rendering.
 
-The purpose of this project is to create a renderging engine for old school tactical rpg games which used a first person perspective while moving and an isometric view during combats.
+level_editor project is a very simple level editor that can be used to create 2d maps. 3D geometry is generated from the 2D map which then is fed into the engine to generate the bsp tree.
 
-level_editor project is a level editor to create such maps, which then are inserted into the engine to create the bsp tree.
+Most recent branch is mapReader (need level_editor to compile in folder ../level_editor).
 
-Most recent branch is mapReader (need level_editor to compile).
+**Requirements**: g++ compiler, libglew-dev, freeglut3-dev

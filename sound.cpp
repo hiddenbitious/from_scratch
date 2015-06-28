@@ -5,7 +5,7 @@ static const char *soundFiles[SOUNDS] = {"audio/intro.ogg",
                                          "audio/rush.ogg",
                                          "audio/turn.ogg"};
 
-C_SoundManager *C_SoundManager::sinlgeton = NULL;
+C_SoundManager *C_SoundManager::singleton = NULL;
 
 C_SoundManager::C_SoundManager()
 {
@@ -22,11 +22,11 @@ C_SoundManager::C_SoundManager()
 C_SoundManager *
 C_SoundManager::GetSingleton(void)
 {
-   if(!sinlgeton) {
+   if(!singleton) {
       return new C_SoundManager();
    }
 
-   return sinlgeton;
+   return singleton;
 }
 
 void
