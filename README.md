@@ -10,3 +10,5 @@ level_editor project is a very simple level editor that can be used to create 2d
 Most recent branch is mapReader (need level_editor to compile in folder ../level_editor).
 
 **Requirements**: g++ compiler, libglew-dev, freeglut3-dev
+
+**Video**: https://www.dropbox.com/s/5smhk7dos6kqwnn/from_scratch.mp4?dl=0
