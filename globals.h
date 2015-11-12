@@ -182,5 +182,7 @@ extern    C_MeshGroup grating;
 extern    C_MeshGroup corner_inner;
 extern    C_MeshGroup corner_outer;
 
+extern char g_glMajorVersion;
+extern char g_glMinorVersion;
 
 #endif // _GLOBALS_H_

@@ -29,6 +29,7 @@
 #include "metaballs/cubeGrid.h"
 #include "metaballs/metaball.h"
 #include "sound.h"
+#include "textRenderer/textRenderer.h"
 
 #include "battleMap/battleMap.h"
 #include "battleMap/battleTile.h"
@@ -69,6 +70,7 @@ static int windowWidth = 800;
 static int windowHeight = 600;
 static int windowPositionX = 200;
 static int windowPositionY = 200;
+static int fontSize = 48;
 
 /// movement vars
 static float speed = 7.0f;
@@ -213,6 +215,8 @@ Initializations(void)
 
 	/// timer initialization
 	timer.Initialize ();
+
+	textRenderInit("FreeSans.ttf", fontSize);
 }
 
 static void
@@ -388,6 +392,9 @@ CountFPS (void)
 	static ULONG count = 0.0f;
 	float delta = timer.GetTime () - start;
 	count++;
+
+    float color[] = {1.0, 1.0, 1.0, 1.0};
+    textRenderDrawText("fps " + std::to_string(fps), -1.0f, 1.0f - (24.0f) / windowHeight, 1.0f / (16.0f * fontSize), 1.0f / (16.0f * fontSize), color);
 
 	if(delta >= 1000.0f) {
 		fps = count;

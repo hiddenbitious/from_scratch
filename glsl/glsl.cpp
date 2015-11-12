@@ -8,6 +8,10 @@ bool extensions_init = false;
 bool glslAvailable = false;
 bool C_GLShaderManager::instanceFlag = false;
 C_GLShaderManager *C_GLShaderManager::classInstance = NULL;
+
+char g_glMajorVersion;
+char g_glMinorVersion;
+
 //vector<C_GLShader *> C_GLShaderManager::shaderList;
 
 C_GLShaderObject::C_GLShaderObject(void)
@@ -1018,30 +1022,38 @@ bool CheckGLSL(void)
 	cout << "\n\n";
 
 	if(GLEW_VERSION_4_1) {
-		cout << "OpenGL 4.1 is available!" << endl;
-	}else if(GLEW_VERSION_4_0) {
-		cout << "OpenGL 4.0 is available!" << endl;
-	} else if(GLEW_VERSION_3_3) {
-		cout << "OpenGL 3.3 is available!" << endl;
-	} else if(GLEW_VERSION_3_2) {
-		cout << "OpenGL 3.2 is available!" << endl;
-	} else if(GLEW_VERSION_3_1) {
-		cout << "OpenGL 3.1 is available!" << endl;
-	} else if(GLEW_VERSION_3_0) {
-		cout << "OpenGL 3.0 is available!" << endl;
-	} else if(GLEW_VERSION_2_1) {
-		cout << "OpenGL 2.1 is available!" << endl;
-	} else if(GLEW_VERSION_2_0) {
-		cout << "OpenGL 2.0 is available!" << endl;
-	} else if(GLEW_VERSION_1_5) {
-		cout << "OpenGL 1.5 core functions are available" << endl;
-	} else if(GLEW_VERSION_1_4) {
-		cout << "OpenGL 1.4 core functions are available" << endl;
-	} else if(GLEW_VERSION_1_3) {
-		cout << "OpenGL 1.3 core functions are available" << endl;
-	} else if(GLEW_VERSION_1_2) {
-		cout << "OpenGL 1.2 core functions are available" << endl;
-	}
+        std::cout << "OpenGL 4.1 is available!" << std::endl;
+        g_glMajorVersion = 4;
+        g_glMinorVersion = 1;
+    } else if(GLEW_VERSION_4_0) {
+        std::cout << "OpenGL 4.0 is available!" << std::endl;
+        g_glMajorVersion = 4;
+        g_glMinorVersion = 0;
+    } else if(GLEW_VERSION_3_3) {
+        std::cout << "OpenGL 3.3 is available!" << std::endl;
+        g_glMajorVersion = 3;
+        g_glMinorVersion = 3;
+    } else if(GLEW_VERSION_3_2) {
+        std::cout << "OpenGL 3.2 is available!" << std::endl;
+        g_glMajorVersion = 3;
+        g_glMinorVersion = 2;
+    } else if(GLEW_VERSION_3_1) {
+        std::cout << "OpenGL 3.1 is available!" << std::endl;
+        g_glMajorVersion = 3;
+        g_glMinorVersion = 1;
+    } else if(GLEW_VERSION_3_0) {
+        std::cout << "OpenGL 3.0 is available!" << std::endl;
+        g_glMajorVersion = 3;
+        g_glMinorVersion = 0;
+    } else if(GLEW_VERSION_2_1) {
+        std::cout << "OpenGL 2.1 is available!" << std::endl;
+        g_glMajorVersion = 2;
+        g_glMinorVersion = 1;
+    } else if(GLEW_VERSION_2_0) {
+        std::cout << "OpenGL 2.0 is available!" << std::endl;
+        g_glMajorVersion = 2;
+        g_glMinorVersion = 0;
+    }
 
 	if(GL_TRUE != glewGetExtension("GL_ARB_fragment_shader")) {
 		cout << "GL_ARB_fragment_shader extension is not available!";
