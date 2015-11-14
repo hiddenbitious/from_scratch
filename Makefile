@@ -4,15 +4,15 @@ CC            = gcc
 GL_PATH       = /usr/lib/x86_64-linux-gnu/mesa/
 GLEW_PATH     = /usr/lib/x86_64-linux-gnu/
 
-INCLUDES      = -ISFML-2.2/include/
+INCLUDES      = -ISFML-2.2/include/ -I/usr/include/freetype2
 PROGRAM       = from_scratch
 REDUCE_ERRORS = -Wno-unused-parameter -Wno-unused-function \
 					 -Wno-variadic-macros -Wno-long-long -Wno-error=vla -Wno-vla -Wno-error=unused-result
 PEDANTIC      = -Wfloat-equal -Wall -pedantic -Wextra -Werror -Winline -Wno-unused-result
-CXXFLAGS      = -c -MMD -MP $(REDUCE_ERRORS) $(PEDANTIC)
+CXXFLAGS      = -c -MMD -MP $(REDUCE_ERRORS) $(PEDANTIC) -std=c++11
 CFLAGS        = $(CXXFLAGS) -std=c99
 LDFLAGS       = -L$(GLEW_PATH) -L$(GL_PATH) -LSFML-2.2/lib/ -Wl,-rpath=SFML-2.2/lib/
-LIBS          = -lm -lGL -lglut -lGLU -lGLEW -lpthread -lsfml-audio
+LIBS          = -lm -lGL -lglut -lGLU -lGLEW -lpthread -lsfml-audio -lfreetype
 
 .PHONY: Release
 Release: CXXFLAGS += -O3
@@ -40,7 +40,7 @@ SOURCES = main.cpp bbox.cpp metaballs/cubeGrid.cpp quaternion.cpp \
 		    battleMap/battleMap.cpp battleMap/battleObject.cpp \
 		    battleMap/battleStaticObject.cpp battleMap/battleDynamicObject.cpp \
 		    battleMap/battleEnemy.cpp battleMap/battlePlayer.cpp battleMap/battleTile.cpp \
-		    sound.cpp
+		    sound.cpp textRenderer/textRenderer.cpp
 
 OBJECTS_CPP = $(SOURCES:.cpp=.o)
 OBJECTS = $(OBJECTS_CPP:.c=.o)
