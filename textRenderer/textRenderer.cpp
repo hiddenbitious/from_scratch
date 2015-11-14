@@ -274,9 +274,11 @@ textRenderDrawText(std::string text, float x, float y, float sx, float sy, float
 
     glBindVertexArray(fontVAO);
     glBindBuffer(GL_ARRAY_BUFFER, fontVBO);
-    glBindTexture(GL_TEXTURE_2D, fontTexID);
     glUseProgram(fontProgram);
-    glUniform1i(glGetUniformLocation(fontProgram, "font_tex"), GL_TEXTURE0);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, fontTexID);
+    glUniform1i(glGetUniformLocation(fontProgram, "font_tex"), 0);
     glUniform4fv(glGetUniformLocation(fontProgram, "font_color"), 1, textColor);
 
     /// holds the x,y,u,v info for each point
