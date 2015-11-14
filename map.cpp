@@ -86,7 +86,7 @@ C_Map::createMap(const string &filename)
    printf("Creating map...\n");
 
    /// Read the tile data
-   string mapFile = filename;
+   string mapFile = std::string("maps/") + filename;
    mapFile.append(".txt\0");
    ret = readMap(mapFile.c_str());
    if(!ret) {
@@ -97,12 +97,14 @@ C_Map::createMap(const string &filename)
    bspTree = new C_BspTree(6);
 
    /// Read bsp geometry and build the bsp tree
-   mapFile = filename;
+   mapFile = std::string("maps/") + filename;
    mapFile.append(".bsp\0");
 
    bspTree->ReadGeometryFile(mapFile.c_str());
    bspTree->BuildBspTree();
-   mapFile = filename;
+
+   /// Read pvs file
+   mapFile = std::string("maps/") + filename;
    mapFile.append(".pvs\0");
    bspTree->BuildPVS(mapFile.c_str());
 
