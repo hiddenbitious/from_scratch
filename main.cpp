@@ -66,8 +66,8 @@ C_BattleMap battleMap(&camera);
 
 /// window stuff
 static int winID;
-static int windowWidth = 800;
-static int windowHeight = 600;
+static int windowWidth = 1680;
+static int windowHeight = 1050;
 static int windowPositionX = 200;
 static int windowPositionY = 200;
 static int fontSize = 48;
@@ -84,9 +84,8 @@ static float timePerFrame = 0.017f;
 static int fps = 60.0f;
 #define FPS (1000.0f / timePerFrame)
 
-/// Metaballs
-static C_CubeGrid *grid;
-static C_Metaball metaball[3];
+bool USE_PVS = true;
+
 //AUDIO!!!
 sf::SoundBuffer bufIntro;
 sf::SoundBuffer bufStep;
@@ -116,7 +115,7 @@ Initializations(void)
     if(DRAW_BSP_GEOMETRY) {
         glClearColor(0.3671875f , 0.15234375f , 0.8359375f , 1.0f);
     } else {
-        glClearColor(0.0, 0.0, 0.0, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     }
 
     /// Backface culling
@@ -137,28 +136,6 @@ Initializations(void)
     camera.fov = 70.0f;
     camera.zFar = 1000.0f;
     camera.zNear = 1.0f;
-
-    /// metaballs initialization
-    grid = new C_CubeGrid();
-    grid->Constructor(0.0f , 0.0f , -80.0f);
-
-    metaball[0].Constructor();
-    metaball[0].position.x = 10.0f;
-    metaball[0].position.y = 10.0f;
-    metaball[0].position.z = 10.0f;
-    metaball[0].radius = 5.0f;
-
-    metaball[1].Constructor();
-    metaball[1].position.x = 10.0f;
-    metaball[1].position.y = 10.0f;
-    metaball[1].position.z = 10.0f;
-    metaball[1].radius = 8.0f;
-
-    metaball[2].Constructor();
-    metaball[2].position.x = 15.0f;
-    metaball[2].position.y = 15.0f;
-    metaball[2].position.z = 15.0f;
-    metaball[2].radius = 3.0f;
 
     /// Shaders
     shaderManager = C_GLShaderManager::getSingleton();
@@ -337,6 +314,11 @@ hande_simple_keys(unsigned char key , int x , int y)
             camera.MoveDown(speed);
             break;
 
+        case 'y':
+        case 'Y':
+            USE_PVS = !USE_PVS;
+            break;
+
         default:
             cout << int (key) << '\n';
             break;
@@ -392,7 +374,7 @@ CountFPS (void)
     count++;
 
     static float color[] = {1.0, 1.0, 1.0, 1.0};
-    textRenderDrawText("fps " + std::to_string(fps), -1.0f, 1.0f - (30.0f) / windowHeight, 1.0f / (16.0f * fontSize), 1.0f / (16.0f * fontSize), color);
+    textRenderDrawText("fps " + std::to_string(fps), -1.0f, .9f - (30.0f) / windowHeight, 1.0f / (16.0f * fontSize), 1.0f / (16.0f * fontSize), color);
 
     if(totalTime >= 1000.0f) {
         fps = count;

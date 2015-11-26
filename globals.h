@@ -5,7 +5,7 @@
 #define DRAW_TREE_MESHES               true
 #define ENABLE_MESH_FRUSTUM_CULLING    true
 #define ENABLE_BSP_FRUSTUM_CULLING     true
-#define USE_PVS                        true
+//#define USE_PVS                        true
 
 #define ENABLE_COLLISION_DETECTION     true
 #define USE_HIGH_QUALITY_SHADERS       true
@@ -184,5 +184,6 @@ extern    C_MeshGroup corner_outer;
 
 extern char g_glMajorVersion;
 extern char g_glMinorVersion;
+extern bool USE_PVS;
 
 #endif // _GLOBALS_H_
