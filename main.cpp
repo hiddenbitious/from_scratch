@@ -250,7 +250,7 @@ Draw(void)
 
     lightPosition = math::transformPoint(&globalViewMatrix, &cube.position);
 
-    angle += .03f;
+    angle += 1.1f / fps;
     if(angle >= 360.0f) angle = 0.0f;
 
     cube.draw(&camera);
