@@ -39,13 +39,16 @@ class C_Timer
       timeval mmTimeStart;       //Multimedia timer start value
 
    public:
-      C_Timer(void) {}           //CTor
-      void Initialize(void);     //Initializes timer
-      float GetTime(void);       //Returns since the timer initialization
+      C_Timer(void) {}
+      void Initialize(void);
 
-      void Update(void);         //Updates the delta variable
+      /// Returns since the timer initialization
+      float GetTime(void);
 
-      /// Returns the delta variable
+      /// Updates the delta variable
+      void Update(void);
+
+      /// Returns time elapsed between two calls of Update in milliseconds
       inline float GetDelta(void) { return delta; }
 };
 

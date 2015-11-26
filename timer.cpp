@@ -10,8 +10,8 @@ void C_Timer::Initialize(void)
 
 float C_Timer::GetTime(void)
 {
-	timeval currentTime;
-	float elapsedTime;
+	static timeval currentTime;
+	static float elapsedTime;
 
 	gettimeofday(&currentTime, NULL);
 

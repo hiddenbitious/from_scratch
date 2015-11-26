@@ -79,9 +79,10 @@ static C_Vector3 center(0.0f , 0.0f , 0.0f);
 
 /// Timer vars
 C_Timer timer;
-float start = timer.GetTime ();
-//static float timeElapsed = 0.0f;
-static int fps = 60;
+static float timerStart;
+static float timePerFrame = 0.017f;
+static int fps = 60.0f;
+#define FPS (1000.0f / timePerFrame)
 
 /// Metaballs
 static C_CubeGrid *grid;
@@ -214,7 +215,9 @@ Initializations(void)
     }
 
     /// timer initialization
-    timer.Initialize ();
+    timer.Initialize();
+    timer.Update();
+    timerStart = timer.GetTime();
 
     textRenderInit("fonts/FreeSans.ttf", fontSize);
 }
@@ -250,35 +253,26 @@ Draw(void)
 
     lightPosition = math::transformPoint(&globalViewMatrix, &cube.position);
 
-    angle += 1.1f / fps;
+    angle += 1.1f / FPS;
     if(angle >= 360.0f) angle = 0.0f;
 
     cube.draw(&camera);
     map.draw(&camera);
 
-    party.update(fps);
+    party.update(FPS);
 
-    mob.update(fps);
+    mob.update(FPS);
     mob.Draw(&camera);
 
-#ifndef JNI_COMPATIBLE
-    /// Print text on screem
-//	int line = 1;
-//	int lineHeight = 18;
-//	camera.PrintText(0 , lineHeight * line++ ,
-//					 1.0f , 1.0f , 0.0f , 0.6f ,
-//					 "FPS: %d" , (int)fps);
-
     /// Update timer
-//	timer.Update ();
-//	timeElapsed = timer.GetDelta () / 1000.0f;
-//	printf("tileElapsed: %f\n", timeElapsed);
-//	printf("fps: %f\n", fps);
+	timer.Update();
+	timePerFrame = timer.GetDelta();
+//	printf("tileElapsed: %f ms\n", timePerFrame);
+//	printf("estimated fps %f \n:", (1000.0f / timePerFrame));
 
     CountFPS ();
 
     glutSwapBuffers();
-#endif
 }
 
 
@@ -300,20 +294,20 @@ idle(void)
 static void
 mouse_look(int x , int y)
 {
-//    static int oldX = 0;
-//    static int oldY = 0;
-//    float xx = 360.0f * (windowWidth - x) / windowWidth;
-//    float yy = 360.0f * (windowHeight - y) / windowHeight;
-//
-//    if(oldY != (int)yy) {
-//        camera.Rotate(2 * (yy - oldY) , 0.0);
-//        oldY = yy;
-//    }
-//
-//    if(oldX != (int)xx) {
-//        camera.Rotate(0.0 , 2 * (xx - oldX));
-//        oldX = xx;
-//    }
+    static int oldX = 0;
+    static int oldY = 0;
+    float xx = 360.0f * (windowWidth - x) / windowWidth;
+    float yy = 360.0f * (windowHeight - y) / windowHeight;
+
+    if(oldY != (int)yy) {
+        camera.Rotate(2 * (yy - oldY) , 0.0);
+        oldY = yy;
+    }
+
+    if(oldX != (int)xx) {
+        camera.Rotate(0.0 , 2 * (xx - oldX));
+        oldX = xx;
+    }
 
     glutPostRedisplay();
 }
@@ -392,20 +386,19 @@ handle_arrows(int key , int x , int y)
 void
 CountFPS (void)
 {
-    static ULONG count = 0.0f;
-    float delta = timer.GetTime () - start;
+    static uint32_t count = 0.0f;
+    static float totalTime = 0.0f;
+    totalTime += timePerFrame;
     count++;
 
-    float color[] = {1.0, 1.0, 1.0, 1.0};
-    textRenderDrawText("fps " + std::to_string(fps), -1.0f, 1.0f - (24.0f) / windowHeight, 1.0f / (16.0f * fontSize), 1.0f / (16.0f * fontSize), color);
+    static float color[] = {1.0, 1.0, 1.0, 1.0};
+    textRenderDrawText("fps " + std::to_string(fps), -1.0f, 1.0f - (30.0f) / windowHeight, 1.0f / (16.0f * fontSize), 1.0f / (16.0f * fontSize), color);
 
-    if(delta >= 1000.0f) {
+    if(totalTime >= 1000.0f) {
         fps = count;
-        start = timer.GetTime ();
-
-        printf("fps: %d\n", fps);
-
+//        printf("fps: %d\n", fps);
         count = 0;
+        totalTime = 0.0f;
     }
 }
 
@@ -428,7 +421,7 @@ main(int argc, char* argv[])
     glutDisplayFunc(Draw);
     glutIdleFunc(idle);
 
-    glutPassiveMotionFunc(mouse_look);
+//    glutPassiveMotionFunc(mouse_look);
 
     glutKeyboardUpFunc(release_simple_keys);
     glutKeyboardFunc(hande_simple_keys);
