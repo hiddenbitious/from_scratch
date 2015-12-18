@@ -15,15 +15,15 @@ level_editor project (https://github.com/hiddenbitious/level_editor) is a very s
 All assets can be found here: www.dropbox.com/s/dqw8nprqa8q91ml/assets.tar.gz
 This includes sounds, font, models and textures. Must be unpacked inside from_scratch root folder.
 
-**Building**:\
-git clone https://github.com/hiddenbitious/from_scratch.git \
-cd from_scratch\
-wget www.dropbox.com/s/dqw8nprqa8q91ml/assets.tar.gz\
-tar -xzf assets.tar.gz\
-make -j\`nproc\`
-
-**Requirements**:\
-g++ compiler, libglew-dev, freeglut3-dev, libsfml-audio2, libsfml-dev, libfreetype6-dev
-
-**Video**:\
+**Building**:  
+git clone https://github.com/hiddenbitious/from_scratch.git  
+cd from_scratch  
+wget www.dropbox.com/s/dqw8nprqa8q91ml/assets.tar.gz   
+tar -xzf assets.tar.gz   
+make -j\`nproc\`   
+   
+**Requirements**:   
+g++ compiler, libglew-dev, freeglut3-dev, libsfml-audio2, libsfml-dev, libfreetype6-dev   
+   
+**Video**:   
 www.dropbox.com/s/5smhk7dos6kqwnn/from_scratch.mp4
