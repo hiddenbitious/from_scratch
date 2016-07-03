@@ -19,7 +19,7 @@ This includes sounds, font, models and textures. Must be unpacked inside from_sc
 ```
 git clone https://github.com/hiddenbitious/from_scratch.git  
 cd from_scratch  
-wget www.dropbox.com/s/dqw8nprqa8q91ml/assets.tar.gz   
+wget https://dl.dropboxusercontent.com/u/93790707/assets.tar.gz   
 tar -xzf assets.tar.gz   
 make -j\`nproc\`   
 ```
