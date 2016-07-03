@@ -12,7 +12,7 @@ After generating the PVS a file name map.pvs (ASCII) will be created in the same
 [level_editor](https://github.com/hiddenbitious/level_editor) is a very simple level editor that can be used to create 2d maps.
 3D geometry is generated from the 2D map which then is fed into the engine to generate the bsp tree.
 
-All assets can be found [here](www.dropbox.com/s/dqw8nprqa8q91ml/assets.tar.gz)
+All assets can be found [here](https://dl.dropboxusercontent.com/u/93790707/assets.tar.gz)
 This includes sounds, font, models and textures. Must be unpacked inside from_scratch root folder.
 
 **Building**:  
