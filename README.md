@@ -28,4 +28,4 @@ make -j\`nproc\`
 g++ compiler, libglew-dev, freeglut3-dev, libsfml-audio2, libsfml-dev, libfreetype6-dev   
    
 **Video**:   
-[video](www.dropbox.com/s/5smhk7dos6kqwnn/from_scratch.mp4)
+[video](https://youtu.be/UoC_8QD-iMk)
